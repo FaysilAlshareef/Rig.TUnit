@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Rig.TUnit.SqlServer.Extensions;
+using Rig.TUnit.Core.Builder;
+using Rig.TUnit.SqlServer.Builder;
 using Rig.TUnit.SqlServer.Fixtures;
 using Rig.TUnit.SqlServer.Helpers;
 using Rig.TUnit.SqlServer.Tests.Integration.TestInfrastructure;
@@ -9,14 +10,22 @@ namespace Rig.TUnit.SqlServer.Tests.Integration.Helpers;
 
 public class DbContextHelperTests
 {
+    private static IServiceProvider BuildProviderFor(SqlServerFixture fixture)
+    {
+        var services = new ServiceCollection();
+        services.AddRigTUnit(rig =>
+        {
+            rig.UseSqlServer(fixture, sql => sql.ReplaceDbContext<TestDbContext>());
+        });
+        return services.BuildServiceProvider();
+    }
+
     [Test]
     [ClassDataSource<SqlServerFixture>(Shared = SharedType.PerTestSession)]
     public async Task InsertAsync_ThenQuery_ReturnsEntity(SqlServerFixture fixture)
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.UseSqlServerContainerIsolated<TestDbContext>(fixture);
-        var provider = services.BuildServiceProvider();
+        var provider = BuildProviderFor(fixture);
         var helper = new DbContextHelper<TestDbContext>(provider);
 
         // Act
@@ -34,9 +43,7 @@ public class DbContextHelperTests
     public async Task InsertAsync_ClearsChangeTracker(SqlServerFixture fixture)
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.UseSqlServerContainerIsolated<TestDbContext>(fixture);
-        var provider = services.BuildServiceProvider();
+        var provider = BuildProviderFor(fixture);
         var helper = new DbContextHelper<TestDbContext>(provider);
 
         // Act
@@ -53,9 +60,7 @@ public class DbContextHelperTests
     public async Task Query_ExecutesInFreshScope(SqlServerFixture fixture)
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.UseSqlServerContainerIsolated<TestDbContext>(fixture);
-        var provider = services.BuildServiceProvider();
+        var provider = BuildProviderFor(fixture);
         var helper = new DbContextHelper<TestDbContext>(provider);
 
         await helper.InsertAsync(TestEntity.Create("scope-test"));
@@ -75,9 +80,7 @@ public class DbContextHelperTests
     public async Task InsertAsync_ThenQuery_UseSeparateScopes(SqlServerFixture fixture)
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.UseSqlServerContainerIsolated<TestDbContext>(fixture);
-        var provider = services.BuildServiceProvider();
+        var provider = BuildProviderFor(fixture);
         var helper = new DbContextHelper<TestDbContext>(provider);
 
         // Act — insert creates its own scope, query creates another

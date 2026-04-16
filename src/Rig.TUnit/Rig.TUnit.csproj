@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
     <ProjectReference Include="..\Rig.TUnit.SqlServer\Rig.TUnit.SqlServer.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Redis\Rig.TUnit.Redis.csproj" />
     <ProjectReference Include="..\Rig.TUnit.ServiceBus\Rig.TUnit.ServiceBus.csproj" />

@@ -10,8 +10,13 @@ public static class InMemoryDbExtensions
         this IServiceCollection services) where TContext : DbContext
     {
         services.RemoveByName(typeof(TContext).Name);
+
+        // Capture a stable database name so every scope in this container points at the same
+        // in-memory store. Without this the options delegate would regenerate the Guid per scope.
+        var databaseName = $"test_{Guid.NewGuid():N}";
+
         services.AddDbContext<TContext>(options =>
-            options.UseInMemoryDatabase($"test_{Guid.NewGuid():N}"));
+            options.UseInMemoryDatabase(databaseName));
         return services;
     }
 }

@@ -54,6 +54,19 @@ As a developer testing REST/HTTP APIs without gRPC, I need `HttpClientHelper<TPr
 4. **Given** an `HttpClientHelper<TProgram>`, **When** I call `DeleteAsync("/api/orders/1")`, **Then** it sends a DELETE request.
 5. **Given** a `WebApplicationFactory<TProgram>`, **When** I call `.WithTestServices(configureServices, configuration)`, **Then** the factory is configured with test services and optional in-memory configuration.
 6. **Given** an `HttpClientHelper<TProgram>`, **When** `DisposeAsync()` is called, **Then** the internal `HttpClient` is disposed.
+7. **Given** an `HttpClientHelper<TProgram>`, **When** I call `.WithBearerToken("jwt")`, **Then** the default `Authorization` header is set to `Bearer jwt` and the helper is returned for chaining. Passing `null` clears the header.
+8. **Given** an `HttpClientHelper<TProgram>`, **When** I call `.WithHeader("X-Trace", "value")`, **Then** the header is set (overwriting any prior value) and the helper is returned for chaining. Null or empty header name throws `ArgumentException`.
+
+### User Story 4b - Test Authentication & Authorization (Priority: P1)
+As a developer testing endpoints that require authentication/authorization, I need a `TestAuthenticationHandler` (with `TestAuthenticationOptions`) and `WithTestAuthentication` / `WithPermissiveAuthorization` extensions on `WebApplicationFactory<TProgram>` so that I can exercise protected endpoints without running a real identity provider.
+
+**Acceptance Scenarios**:
+1. **Given** a `WebApplicationFactory<TProgram>`, **When** I call `.WithTestAuthentication()`, **Then** a `"Test"` authentication scheme is registered and made the default authenticate/challenge scheme.
+2. **Given** `WithTestAuthentication(options => options.Claims.Add(...))`, **When** a request is sent, **Then** the test handler produces a `ClaimsPrincipal` populated with the configured claims.
+3. **Given** `WithTestAuthentication()` with no configured claims, **When** a request is sent, **Then** the principal has a single `ClaimTypes.Name` claim equal to `TestAuthenticationOptions.DefaultUserName` (`"test-user"`).
+4. **Given** a factory chained with `.WithTestAuthentication().WithPermissiveAuthorization()`, **When** an `[Authorize]`-protected endpoint is called, **Then** it returns 200.
+5. **Given** a null `WebApplicationFactory<TProgram>`, **When** `WithTestAuthentication` or `WithPermissiveAuthorization` is called, **Then** `ArgumentNullException` is thrown.
+6. **Given** `WithPermissiveAuthorization`, **When** applied, **Then** only `DefaultPolicy` and `FallbackPolicy` are replaced — named policies (`[Authorize(Policy="...")]`) and role requirements (`[Authorize(Roles="...")]`) are NOT bypassed.
 
 ### User Story 5 - Core Utilities (Priority: P1)
 As a test infrastructure author, I need `WaitHelper`, `TestConfigurationBuilder`, `RigFixtureBase`, and `CompositeFixture` so that I can build test setups with reusable polling, configuration, and fixture composition.
@@ -182,6 +195,12 @@ As a library maintainer, I need the solution file, meta-package, and all project
 - **FR-036**: `ForceContainersInCi()` is a **metadata flag** on the builder — it does NOT override `AutoConnectionSource` behavior. Consumers can read `RigBuilder.IsForceContainersInCi` within the configure delegate to make their own decisions. `AutoConnectionSource` independently uses `EnvironmentDetection.IsRunningInCiCd()`.
 - **FR-037**: `Grpc/Extensions/WebApplicationFactoryExtensions.cs` and its test MUST be intentionally retained alongside the new `WebAPI/Extensions/WebApiFactoryExtensions.cs` — they serve different purposes (`WithTestConfiguration` for gRPC vs `WithTestServices` for HTTP)
 - **FR-038**: Naming convention note: `WebApiFactoryExtensions` (abbreviated) in WebAPI package vs `WebApplicationFactoryExtensions` (full name) in Grpc package — this inconsistency is accepted as the two classes serve different packages with different naming conventions
+- **FR-039**: `Rig.TUnit.WebAPI` MUST ship a `TestAuthenticationHandler` (`public sealed`, scheme name `"Test"`) derived from `AuthenticationHandler<TestAuthenticationOptions>` that authenticates every request unconditionally using the configured claims, or a single `ClaimTypes.Name` claim matching `TestAuthenticationOptions.DefaultUserName` when `Claims` is empty
+- **FR-040**: `TestAuthenticationOptions` MUST expose `DefaultUserName` (default `"test-user"`) and a mutable `IList<Claim> Claims` initialized empty
+- **FR-041**: `WebApplicationFactory<TProgram>.WithTestAuthentication(Action<TestAuthenticationOptions>?)` MUST register the `"Test"` scheme and set it as both `DefaultAuthenticateScheme` and `DefaultChallengeScheme`; MUST throw `ArgumentNullException` when the factory is null
+- **FR-042**: `WebApplicationFactory<TProgram>.WithPermissiveAuthorization()` MUST replace `AuthorizationOptions.DefaultPolicy` and `FallbackPolicy` with a policy that requires an authenticated user against the `"Test"` scheme; MUST throw `ArgumentNullException` when the factory is null; MUST NOT bypass named policies (`[Authorize(Policy=...)]`) or role requirements (`[Authorize(Roles=...)]`)
+- **FR-043**: `HttpClientHelper<TProgram>.WithBearerToken(string?)` MUST set the default `Authorization` header to `Bearer <token>`; passing `null` MUST clear the header; MUST return `this` for fluent chaining
+- **FR-044**: `HttpClientHelper<TProgram>.WithHeader(string name, string value)` MUST overwrite any prior value, MUST throw `ArgumentException` for null or empty `name`, and MUST return `this` for fluent chaining
 
 ### Key Entities
 
@@ -194,7 +213,10 @@ As a library maintainer, I need the solution file, meta-package, and all project
 - **GrpcRigBuilder\<TProgram\>**: Sub-builder for gRPC with `ReplaceClient<TClient>()` methods
 - **WebApiRigBuilder\<TProgram\>**: Sub-builder for WebAPI with `AddHttpClientHelper()` and `AddHandlerHelper()` methods
 - **HandlerHelper**: Dispatches Mediator requests/commands/queries/notifications within isolated DI scopes (ValueTask-based)
-- **HttpClientHelper\<TProgram\>**: Creates typed HttpClient instances routed through in-memory test server with GET/POST/PUT/DELETE helpers
+- **HttpClientHelper\<TProgram\>**: Creates typed HttpClient instances routed through in-memory test server with GET/POST/PUT/DELETE helpers plus `WithBearerToken(string?)` and `WithHeader(string, string)` for default-header configuration
+- **TestAuthenticationHandler**: `AuthenticationHandler<TestAuthenticationOptions>` that unconditionally authenticates every request with the `"Test"` scheme, ignoring incoming `Authorization` headers
+- **TestAuthenticationOptions**: `AuthenticationSchemeOptions` exposing `DefaultUserName` (default `"test-user"`) and a mutable `IList<Claim>` for configured principal claims
+- **TestAuthenticationExtensions**: `WithTestAuthentication(Action<TestAuthenticationOptions>?)` and `WithPermissiveAuthorization()` extensions on `WebApplicationFactory<TProgram>` for test-only auth pipelines
 - **WaitHelper**: Static generic async polling utility with sync, async, and result-producing overloads
 - **TestConfigurationBuilder**: Fluent in-memory `IConfiguration` builder with `Set`, `SetConnectionString`, `SetSection`, `Build`, `BuildOptions`
 - **RigFixtureBase**: Abstract base implementing `IAsyncInitializer` + `IAsyncDisposable` + `IRigConnectionSource`
@@ -254,7 +276,7 @@ This is a **standalone library** expansion (not a microservice). The architectur
 
 ### File Inventory
 
-**New Source Files (27 files):**
+**New Source Files (30 files):**
 - `Core/Builder/IRigConnectionSource.cs`
 - `Core/Builder/RigBuilder.cs`
 - `Core/Builder/RigBuilderExtensions.cs`
@@ -274,6 +296,9 @@ This is a **standalone library** expansion (not a microservice). The architectur
 - `WebAPI/Extensions/WebApiFactoryExtensions.cs`
 - `WebAPI/Builder/WebApiRigBuilder.cs`
 - `WebAPI/Builder/WebApiRigBuilderExtensions.cs`
+- `WebAPI/Authentication/TestAuthenticationHandler.cs`
+- `WebAPI/Authentication/TestAuthenticationOptions.cs`
+- `WebAPI/Authentication/TestAuthenticationExtensions.cs`
 - `SqlServer/Builder/SqlServerRigBuilder.cs`
 - `SqlServer/Builder/SqlServerRigBuilderExtensions.cs`
 - `Redis/Builder/RedisRigBuilder.cs`
@@ -321,6 +346,9 @@ This is a **standalone library** expansion (not a microservice). The architectur
 - `Redis.Tests.Integration/Builder/RedisRigBuilderTests.cs`
 - `ServiceBus.Tests.Integration/Builder/ServiceBusRigBuilderTests.cs`
 - `Grpc.Tests.Unit/Builder/GrpcRigBuilderTests.cs`
+- `WebAPI.Tests.Unit/Authentication/TestAuthenticationHandlerTests.cs`
+- `WebAPI.Tests.Unit/Authentication/TestAuthenticationOptionsTests.cs`
+- `WebAPI.Tests.Unit/Authentication/TestAuthenticationExtensionsTests.cs`
 
 **Deleted Test Files (replaced by new builder/mediator tests):**
 - `SqlServer.Tests.Integration/Extensions/SqlServerContainerExtensionsTests.cs` (replaced by `SqlServerRigBuilderTests.cs`)
@@ -467,3 +495,5 @@ This is a **standalone library** expansion (not a microservice). The architectur
 - **C-015** [Task Dependencies]: T032/T040 incorrectly marked [P] when subsequent test tasks depend on them -- removed [P] markers.
 - **C-016** [Task Dependencies]: Phase 4 implicit dependency on Phase 1 Core types -- added `[depends: T029]` to first Phase 4 task.
 - **C-017** [Edge Cases]: T050 (SqlServer atomic deletion) must not accidentally delete `InMemoryDbExtensions.cs` -- added explicit guard note to task.
+- **C-018** [Scope Addition]: Test authentication/authorization surface (`TestAuthenticationHandler`, `TestAuthenticationOptions`, `TestAuthenticationExtensions.WithTestAuthentication`, `TestAuthenticationExtensions.WithPermissiveAuthorization`) and `HttpClientHelper.WithBearerToken` / `WithHeader` were added during implementation to round out the WebAPI test story. Retroactively formalized via User Story 4b, FR-039..FR-044, tasks T070..T075, and file inventory updates (27 → 30 source files, new test files under `WebAPI.Tests.Unit/Authentication/`).
+- **C-019** [Semantics]: `WithPermissiveAuthorization` only replaces `DefaultPolicy`/`FallbackPolicy`. Named policies and role requirements still apply. XML doc on the method and FR-042 make this explicit.

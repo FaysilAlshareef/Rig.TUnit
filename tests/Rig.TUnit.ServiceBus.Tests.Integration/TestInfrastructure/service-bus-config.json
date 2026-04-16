@@ -1,0 +1,25 @@
+{
+  "UserConfig": {
+    "Namespaces": [
+      {
+        "Name": "sbemulatorns",
+        "Topics": [
+          {
+            "Name": "test-topic",
+            "Subscriptions": [
+              {
+                "Name": "test-subscription",
+                "Properties": {
+                  "RequiresSession": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Logging": {
+      "Type": "console"
+    }
+  }
+}

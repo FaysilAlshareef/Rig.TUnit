@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Rig.TUnit.Core/Rig.TUnit.Core.csproj" />
+    <Project Path="src/Rig.TUnit.Grpc/Rig.TUnit.Grpc.csproj" />
+    <Project Path="src/Rig.TUnit.SqlServer/Rig.TUnit.SqlServer.csproj" />
+    <Project Path="src/Rig.TUnit.Redis/Rig.TUnit.Redis.csproj" />
+    <Project Path="src/Rig.TUnit.ServiceBus/Rig.TUnit.ServiceBus.csproj" />
+    <Project Path="src/Rig.TUnit/Rig.TUnit.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Rig.TUnit.Core.Tests.Unit/Rig.TUnit.Core.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Grpc.Tests.Unit/Rig.TUnit.Grpc.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.SqlServer.Tests.Unit/Rig.TUnit.SqlServer.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.SqlServer.Tests.Integration/Rig.TUnit.SqlServer.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Redis.Tests.Integration/Rig.TUnit.Redis.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.ServiceBus.Tests.Integration/Rig.TUnit.ServiceBus.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj" />
+  </Folder>
+</Solution>

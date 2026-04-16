@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Azure.Messaging.ServiceBus;
+using Rig.TUnit.Core.Helpers;
 
 namespace Rig.TUnit.ServiceBus.Helpers;
 
@@ -53,15 +54,15 @@ public sealed class ListenerHelper : IAsyncDisposable
         CancellationToken ct = default)
     {
         var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(15);
-        var deadline = _timeProvider.GetUtcNow() + effectiveTimeout;
 
-        while (_messages.Count < expectedCount && _timeProvider.GetUtcNow() < deadline)
+        try
         {
-            ct.ThrowIfCancellationRequested();
-            await Task.Delay(250, ct);
+            await WaitHelper.WaitForAsync(
+                () => _messages.Count >= expectedCount,
+                effectiveTimeout,
+                cancellationToken: ct);
         }
-
-        if (_messages.Count < expectedCount)
+        catch (TimeoutException)
         {
             throw new TimeoutException(
                 $"Expected {expectedCount} messages but received {_messages.Count} within {effectiveTimeout}.");

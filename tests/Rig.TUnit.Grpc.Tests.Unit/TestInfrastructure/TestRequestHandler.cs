@@ -1,9 +1,9 @@
-using MediatR;
+using Mediator;
 
 namespace Rig.TUnit.Grpc.Tests.Unit.TestInfrastructure;
 
 public sealed class TestRequestHandler : IRequestHandler<TestRequest, string>
 {
-    public Task<string> Handle(TestRequest request, CancellationToken cancellationToken)
-        => Task.FromResult($"Handled: {request.Value}");
+    public ValueTask<string> Handle(TestRequest request, CancellationToken cancellationToken)
+        => ValueTask.FromResult($"Handled: {request.Value}");
 }

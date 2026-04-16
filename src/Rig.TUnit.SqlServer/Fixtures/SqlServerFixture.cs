@@ -1,9 +1,10 @@
+using Rig.TUnit.Core.Builder;
 using Testcontainers.MsSql;
 using TUnit.Core.Interfaces;
 
 namespace Rig.TUnit.SqlServer.Fixtures;
 
-public sealed class SqlServerFixture : IAsyncInitializer, IAsyncDisposable
+public sealed class SqlServerFixture : IAsyncInitializer, IAsyncDisposable, IRigConnectionSource
 {
     public MsSqlContainer Container { get; } = new MsSqlBuilder()
         .WithImage("mcr.microsoft.com/mssql/server:2022-latest")

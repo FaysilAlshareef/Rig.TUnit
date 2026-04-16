@@ -36,4 +36,32 @@ public sealed class DbContextHelper<TContext>(IServiceProvider provider) where T
         context.ChangeTracker.Clear();
         return entities;
     }
+
+    /// <summary>
+    /// Invokes the supplied async seed action against a fresh DbContext scope, then commits the
+    /// changes with <see cref="DbContext.SaveChangesAsync(CancellationToken)"/> and clears the change tracker.
+    /// </summary>
+    public async Task SeedAsync(Func<TContext, Task> seed)
+    {
+        ArgumentNullException.ThrowIfNull(seed);
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<TContext>();
+        await seed(context);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+    }
+
+    /// <summary>
+    /// Invokes the supplied synchronous seed action against a fresh DbContext scope, then commits the
+    /// changes with <see cref="DbContext.SaveChangesAsync(CancellationToken)"/> and clears the change tracker.
+    /// </summary>
+    public async Task SeedAsync(Action<TContext> seed)
+    {
+        ArgumentNullException.ThrowIfNull(seed);
+        using var scope = provider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<TContext>();
+        seed(context);
+        await context.SaveChangesAsync();
+        context.ChangeTracker.Clear();
+    }
 }

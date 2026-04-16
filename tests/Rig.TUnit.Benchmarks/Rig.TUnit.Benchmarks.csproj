@@ -12,5 +12,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.SqlServer\Rig.TUnit.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="TUnit.Core" Version="1.33.0" />
+    <PackageReference Include="TUnit.Core" Version="1.34.5" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />

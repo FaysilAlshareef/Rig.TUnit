@@ -1,4 +1,4 @@
-using MediatR;
+using Mediator;
 
 namespace Rig.TUnit.Grpc.Tests.Unit.TestInfrastructure;
 

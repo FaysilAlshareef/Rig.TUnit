@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" Version="1.34.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.ServiceBus\Rig.TUnit.ServiceBus.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TestInfrastructure\service-bus-config.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,6 @@
 using Mediator;
 
-namespace Rig.TUnit.Grpc.Tests.Unit.TestInfrastructure;
+namespace Rig.TUnit.Mediator.Tests.Unit.TestInfrastructure;
 
 public sealed class TestRequestHandler : IRequestHandler<TestRequest, string>
 {

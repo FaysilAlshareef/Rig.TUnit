@@ -31,8 +31,7 @@ public sealed class TestServerFactory : IAsyncDisposable
                 {
                     services.AddGrpc();
                     services.AddRouting();
-                    services.AddMediatR(cfg =>
-                        cfg.RegisterServicesFromAssemblyContaining<TestRequestHandler>());
+                    services.AddMediator();
                 });
                 webHost.Configure(app =>
                 {

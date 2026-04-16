@@ -1,9 +1,10 @@
+using Rig.TUnit.Core.Builder;
 using Testcontainers.ServiceBus;
 using TUnit.Core.Interfaces;
 
 namespace Rig.TUnit.ServiceBus.Fixtures;
 
-public sealed class ServiceBusFixture : IAsyncInitializer, IAsyncDisposable
+public sealed class ServiceBusFixture : IAsyncInitializer, IAsyncDisposable, IRigConnectionSource
 {
     private ServiceBusContainer? _container;
 

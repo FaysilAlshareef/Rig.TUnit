@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Rig.TUnit.Core/Rig.TUnit.Core.csproj" />
+    <Project Path="src/Rig.TUnit.Mediator/Rig.TUnit.Mediator.csproj" />
     <Project Path="src/Rig.TUnit.Grpc/Rig.TUnit.Grpc.csproj" />
     <Project Path="src/Rig.TUnit.SqlServer/Rig.TUnit.SqlServer.csproj" />
     <Project Path="src/Rig.TUnit.Redis/Rig.TUnit.Redis.csproj" />
@@ -9,6 +10,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Rig.TUnit.Core.Tests.Unit/Rig.TUnit.Core.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Mediator.Tests.Unit/Rig.TUnit.Mediator.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Grpc.Tests.Unit/Rig.TUnit.Grpc.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.SqlServer.Tests.Unit/Rig.TUnit.SqlServer.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.SqlServer.Tests.Integration/Rig.TUnit.SqlServer.Tests.Integration.csproj" />

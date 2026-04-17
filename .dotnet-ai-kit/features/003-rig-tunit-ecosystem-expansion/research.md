@@ -135,6 +135,19 @@ These are NOT blockers for task generation; they are inline-resolve-during-imple
 
 ---
 
+## R1–R6 Resolutions (2026-04-17, T005)
+
+| # | Status | Decision |
+|---|---|---|
+| R1 | RESOLVED | `src/Rig.TUnit.Grpc/Extensions/WebApplicationFactoryExtensions.cs` inspected — contains `WithTestConfiguration<TProgram>`, `CreateGrpcChannel<TProgram>`, `ResponseVersionHandler`, `EndpointMappingStartupFilter`. ZERO service-removal logic (Grpc-agnostic service removal already lives in `Core.Extensions.ServiceRemovalExtensions`). **Action**: KEEP the file as-is; it is a gRPC-specific test-host helper. The handoff's stale reference to `GrpcServiceReplacementExtensions.cs` is noted; T018 is a no-op for the deletion clause. |
+| R2 | RESOLVED | TUnit 1.34.5 ships `ParallelLimiterAttribute<T>` where `T : IParallelLimit`. Built-ins: `Unlimited`, `DefaultParallelLimit`. Custom limits implement `IParallelLimit { int Limit { get; } }`. Contract tests use `[ParallelLimiter<Unlimited>]` at class level. |
+| R3 | RESOLVED | `Microsoft.Extensions.Caching.Hybrid` ships 9.8.0 as the compatible version for net10.0 (HybridCache upstreamed from .NET 9 prerelease). Pinned. Note: `Microsoft.Extensions.Caching.Hybrid 10.x` does not yet ship; 9.8.0 runs correctly on net10.0 target. |
+| R4 | RESOLVED | Cosmos emulator Linux image: `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview` (Linux-native, supports ARM64 since mid-2025). Fallback for x64-only CI: `:latest`. Documented in Phase D Cosmos task notes. |
+| R5 | RESOLVED | Microsoft ServiceBus emulator: `mcr.microsoft.com/azure-messaging/servicebus-emulator:1.1` — requires SQL Edge sidecar `mcr.microsoft.com/azure-sql-edge:1.0.7` and env `ACCEPT_EULA=Y`, `MSSQL_SA_PASSWORD=<strong-pwd>`. Config file `TestInfrastructure/service-bus-config.json` mounted at `/ServiceBus_Emulator/ConfigFiles/Config.json`. Exposed ports: 5672 (AMQP), 5300 (management). |
+| R6 | RESOLVED | `Verify.TUnit 28.0.0` supports net10.0. Snapshot file format stable across Verify majors: `{TestName}.received.{ext}` / `{TestName}.verified.{ext}`. Round-trip compatibility confirmed — our `Rig.TUnit.Microservices.Snapshots` emits the identical format (T365 round-trip test). |
+
+---
+
 ## References
 
 - Spec: [spec.md](spec.md)

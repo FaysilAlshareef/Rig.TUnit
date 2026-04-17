@@ -6,12 +6,11 @@
     <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference Include="BenchmarkDotNet" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
-    <ProjectReference Include="..\..\src\Rig.TUnit.SqlServer\Rig.TUnit.SqlServer.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
   </ItemGroup>
 </Project>

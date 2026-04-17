@@ -1,0 +1,3 @@
+# Coverage whitelist — types listed here are exempt from EveryPublicType_HasReferencingTestAssembly.
+# Format: one fully-qualified type name per line. Lines starting with '#' are comments.
+# Reason must accompany the entry in a trailing '# reason: ...' comment.

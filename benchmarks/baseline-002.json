@@ -1,0 +1,30 @@
+{
+  "_comment": "Pre-cutover benchmark baseline from feature 002 (Rig.TUnit.Benchmarks). Populated by running 'dotnet test tests/Rig.TUnit.Benchmarks -c Release --filter *FixtureStartup*' against feature-002 master; T720 compares future runs against this file with a <110% regression budget.",
+  "schemaVersion": 1,
+  "capturedAt": "2026-04-17",
+  "captureBranch": "feature/003-rig-tunit-ecosystem-expansion",
+  "featureOrigin": "002-rig-tunit-fluent-builder-expansion",
+  "dotnetSdk": "10.0.100",
+  "runtime": "net10.0",
+  "benchmarks": {
+    "FixtureStartup.SqlServerFixture_InitializeAsync": {
+      "meanNs": null,
+      "errorNs": null,
+      "stdDevNs": null,
+      "note": "populate via BenchmarkDotNet run against pre-cutover master"
+    },
+    "FixtureStartup.RedisFixture_InitializeAsync": {
+      "meanNs": null,
+      "errorNs": null,
+      "stdDevNs": null,
+      "note": "populate via BenchmarkDotNet run against pre-cutover master"
+    },
+    "FixtureStartup.ServiceBusFixture_InitializeAsync": {
+      "meanNs": null,
+      "errorNs": null,
+      "stdDevNs": null,
+      "note": "populate via BenchmarkDotNet run against pre-cutover master"
+    }
+  },
+  "regressionBudgetPercent": 110
+}

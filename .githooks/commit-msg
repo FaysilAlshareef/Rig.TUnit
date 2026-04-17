@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Rig.TUnit commit-msg hook
+# Enforces Conventional Commits first-token prefix for TDD discipline.
+# Valid prefixes: test, feat, refactor, fix, chore, docs, style, perf, build, ci, revert
+
+set -euo pipefail
+
+COMMIT_MSG_FILE="$1"
+FIRST_LINE=$(head -n1 "$COMMIT_MSG_FILE")
+
+# Allow empty commits and merge commits
+if [[ -z "$FIRST_LINE" ]] || [[ "$FIRST_LINE" == Merge* ]] || [[ "$FIRST_LINE" == Revert* ]]; then
+  exit 0
+fi
+
+# Extract first token (before ':' or '(')
+FIRST_TOKEN=$(echo "$FIRST_LINE" | sed -E 's/^([a-z]+)([(:].*)?$/\1/')
+
+case "$FIRST_TOKEN" in
+  test|feat|refactor|fix|chore|docs|style|perf|build|ci|revert)
+    exit 0
+    ;;
+  *)
+    echo "ERROR: Commit message must start with one of: test, feat, refactor, fix, chore, docs, style, perf, build, ci, revert" >&2
+    echo "Got: '$FIRST_LINE'" >&2
+    echo "" >&2
+    echo "TDD cadence required for content work:" >&2
+    echo "  test: red  - {behavior}    # failing test first" >&2
+    echo "  feat: green - {behavior}   # minimum code to pass" >&2
+    echo "  refactor: {improvement}    # structural change, no behavior change" >&2
+    exit 1
+    ;;
+esac

@@ -1,0 +1,41 @@
+name: commit-msg-lint
+
+on:
+  pull_request:
+    branches: [master, main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          set -euo pipefail
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          echo "Validating commits in range $BASE_SHA..$HEAD_SHA"
+          VALID='^(test|feat|refactor|fix|chore|docs|style|perf|build|ci|revert)(\(.+\))?:'
+          FAIL=0
+          while IFS= read -r sha; do
+            SUBJECT=$(git log -1 --format=%s "$sha")
+            if [[ "$SUBJECT" =~ ^Merge ]] || [[ "$SUBJECT" =~ ^Revert ]]; then
+              continue
+            fi
+            if ! [[ "$SUBJECT" =~ $VALID ]]; then
+              echo "INVALID: $sha - $SUBJECT"
+              FAIL=1
+            fi
+          done < <(git rev-list "$BASE_SHA..$HEAD_SHA")
+          if [[ $FAIL -ne 0 ]]; then
+            echo ""
+            echo "All commits must start with: test, feat, refactor, fix, chore, docs, style, perf, build, ci, or revert."
+            exit 1
+          fi
+          echo "All commit messages valid."

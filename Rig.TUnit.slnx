@@ -28,5 +28,7 @@
     <Project Path="tests/Rig.TUnit.Databases.Sql.Tests.Unit/Rig.TUnit.Databases.Sql.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.Tests.Contract/Rig.TUnit.Databases.Sql.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Parallelism.Tests.Contract/Rig.TUnit.Parallelism.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration.csproj" />
   </Folder>
 </Solution>

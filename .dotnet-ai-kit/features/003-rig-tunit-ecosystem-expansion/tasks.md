@@ -119,8 +119,8 @@
       File: `src/Rig.TUnit.Databases.Sql.SqlServer/Builder/SqlServerRigBuilder.cs`
 - [x] **T063** [depends: T062] [TDD] Relocate `SqlServerRigBuilderExtensions` [FR:020]
       File: `src/Rig.TUnit.Databases.Sql.SqlServer/Builder/SqlServerRigBuilderExtensions.cs`
-- [ ] **T064** Create `tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration/` project + concrete `SqlServerContract : SqlRigContract` implementing all 13 mandatory tests + ≥ 3 SqlServer quirk tests (rowversion binary(8), DateTimeOffset native, SequentialGuid) [FR:042, FR:060]
-- [ ] **T065** [depends: T064] Add `SqlServerDbContextHelperTests : DbContextHelperCrudContract<SqlServerFixture>` [FR:031]
+- [x] **T064** Create `tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration/` project + concrete `SqlServerContract : SqlRigContract` implementing all 13 mandatory tests + ≥ 3 SqlServer quirk tests (rowversion binary(8), DateTimeOffset native, SequentialGuid) [FR:042, FR:060]
+- [x] **T065** [depends: T064] Add `SqlServerDbContextHelperTests : DbContextHelperCrudContract<SqlServerFixture>` [FR:031]
 
 ### A.6 — `Rig.TUnit.Databases.Sql.Sqlite` provider (NEW)
 
@@ -131,9 +131,9 @@
       File: `src/Rig.TUnit.Databases.Sql.Sqlite/Builder/SqliteRigBuilder.cs`
 - [x] **T073** [depends: T072] [TDD] Create `SqliteRigBuilderExtensions` with `UseSqlite(source, sql => …)` [FR:030]
       File: `src/Rig.TUnit.Databases.Sql.Sqlite/Builder/SqliteRigBuilderExtensions.cs`
-- [ ] **T074** Create `tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/` + `SqliteContract : SqlRigContract` + ≥ 3 SQLite quirk tests (case-insensitive default collation, no FK enforcement without pragma, WITHOUT ROWID support) [FR:042]
-- [ ] **T075** [depends: T074] Add `SqliteDbContextHelperTests : DbContextHelperCrudContract<SqliteFixture>` [FR:031]
-- [ ] **T076** [depends: T058, T065, T075] Add `InMemoryDbContextHelperTests : DbContextHelperCrudContract<…>` completing three-way fast-path parity [FR:031]
+- [x] **T074** Create `tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/` + `SqliteContract : SqlRigContract` + ≥ 3 SQLite quirk tests (case-insensitive default collation, no FK enforcement without pragma, WITHOUT ROWID support) [FR:042]
+- [x] **T075** [depends: T074] Add `SqliteDbContextHelperTests : DbContextHelperCrudContract<SqliteFixture>` [FR:031]
+- [x] **T076** [depends: T058, T065, T075] Add `InMemoryDbContextHelperTests : DbContextHelperCrudContract<…>` completing three-way fast-path parity [FR:031]
 
 ### A.7 — `Rig.TUnit.Databases.NoSql` base + Redis KV provider
 

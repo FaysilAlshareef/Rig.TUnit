@@ -7,7 +7,7 @@ public sealed class ServiceBusFixtureOptions : IValidatableObject
     public const string SectionName = "RigTUnit:ServiceBus";
 
     [Required]
-    public string ImageTag { get; init; } = "1.1";
+    public string ImageTag { get; init; } = "1.1.2";
 
     [Required]
     public string SqlEdgeImageTag { get; init; } = "1.0.7";

@@ -30,5 +30,12 @@
     <Project Path="tests/Rig.TUnit.Parallelism.Tests.Contract/Rig.TUnit.Parallelism.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration/Rig.TUnit.Databases.Sql.SqlServer.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.Tests.Contract/Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Caching.Tests.Contract/Rig.TUnit.Caching.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Tests.Contract/Rig.TUnit.Messaging.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Caching.Redis.Tests.Integration/Rig.TUnit.Caching.Redis.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Rig.TUnit.Messaging.ServiceBus.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Unit/Rig.TUnit.Databases.Sql.SqlServer.Tests.Unit.csproj" />
   </Folder>
 </Solution>

@@ -43,7 +43,6 @@ public sealed class ReadmeCompletenessTests
     [
         ("Rig.TUnit.Docker",                      "T137"),
         ("Rig.TUnit.Observability.Metrics",       "T095"),
-        ("Rig.TUnit.Security.Policies",           "T090"),
     ];
 
     [Test]

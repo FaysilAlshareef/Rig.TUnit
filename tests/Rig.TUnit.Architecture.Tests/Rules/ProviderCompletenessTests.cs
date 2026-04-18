@@ -56,6 +56,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Security.Jwt",             null,               "JwtBuilderOptions",       "JwtRigBuilder",        "UseJwt"),
         new("Rig.TUnit.Security.OAuth",           "MockOAuthServer",  "MockOAuthServerOptions",  "OAuthRigBuilder",      "UseOAuthServer"),
         new("Rig.TUnit.Security.Mtls",            "MtlsFixture",      "MtlsFixtureOptions",      "MtlsRigBuilder",       "UseMtls"),
+        new("Rig.TUnit.Security.Policies",        "PolicyFixture",    "PolicyFixtureOptions",    "PolicyRigBuilder",     "UsePolicies"),
     ];
 
     /// <summary>
@@ -67,7 +68,6 @@ public sealed class ProviderCompletenessTests
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
-        ("Rig.TUnit.Security.Policies",               "T087-T090"),
         ("Rig.TUnit.Observability.Metrics",           "T091-T095"),
         ("Rig.TUnit.Observability.Logging",           "by-design — telemetry-style (no fluent Use extension)"),
         ("Rig.TUnit.Observability.Tracing",           "by-design — telemetry-style"),

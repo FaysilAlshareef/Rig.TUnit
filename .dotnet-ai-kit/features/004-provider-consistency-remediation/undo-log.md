@@ -75,3 +75,15 @@
 - T020 verified: 16/16 architecture tests GREEN; 166 tests across unit+contract+architecture projects still green.
 
 **Deferred (beyond Phase 2 exit-gate scope):** T011/T012/T013/T014/T015/T017/T018 — hygiene extractions of inline setup code (ActivitySource factories, Polly pipelines, JWKS keys, Outbox builders, QuirkTests helpers) from worst-offender test files into per-project `TestInfrastructure/` folders. The rule itself passes — these are quality improvements for a follow-up PR.
+
+## Phase 3.0 — T174/T175/T176 Postgresql remediation
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- T174 created: `src/Rig.TUnit.Databases.Sql.Postgresql/Builder/PostgresRigBuilderExtensions.cs` (UsePostgres fluent entry on RigBuilder)
+- T175 created: `src/Rig.TUnit.Databases.Sql.Postgresql/Extensions/PostgresBuilderExtensions.cs` (UsePostgres EF Core wrapper on DbContextOptionsBuilder)
+- T176 created: `src/Rig.TUnit.Databases.Sql.Postgresql/README.md` (536 chars — quick-start + install + deps)
+- T176 modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Postgresql moved from SkipUntilFixed into RequiredProviders (5 required now)
+- T176 modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — Postgresql removed from SkipUntilFixed (19 remaining)
+- verified: 16/16 architecture tests GREEN.

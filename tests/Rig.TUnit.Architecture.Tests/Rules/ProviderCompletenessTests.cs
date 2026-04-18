@@ -33,10 +33,11 @@ public sealed class ProviderCompletenessTests
     /// </summary>
     private static readonly ProviderEntry[] RequiredProviders =
     [
-        new("Rig.TUnit.Databases.Sql.SqlServer", "SqlServerFixture",  "SqlServerFixtureOptions",  "SqlServerRigBuilder",  "UseSqlServer"),
-        new("Rig.TUnit.Databases.Sql.Sqlite",    "SqliteFixture",     "SqliteFixtureOptions",     "SqliteRigBuilder",     "UseSqlite"),
-        new("Rig.TUnit.Messaging.ServiceBus",    "ServiceBusFixture", "ServiceBusFixtureOptions", "ServiceBusRigBuilder", "UseServiceBus"),
-        new("Rig.TUnit.Caching.Redis",           "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
+        new("Rig.TUnit.Databases.Sql.SqlServer",  "SqlServerFixture",  "SqlServerFixtureOptions",  "SqlServerRigBuilder",  "UseSqlServer"),
+        new("Rig.TUnit.Databases.Sql.Sqlite",     "SqliteFixture",     "SqliteFixtureOptions",     "SqliteRigBuilder",     "UseSqlite"),
+        new("Rig.TUnit.Databases.Sql.Postgresql", "PostgresFixture",   "PostgresFixtureOptions",   "PostgresRigBuilder",   "UsePostgres"),
+        new("Rig.TUnit.Messaging.ServiceBus",     "ServiceBusFixture", "ServiceBusFixtureOptions", "ServiceBusRigBuilder", "UseServiceBus"),
+        new("Rig.TUnit.Caching.Redis",            "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
     ];
 
     /// <summary>
@@ -47,7 +48,6 @@ public sealed class ProviderCompletenessTests
     /// </summary>
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
-        ("Rig.TUnit.Databases.Sql.Postgresql",        "T174-T176"),
         ("Rig.TUnit.Databases.NoSql.Mongo",           "T022-T025"),
         ("Rig.TUnit.Databases.NoSql.Cassandra",       "T026-T029"),
         ("Rig.TUnit.Databases.NoSql.Dynamo",          "T030-T033"),

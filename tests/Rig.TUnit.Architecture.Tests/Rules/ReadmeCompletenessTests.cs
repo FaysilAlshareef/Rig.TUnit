@@ -48,7 +48,6 @@ public sealed class ReadmeCompletenessTests
         ("Rig.TUnit.Databases.NoSql.ElasticSearch", "T037"),
         ("Rig.TUnit.Databases.NoSql.KurrentDb",   "T041 (renamed from EventStore in T002c)"),
         ("Rig.TUnit.Databases.NoSql.Mongo",       "T024"),
-        ("Rig.TUnit.Databases.Sql.Postgresql",    "T176"),
         ("Rig.TUnit.Docker",                      "T137"),
         ("Rig.TUnit.Messaging.Kafka",             "T044"),
         ("Rig.TUnit.Messaging.Nats",              "T051"),

@@ -129,11 +129,11 @@ Pattern per provider: Options (if missing) → Fixture adjustments (if missing) 
 
 Postgresql already has `PostgresFixture + PostgresFixtureOptions + PostgresRigBuilder`. Library design §4.1 requires adding `PostgresRigBuilderExtensions` (fluent entry) and `PostgresBuilderExtensions` (EF quickstart) plus README. `SqlRigContract` already exists and runs against `PostgresFixture`.
 
-- [ ] T174 [P] [depends: T020] RED→GREEN `PostgresRigBuilderExtensions.UsePostgres(this RigBuilder, IRigConnectionSource, Action<PostgresRigBuilder>)`.
+- [x] T174 [P] [depends: T020] RED→GREEN `PostgresRigBuilderExtensions.UsePostgres(this RigBuilder, IRigConnectionSource, Action<PostgresRigBuilder>)`.
   File: `src/Rig.TUnit.Databases.Sql.Postgresql/Builder/PostgresRigBuilderExtensions.cs`
-- [ ] T175 [depends: T174] RED→GREEN `PostgresBuilderExtensions` — `UsePostgresInMemory`-style EF quickstart shortcut (mirrors `SqlServerBuilderExtensions` / `SqliteBuilderExtensions` shape for developer IntelliSense parity).
+- [x] T175 [depends: T174] RED→GREEN `PostgresBuilderExtensions` — `UsePostgresInMemory`-style EF quickstart shortcut (mirrors `SqlServerBuilderExtensions` / `SqliteBuilderExtensions` shape for developer IntelliSense parity).
   File: `src/Rig.TUnit.Databases.Sql.Postgresql/Extensions/PostgresBuilderExtensions.cs`
-- [ ] T176 [depends: T175] Add `README.md` (> 100 chars, 30-sec quick-start using `UsePostgres`). Verify `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/` continues to pass `SqlRigContract` + `ParallelIsolationContract`. Remove Postgresql from `ProviderCompletenessTests` skip list (T005); confirm GREEN.
+- [x] T176 [depends: T175] Add `README.md` (> 100 chars, 30-sec quick-start using `UsePostgres`). Verify `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/` continues to pass `SqlRigContract` + `ParallelIsolationContract`. Remove Postgresql from `ProviderCompletenessTests` skip list (T005); confirm GREEN.
   Files: `src/Rig.TUnit.Databases.Sql.Postgresql/README.md`, `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs`
 
 ### 3a Databases.NoSql

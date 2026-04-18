@@ -364,10 +364,10 @@ Contract suite: `CacheRigContract`.
 **TDD GATE APPLIES to §3c.ii/3c.iii**: same 4-test cadence (Unit / Integration / Contract / Benchmark) + RED→GREEN two-commit cycle per task.
 
 #### 3c.ii Hybrid *(TDD template)*
-- [ ] T058-RED [P] Create `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/` with `HybridCacheFixtureOptionsTests`, `HybridCacheRigBuilderTests`, `UseHybridCacheExtensionsTests`. Integration live + `HybridCacheBenchmarks.cs`. Verify RED.
-- [ ] T058-GREEN [depends: T058-RED] Write `Options/HybridCacheFixtureOptions.cs`.
-- [ ] T059-GREEN [depends: T058-GREEN] Write `Builder/HybridCacheRigBuilder.cs` + `HybridCacheRigBuilderExtensions.cs`.
-- [ ] T060 [depends: T059-GREEN] Add README. Remove Hybrid from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T058-RED [P] Strict TDD flip-first: moved Hybrid from `SkipUntilFixed` → `RequiredProviders` in `ProviderCompletenessTests` + removed from `ReadmeCompletenessTests` skip list — arch tests RED (2 failures). Created `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/` (csproj + 6 test files: HybridCacheRigBuilderTests, UseHybridCacheExtensionsTests, HybridCacheFixtureOptionsTests, HybridCacheRigBuilderConnectionStringTests, HybridCacheFixtureTests) + `tests/Rig.TUnit.Caching.Hybrid.Tests.Integration/UseHybridCacheFluentTests.cs` + `tests/Rig.TUnit.Benchmarks/HybridCacheBenchmarks.cs`. RED verified via 5 × CS0234 (Builder + Options namespaces missing).
+- [x] T058-GREEN [depends: T058-RED] Wrote `src/Rig.TUnit.Caching.Hybrid/Options/HybridCacheFixtureOptions.cs` (SectionName + DefaultExpirationSeconds/LocalCacheExpirationSeconds/MaximumPayloadBytes/MaximumKeyLength with `[Range]` validation).
+- [x] T059-GREEN [depends: T058-GREEN] Wrote `Builder/HybridCacheRigBuilder.cs` (sealed CRTP subclass of `CacheRigBuilder<HybridCacheRigBuilder>` with ConnectionString passthrough) + `Builder/HybridCacheRigBuilderExtensions.cs` (`UseHybridCache` fluent extension with null-guards). Rewrote `Fixtures/HybridCacheFixture.cs` with ctor variants (parameterless / IOptions / direct-options) + null-guards + options-driven `AddHybridCache` configuration (DefaultEntryOptions.Expiration, LocalCacheExpiration, MaximumPayloadBytes, MaximumKeyLength).
+- [x] T060 [depends: T059-GREEN] Added README (> 100 chars — install + example + fluent wiring + options). Hybrid promoted in ProviderCompletenessTests.RequiredProviders (14 → 15); removed from ReadmeCompletenessTests.SkipUntilFixed (10 → 9). Unit 27/27 GREEN · Integration 18/18 GREEN (in-process) · Architecture 16/16 GREEN · Benchmark 2/2 executed via InProcessEmitToolchain.
 
 #### 3c.iii Fusion *(TDD template)*
 - [ ] T061-RED [P] Create `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/` with `FusionCacheFixtureOptionsTests`, `FusionCacheRigBuilderTests`, `UseFusionCacheExtensionsTests`, `FailSafeHelperTests` (pure), `EagerRefreshHelperTests` (pure). Integration live + `FusionCacheBenchmarks.cs`. Verify RED.

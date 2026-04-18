@@ -375,3 +375,41 @@ All five NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb) no
 - Benchmarks: 19/19 executed (4 Kafka, 4 RabbitMq, 4 Nats, 4 Sqs, 3 ServiceBus) via InProcessEmitToolchain in 1-iter Dry mode — MemoryDiagnoser reports for Options + Listener + Sender construction.
 
 **Phase 3b exit gate MET.** ProviderCompletenessTests.RequiredProviders grew 10 → 14 (Kafka/RabbitMq/Nats/Sqs added). ReadmeCompletenessTests skip list shrunk 14 → 10 (4 messaging leaves removed).
+
+## T058/T059/T060 — Hybrid Caching GREEN (Phase 3c.ii, strict TDD)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+**RED sequence** (executed first — arch + unit + integration + benchmark tests all failing before any src touched):
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Hybrid moved from SkipUntilFixed → RequiredProviders (15 required now). Running arch tests produced 2 failures: `RequiredProviders_ExposeCanonicalTypes` reported 3 missing symbols (HybridCacheFixtureOptions, HybridCacheRigBuilder, UseHybridCache); `EveryLeafProvider_ShipsReadme` reported missing README.
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — removed Caching.Hybrid entry from SkipUntilFixed (10 remaining).
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/Rig.TUnit.Caching.Hybrid.Tests.Unit.csproj`
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/HybridCacheRigBuilderTests.cs` (sealed/CRTP/null-guards)
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/UseHybridCacheExtensionsTests.cs` (6 tests — null-guards, fluent, configure-invocation)
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/HybridCacheFixtureOptionsTests.cs` (6 tests — SectionName + defaults + overrides + data-annotations)
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/HybridCacheRigBuilderConnectionStringTests.cs` (2 tests — getter exercise via UseHybridCache + direct ctor)
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/HybridCacheFixtureTests.cs` (9 tests — ctor variants, pre-init Cache throws, dispose safe)
+- created: `tests/Rig.TUnit.Caching.Hybrid.Tests.Integration/UseHybridCacheFluentTests.cs` (fluent wiring + in-process round-trip through GetOrCreateAsync factory coalescing)
+- created: `tests/Rig.TUnit.Benchmarks/HybridCacheBenchmarks.cs` ([Config(InProcessEmitBenchmarkConfig)])
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added `Rig.TUnit.Caching.Hybrid` ProjectReference
+- modified: `Rig.TUnit.slnx` — registered new Hybrid Tests.Unit project
+
+**RED evidence**: `dotnet build tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/…` produced 5 × CS0234 (`namespace Rig.TUnit.Caching.Hybrid.{Builder,Options}` missing). Architecture tests: 2/16 failed.
+
+**GREEN sequence**:
+- created: `src/Rig.TUnit.Caching.Hybrid/Options/HybridCacheFixtureOptions.cs` (SectionName="RigTUnit:HybridCache"; DefaultExpirationSeconds/LocalCacheExpirationSeconds/MaximumPayloadBytes/MaximumKeyLength with `[Range]` validation)
+- created: `src/Rig.TUnit.Caching.Hybrid/Builder/HybridCacheRigBuilder.cs` (sealed CRTP of `CacheRigBuilder<HybridCacheRigBuilder>`, `ConnectionString` passthrough)
+- created: `src/Rig.TUnit.Caching.Hybrid/Builder/HybridCacheRigBuilderExtensions.cs` (`UseHybridCache` fluent extension with ArgumentNullException.ThrowIfNull for rig/source/configure)
+- modified: `src/Rig.TUnit.Caching.Hybrid/Fixtures/HybridCacheFixture.cs` — added ctor variants (parameterless/IOptions/direct) + null-guards; `AddHybridCache(o => …)` now wires DefaultEntryOptions (Expiration + LocalCacheExpiration) and MaximumPayloadBytes/MaximumKeyLength from options
+- modified: `src/Rig.TUnit.Caching.Hybrid/Rig.TUnit.Caching.Hybrid.csproj` — added `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences
+- created: `src/Rig.TUnit.Caching.Hybrid/README.md` (install + usage + fluent wiring + Options section)
+
+**Verification (fresh)**:
+- Full solution build: 124 projects, 0 warnings, 0 errors (Debug + Release).
+- Unit: Hybrid 27/27 GREEN (no Docker).
+- Integration: Hybrid 18/18 GREEN (in-process — HybridContract + HybridCacheQuirkTests + UseHybridCacheFluentTests).
+- Architecture: 16/16 GREEN — `ProviderCompletenessTests.RequiredProviders_ExposeCanonicalTypes` + `EveryLeafProvider_ShipsReadme` now pass with Hybrid enforced.
+- Benchmarks: 2/2 executed via InProcessEmitToolchain (Options ctor allocations).
+
+ProviderCompletenessTests.RequiredProviders: 14 → 15 · ReadmeCompletenessTests.SkipUntilFixed: 10 → 9.

@@ -32,5 +32,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.RabbitMq\Rig.TUnit.Messaging.RabbitMq.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Nats\Rig.TUnit.Messaging.Nats.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Sqs\Rig.TUnit.Messaging.Sqs.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Hybrid\Rig.TUnit.Caching.Hybrid.csproj" />
   </ItemGroup>
 </Project>

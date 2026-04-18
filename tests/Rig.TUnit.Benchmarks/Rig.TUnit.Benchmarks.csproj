@@ -14,5 +14,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Postgresql\Rig.TUnit.Databases.Sql.Postgresql.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Mongo\Rig.TUnit.Databases.NoSql.Mongo.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Cassandra\Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
   </ItemGroup>
 </Project>

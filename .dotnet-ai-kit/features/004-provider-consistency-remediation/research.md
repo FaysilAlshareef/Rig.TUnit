@@ -242,6 +242,37 @@ dotnet test --collect:"XPlat Code Coverage" \
 
 ---
 
+## R16 — Coverage measurement under TUnit / Microsoft.Testing.Platform (added 2026-04-18)
+
+**Current state:** `Directory.Packages.props` pins `coverlet.collector 6.0.*` + `coverlet.msbuild 6.0.*` (added in T002). First attempts to run per-package coverage used the classic VSTest invocation:
+
+```
+dotnet test --project <proj> /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+```
+
+**Problem observed 2026-04-18:** TUnit test projects run under Microsoft.Testing.Platform (MTP), not VSTest. The `/p:CollectCoverage=true` parameter is a coverlet.msbuild hook that only engages when MSBuild + VSTest drives the run; MTP ignores it silently. Result: `Test run summary: Zero tests ran` with exit code 5, and no `*.cobertura.xml` is produced.
+
+**Decision (2026-04-18):** Use the MTP-native coverage flag instead:
+
+```
+cd tests/<project>/
+dotnet run --no-build -c Debug -- --coverage --coverage-output-format cobertura --coverage-output <name>.cobertura.xml
+```
+
+Output lands in `<project>/bin/Debug/net10.0/TestResults/<name>.cobertura.xml`. Confirmed working against both unit (`.Tests.Unit`) and integration (`.Tests.Integration`) projects; merged per-package line + branch rates can be computed by combining cobertura line entries by `(filename, line-number)`.
+
+**Evidence:**
+- [Microsoft.Testing.Platform coverage docs](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform-extensions-code-coverage) — lists `--coverage-output-format cobertura` / `xml` / `coberturamerge` among the built-in options.
+- Measured 2026-04-18 on Mongo (T022-T025) + Postgres (T176a): unit-only = 48 %/37 % line; unit+integration merged = 87 % / 78 % line. Script-level merge recommended (Phase 6 adds `tools/coverage-merge.py`).
+
+**Gate implications:**
+- Tracked by new FR-035 (coverage-lifting tests — `{Provider}FixtureOptionsTests.cs` + `{Provider}RigBuilder_ExerciseTests.cs` added to every provider) and FR-036 (MTP-native coverage mechanism).
+- First-pass template without FR-035 additions lands at 87 % — **2.6 % short**. With the two extra unit tests, every provider should clear 90 % on the first pass.
+
+**Fallback:** If `--coverage-output-format cobertura` ever regresses under a future MTP release, `--coverage-output-format xml` produces native MTP XML which `ReportGenerator` can translate. `coverlet.collector` via `--collect "XPlat Code Coverage"` also works against the MTP runner as a backup path.
+
+---
+
 ## R15 — Event Store → KurrentDB rebrand (added post-analysis 2026-04-18)
 
 **Current state:** `src/Rig.TUnit.Databases.NoSql.EventStore/` depends on `Testcontainers.EventStoreDb 4.6.0` + `EventStore.Client.Grpc.Streams 23.3.8`. Under Testcontainers 4.11 the `Testcontainers.EventStoreDb` package has no release beyond `4.9.0`, and in `4.9.0` the whole module is marked `[Obsolete]` — Event Store rebranded to **KurrentDB** on 2026-11-20 and upstream Testcontainers mirrors the rename as a separate module `Testcontainers.KurrentDb`.

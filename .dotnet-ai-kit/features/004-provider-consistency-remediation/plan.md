@@ -25,7 +25,7 @@
 
 Close the provider-surface-area gap left by 003: bring every `Rig.TUnit.{Family}.{Provider}` package to the canonical shape (Fixture + Options + Builder + Extensions + Helpers + README); ship 4 never-delivered packages (MySql, Oracle, Cosmos, AppInsights); complete the partial Docker package; extract inline test-setup infrastructure into per-project `TestInfrastructure/` folders; enforce the uniformity via three new architecture tests.
 
-**Delivery discipline** — strictly test-first (RED → GREEN → REFACTOR), per-package merge gate identical to 003 (≥ 90% line / ≥ 85% branch / 100% contract suite / parallel-isolation smoke), zero regressions on the 219-test baseline.
+**Delivery discipline** — strictly test-first (RED → GREEN → REFACTOR), **4-test categories per provider (Unit + Integration + Contract + Benchmark — FR-030..FR-034)**, per-package merge gate identical to 003 (≥ 90 % line / ≥ 85 % branch / 100 % contract suite / parallel-isolation smoke), zero regressions on the 219-test baseline. The `## TDD Gate` section in `tasks.md` is the normative source for per-task cadence — reviewers verify commit order (`test(004): TNNN — RED` must precede `feat(004): TNNN — GREEN`) before approving any PR hunk that touches `src/`. `TestCompletenessTests` (landed in Phase 6 T157a) makes the 4-category requirement machine-visible alongside the existing three architecture rules.
 
 **Phase order is a hard dependency chain.** No phase starts until the previous is green.
 

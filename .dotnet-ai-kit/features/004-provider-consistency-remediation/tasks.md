@@ -4,14 +4,67 @@
 **Generated**: 2026-04-18 | **Revised**: 2026-04-18 (post-analysis + full-scan — Postgresql remediation added, ParallelIsolationContract explicit, Cosmos package clarified, coverage command specified, README counts corrected to 20-of-32 leaf providers, orphan 003-era dirs scheduled for cleanup at T003a, Rig.TUnit meta-package description at T004a, **Kurrent migration added at T002b/T002c** — Testcontainers 4.9+ marks the whole `EventStoreDb` module obsolete in favour of the upstream `KurrentDb` rename)
 **Source**: [spec.md](spec.md), [plan.md](plan.md), [data-model.md](data-model.md), [research.md](research.md)
 
-## TDD cadence (applies to every task that creates or modifies production code)
+## TDD Gate — MANDATORY, UNSKIPPABLE (applies to every task in Phases 3, 4, 5, 6 that creates or modifies production code)
 
-Each task with `RED→GREEN` means: write the failing test FIRST (commit `test(004): T{NNN} — RED for {Type}`), then write the minimum implementation (commit `feat(004): T{NNN} — GREEN implement {Type}`). Optional refactor commit follows. Reviewers verify commit order on PR.
+**Every task that adds or modifies a file under `src/` MUST follow this 4-test, 2-commit cadence. No exceptions.** Any commit that adds production code without a preceding failing test on the same branch is a blocker and MUST be reverted + redone. A retroactive test "proving" already-committed code does NOT satisfy the gate — the RED commit must precede the GREEN commit in `git log`.
 
-Marker legend:
-- `[P]` — task may run in parallel with peers in the same phase (different files, no intra-phase dependency)
-- `[depends: T{NNN}]` — blocked until the cited task is complete
-- No marker — sequential default (prior task must complete first)
+### The 4 test categories (each provider feature MUST carry all four)
+
+| Category | Project path pattern | Purpose | Runs without Docker? |
+|---|---|---|---|
+| **Unit** | `tests/Rig.TUnit.{Family}.{Provider}.Tests.Unit/` | Pure-function helpers, Options validation, builder wiring — no external services | ✅ yes |
+| **Integration** | `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/` | Container-backed behaviour; `*QuirkTests.cs` for provider-specific quirks | ❌ Docker required |
+| **Contract** | `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/{Provider}Contract.cs` (inherits `{Family}RigContract`) | Every provider of a family passes the same behavioural suite | ❌ Docker required |
+| **Benchmark** | `tests/Rig.TUnit.Benchmarks/{Provider}Benchmarks.cs` (BenchmarkDotNet) | Allocation / throughput measurements for the Fixture + Helpers | ✅ yes (pure) or ❌ (container-backed) |
+
+### Per-task TDD checklist (reviewer verifies every item on PR)
+
+For each RED→GREEN task touching `src/`:
+
+1. **RED — write the failing tests first**
+   - Add the **Unit test(s)** in the matching `*.Tests.Unit/` project (create the project if it does not yet exist; scaffold with `TUnit`, `NSubstitute`, and `ProjectReference` back to the provider src).
+   - Add the **Integration test(s)** in the matching `*.Tests.Integration/` project.
+   - If a public API surface is introduced (RigBuilder / Extension), add a **Benchmark** class in `tests/Rig.TUnit.Benchmarks/` before the GREEN impl.
+   - Run each: `dotnet test --project tests/...Tests.Unit/` (no Docker needed) + `dotnet test --project tests/...Tests.Integration/ --filter "FullyQualifiedName~{TestName}"` (Docker up). Tests MUST fail with a missing-symbol error (`CS0246` / "method not found") — a pass at RED time means the test does not actually cover the new surface.
+   - Commit with message: `test(004): T{NNN} — RED for {Type} (unit + integration + benchmark)`. The commit MUST include all test files for the feature (unit, integration, benchmark) in the single RED commit.
+
+2. **GREEN — write the minimum src to make the RED tests pass**
+   - Write the production file(s) listed in the task's `File:` line.
+   - Re-run the same filters. All newly-added tests MUST pass. Existing tests MUST NOT regress.
+   - Run `dotnet build Rig.TUnit.slnx` — 0 warnings, 0 errors under `TreatWarningsAsErrors=true`.
+   - Commit: `feat(004): T{NNN} — GREEN implement {Type}`.
+
+3. **REFACTOR (optional)** — may follow once GREEN is stable. MUST NOT change test semantics; a test change signals a behaviour change which demands a new RED first.
+
+4. **Docker precondition** — before any Integration/Contract run, verify `docker ps` works. If Docker is down, STOP and report — do not skip the Integration leg and claim GREEN.
+
+### Coverage gate (per-package, enforced at Phase 3/4/5/6 exit)
+
+- Line coverage ≥ **90 %** per modified package (coverlet `/p:Threshold=90 /p:ThresholdType=line`)
+- Branch coverage ≥ **85 %** per modified package (`/p:ThresholdType=branch`)
+- `ProviderCompletenessTests` GREEN for the provider (moved from `SkipUntilFixed` to `RequiredProviders`)
+- `ReadmeCompletenessTests` GREEN for the provider (removed from skip list)
+- **No src file merged without a unit + integration + contract + benchmark entry covering it.**
+
+### Forbidden anti-patterns
+
+- ❌ Shipping src code first and "backfilling tests later" — this is what violated TDD earlier in this feature and was reverted. Commits must show RED → GREEN order in `git log`.
+- ❌ Adding a new helper without a unit test (pure-function helpers MUST be unit-tested even when the fixture needs a container).
+- ❌ Skipping the benchmark because "it's just wiring" — every new public API surface gets at least one BenchmarkDotNet entry measuring allocation.
+- ❌ Marking a task `- [x]` before running the full `dotnet test --project {both}.Tests.Unit/ {both}.Tests.Integration/` filter and pasting the output in the commit body.
+
+### Retroactive remediation (pre-existing TDD debt)
+
+Phase 3.0 Postgres (commit `2b149b2`) shipped `PostgresRigBuilderExtensions.UsePostgres` + `PostgresBuilderExtensions.UsePostgres` without a preceding RED. **Task T176a (added below)** back-fills the missing tests — MUST be executed before any further Phase 3 work starts.
+
+---
+
+### Marker legend
+
+- `[P]` — task may run in parallel with peers in the same phase (different files, no intra-phase dependency).
+- `[depends: T{NNN}]` — blocked until the cited task is complete.
+- No marker — sequential default (prior task must complete first).
+- Every `RED→GREEN` task implicitly carries the 4-test checklist above; do not restate it per line.
 
 ---
 
@@ -135,88 +188,126 @@ Postgresql already has `PostgresFixture + PostgresFixtureOptions + PostgresRigBu
   File: `src/Rig.TUnit.Databases.Sql.Postgresql/Extensions/PostgresBuilderExtensions.cs`
 - [x] T176 [depends: T175] Add `README.md` (> 100 chars, 30-sec quick-start using `UsePostgres`). Verify `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/` continues to pass `SqlRigContract` + `ParallelIsolationContract`. Remove Postgresql from `ProviderCompletenessTests` skip list (T005); confirm GREEN.
   Files: `src/Rig.TUnit.Databases.Sql.Postgresql/README.md`, `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs`
+- [ ] **T176a [depends: T176] RETROACTIVE TDD REMEDIATION — Postgres.** Commit `2b149b2` shipped `UsePostgres` (RigBuilder + DbContextOptionsBuilder extensions) without a RED test. Back-fill now, in TDD order (RED commit → GREEN no-op commit is acceptable since the src already exists — but the test commit MUST precede any future Postgres src change). Write four test files:
+  1. **Unit** — `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresRigBuilderExtensionsTests.cs` (new project; scaffold csproj with `TUnit`, `Microsoft.Extensions.DependencyInjection`, `ProjectReference` to `Rig.TUnit.Databases.Sql.Postgresql`). Assert: `ArgumentNullException` thrown when rig/source/configure is null; `UsePostgres(rig, source, cfg => {})` returns the same `RigBuilder` instance (fluent chain); the `configure` action is invoked exactly once.
+  2. **Unit** — `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresDbContextOptionsExtensionsTests.cs`. Assert: non-generic + generic overloads both route to `UseNpgsql` (verify via `DbContextOptionsBuilder.Options.Extensions` containing `NpgsqlOptionsExtension`); empty/null connection string throws.
+  3. **Integration** — extend `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/` with `UsePostgresFluentTests.cs` that wires `services.AddRigTUnit(rig => rig.UsePostgres(new StaticConnectionSource(_fx.ConnectionString), cfg => cfg.ReplaceDbContext<TestDb>()))` then resolves a `TestDb` from DI and issues a round-trip insert/read against the live Postgres container. Must actually create a table, insert, re-query. No mocks.
+  4. **Benchmark** — add `tests/Rig.TUnit.Benchmarks/PostgresUseBenchmarks.cs` (add a `ProjectReference` to `Rig.TUnit.Databases.Sql.Postgresql` in `Rig.TUnit.Benchmarks.csproj`). Measure allocations of the `UsePostgres` fluent wiring (container NOT started — measures only the Builder/Extensions path, not Postgres itself).
+
+  Run order: unit first (must pass immediately since src exists), integration next with Docker up (container-backed — must pass), benchmark third (`dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*Postgres*"`). Commit: `test(004): T176a — retroactive TDD cover for Postgres (commit 2b149b2)`. Coverage check: `dotnet test /p:CollectCoverage=true /p:Threshold=90 /p:ThresholdType=line --filter "FullyQualifiedName~Postgres"` must report ≥ 90 %.
+
+  Files:
+  - `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit.csproj` (NEW)
+  - `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresRigBuilderExtensionsTests.cs` (NEW)
+  - `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresDbContextOptionsExtensionsTests.cs` (NEW)
+  - `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/UsePostgresFluentTests.cs` (NEW)
+  - `tests/Rig.TUnit.Benchmarks/PostgresUseBenchmarks.cs` (NEW)
+  - `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` (MODIFIED — add ProjectReference)
+  - `Rig.TUnit.slnx` (MODIFIED — add the new Tests.Unit project)
 
 ### 3a Databases.NoSql
 
 Contract suite: `NoSqlRigContract` — runs 13+ tests per provider (per 003 baseline pattern).
 
-#### 3a.i Mongo
-- [ ] T022 [P] RED→GREEN `MongoRigBuilder` + `UseMongo` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilder.cs`, `MongoRigBuilderExtensions.cs`
-- [ ] T023 [depends: T022] RED→GREEN `CollectionPerTestHelper` + `BsonDiff`.
-  Files: `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/CollectionPerTestHelper.cs`, `BsonDiff.cs`
-- [ ] T024 [depends: T023] Add `README.md` and wire `MongoContractTests : NoSqlRigContract<MongoFixture>` in `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/`.
-  Files: `src/Rig.TUnit.Databases.NoSql.Mongo/README.md`, `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/MongoContractTests.cs`
-- [ ] T025 [depends: T024] Remove Mongo from `ProviderCompletenessTests` skip list. Confirm GREEN.
+**Every provider in §3a MUST complete all four TDD legs per task (see TDD Gate at top). The Mongo block below is the canonical template — Cassandra/Dynamo/ElasticSearch/KurrentDb follow the identical shape, just swap the provider name.**
 
-#### 3a.ii Cassandra
-- [ ] T026 [P] RED→GREEN `CassandraFixtureOptions`.
-  File: `src/Rig.TUnit.Databases.NoSql.Cassandra/Options/CassandraFixtureOptions.cs`
-- [ ] T027 [depends: T026] RED→GREEN `CassandraRigBuilder` + `UseCassandra` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.Cassandra/Builder/CassandraRigBuilder.cs`, `CassandraRigBuilderExtensions.cs`
-- [ ] T028 [depends: T027] RED→GREEN `KeyspacePerTestHelper`.
-  File: `src/Rig.TUnit.Databases.NoSql.Cassandra/Helpers/KeyspacePerTestHelper.cs`
-- [ ] T029 [depends: T028] Add README + `CassandraContractTests`. Remove from skip list. Confirm GREEN.
-  Files: `src/Rig.TUnit.Databases.NoSql.Cassandra/README.md`, `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Integration/CassandraContractTests.cs`
+#### 3a.i Mongo — CANONICAL TDD TEMPLATE (copy for other providers)
 
-#### 3a.iii Dynamo
-- [ ] T030 [P] RED→GREEN `DynamoFixtureOptions`.
-  File: `src/Rig.TUnit.Databases.NoSql.Dynamo/Options/DynamoFixtureOptions.cs`
-- [ ] T031 [depends: T030] RED→GREEN `DynamoRigBuilder` + `UseDynamo` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.Dynamo/Builder/DynamoRigBuilder.cs`, `DynamoRigBuilderExtensions.cs`
-- [ ] T032 [depends: T031] RED→GREEN `GsiVerifier` using LocalStack.
-  File: `src/Rig.TUnit.Databases.NoSql.Dynamo/Helpers/GsiVerifier.cs`
-- [ ] T033 [depends: T032] Add README + `DynamoContractTests`. Remove from skip list.
-  Files: `src/Rig.TUnit.Databases.NoSql.Dynamo/README.md`, `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Integration/DynamoContractTests.cs`
+- [ ] T022-RED [P] **Write failing tests FIRST**. Create the Tests.Unit project if missing, write all four test categories, run, confirm RED:
+  1. **Unit (new project)** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit.csproj` with `TUnit`, `NSubstitute`, `ProjectReference` to `Rig.TUnit.Databases.NoSql.Mongo`. Register in `Rig.TUnit.slnx`.
+  2. **Unit test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/MongoRigBuilderTests.cs`: asserts `MongoRigBuilder` is sealed, inherits `NoSqlRigBuilder<MongoRigBuilder>`, exposes `ConnectionString` from source; ctor rejects null root/source.
+  3. **Unit test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/UseMongoExtensionsTests.cs`: asserts `UseMongo` rejects null args; returns same `RigBuilder` (fluent); `configure` invoked exactly once.
+  4. **Unit test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/BsonDiffTests.cs`: 8+ pure-function cases (identical docs → empty; value mismatch; missing-field both directions; nested dotted path; type mismatch; null-arg guards).
+  5. **Integration test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/CollectionPerTestHelperTests.cs`: against live Mongo container, assert isolated collection created + dropped on dispose; two parallel helpers produce distinct collections.
+  6. **Integration test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/UseMongoFluentTests.cs`: `services.AddRigTUnit(rig => rig.UseMongo(source, cfg => {}))` resolves cleanly + registers expected services.
+  7. **Contract** — `MongoContract.cs` already exists; verify it still inherits `NoSqlRigContract` and will run post-GREEN.
+  8. **Benchmark** — `tests/Rig.TUnit.Benchmarks/MongoBenchmarks.cs`: BsonDiff allocation benchmark (pure); add ProjectReference in `Rig.TUnit.Benchmarks.csproj`.
 
-#### 3a.iv ElasticSearch
-- [ ] T034 [P] RED→GREEN `ElasticSearchFixtureOptions`.
-  File: `src/Rig.TUnit.Databases.NoSql.ElasticSearch/Options/ElasticSearchFixtureOptions.cs`
-- [ ] T035 [depends: T034] RED→GREEN `ElasticSearchRigBuilder` + `UseElasticSearch` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.ElasticSearch/Builder/ElasticSearchRigBuilder.cs`, `ElasticSearchRigBuilderExtensions.cs`
-- [ ] T036 [depends: T035] RED→GREEN `IndexRefreshHelper` + `DslAssert`.
-  Files: `src/Rig.TUnit.Databases.NoSql.ElasticSearch/Helpers/IndexRefreshHelper.cs`, `Assertions/DslAssert.cs`
-- [ ] T037 [depends: T036] Add README + `ElasticSearchContractTests`. Remove from skip list.
+  Verify RED: `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` — MUST fail with CS0246 (MongoRigBuilder / UseMongo / BsonDiff / CollectionPerTestHelper not found). Paste failure output in commit body.
+  Commit: `test(004): T022 — RED for MongoRigBuilder + UseMongo + BsonDiff + CollectionPerTestHelper (unit + integration + benchmark)`.
 
-#### 3a.v KurrentDb (was EventStore — package renamed in Phase 1 T002c)
-- [ ] T038 [P] RED→GREEN `KurrentDbFixtureOptions`.
-  File: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Options/KurrentDbFixtureOptions.cs`
-- [ ] T039 [depends: T038] RED→GREEN `KurrentDbRigBuilder` + `UseKurrentDb` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Builder/KurrentDbRigBuilder.cs`, `KurrentDbRigBuilderExtensions.cs`
-- [ ] T040 [depends: T039] RED→GREEN `StreamAssert` + `ProjectionAssert` — built against `KurrentDB.Client 1.3.x`.
-  Files: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Assertions/StreamAssert.cs`, `ProjectionAssert.cs`
-- [ ] T041 [depends: T040] Add README (cite upstream rebrand + image `kurrentplatform/kurrentdb:25.1`) + `KurrentDbContractTests`. Remove `Rig.TUnit.Databases.NoSql.KurrentDb` from `ProviderCompletenessTests` + `ReadmeCompletenessTests` skip lists.
+- [ ] T022-GREEN [depends: T022-RED] **Minimum src to flip the unit tests GREEN**. Write:
+  - `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilder.cs` — sealed CRTP subclass of `NoSqlRigBuilder<MongoRigBuilder>` with `ConnectionString` passthrough.
+  - `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilderExtensions.cs` — `static class` with `public static RigBuilder UseMongo(this RigBuilder, IRigConnectionSource, Action<MongoRigBuilder>)`.
+
+  Run `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` — all unit tests GREEN. Run `dotnet build Rig.TUnit.slnx` — 0 warnings. Commit: `feat(004): T022 — GREEN MongoRigBuilder + UseMongo`.
+
+- [ ] T023-GREEN [depends: T022-GREEN] **Minimum src for Helpers** (unit tests for BsonDiff are already landed in T022-RED; CollectionPerTestHelper integration test is too). Write:
+  - `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/BsonDiff.cs`
+  - `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/CollectionPerTestHelper.cs`
+
+  Run: `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` (BsonDiffTests pass) + `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/ --filter "FullyQualifiedName~CollectionPerTestHelper"` (Docker up). Commit: `feat(004): T023 — GREEN BsonDiff + CollectionPerTestHelper`.
+
+- [ ] T024 [depends: T023-GREEN] Add `README.md` (> 100 chars — `dotnet add` snippet + runnable `[Test]` + Dependencies section). Run `ReadmeCompletenessTests` after removing Mongo from its skip list — confirm GREEN. Run benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*Mongo*"` and paste output in commit body.
+  Files: `src/Rig.TUnit.Databases.NoSql.Mongo/README.md`, `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`.
+
+- [ ] T025 [depends: T024] **Promote Mongo to `RequiredProviders`** in `ProviderCompletenessTests.cs`. Remove from `SkipUntilFixed`. Run the full architecture test suite and all Mongo unit + integration tests — confirm every rule GREEN. Coverage gate: line ≥ 90 %, branch ≥ 85 % on `Rig.TUnit.Databases.NoSql.Mongo.dll` via coverlet. Commit: `feat(004): T025 — Mongo reaches canonical shape; ProviderCompletenessTests GREEN`.
+
+#### 3a.ii Cassandra *(follows the T022–T025 TDD template — every sub-task splits into RED then GREEN with the 4 test categories)*
+- [ ] T026-RED [P] Write failing tests: new `Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/` project with `CassandraFixtureOptionsTests` (SectionName const exists + `[Required]` triggers `ValidateDataAnnotations`) + `CassandraRigBuilderTests` (sealed, CRTP, ctor null-guards) + `UseCassandraExtensionsTests` (fluent + null-guards) + `KeyspacePerTestHelperTests` (pure: `BuildSafeKeyspace` rejects injection-like inputs, accepts a-z0-9_). Integration: `KeyspacePerTestLiveTests.cs` in `*.Tests.Integration/` creates + drops a keyspace on live Cassandra container. Benchmark: `CassandraKeyspaceBenchmarks.cs` in `Rig.TUnit.Benchmarks/`. Verify RED.
+- [ ] T026-GREEN [depends: T026-RED] Write `src/Rig.TUnit.Databases.NoSql.Cassandra/Options/CassandraFixtureOptions.cs` to flip the options test GREEN.
+- [ ] T027-GREEN [depends: T026-GREEN] Write `Builder/CassandraRigBuilder.cs` + `Builder/CassandraRigBuilderExtensions.cs` to flip the builder + extensions tests GREEN.
+- [ ] T028-GREEN [depends: T027-GREEN] Write `Helpers/KeyspacePerTestHelper.cs` (with `SafeIdentifier` regex validation — DDL string concat is only safe because every input is validated; tests must cover injection attempts). Flip helper tests GREEN.
+- [ ] T029 [depends: T028-GREEN] Add `README.md`. Remove Cassandra from `ProviderCompletenessTests` + `ReadmeCompletenessTests` skip lists. Run full architecture test + Cassandra unit + integration + benchmark suites. Coverage ≥ 90/85. Commit.
+
+#### 3a.iii Dynamo *(follows T022–T025 TDD template — RED→GREEN split per sub-task, 4 test categories)*
+- [ ] T030-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit/` with `DynamoFixtureOptionsTests`, `DynamoRigBuilderTests`, `UseDynamoExtensionsTests`, `GsiVerifierTests` (uses `NSubstitute` to mock `IAmazonDynamoDB` — asserts the verifier flags name/partition-key/sort-key/status mismatches without touching LocalStack). Integration: `GsiVerifierLiveTests.cs` in `.Tests.Integration/` uses LocalStack. Benchmark: `DynamoBenchmarks.cs`. Verify RED.
+- [ ] T030-GREEN [depends: T030-RED] Write `src/Rig.TUnit.Databases.NoSql.Dynamo/Options/DynamoFixtureOptions.cs`.
+- [ ] T031-GREEN [depends: T030-GREEN] Write `Builder/DynamoRigBuilder.cs` + `Builder/DynamoRigBuilderExtensions.cs`. GREEN.
+- [ ] T032-GREEN [depends: T031-GREEN] Write `Helpers/GsiVerifier.cs` + `Helpers/GsiExpectation.cs` (record). GREEN all unit + integration.
+- [ ] T033 [depends: T032-GREEN] Add `README.md`. Remove Dynamo from skip lists. Coverage ≥ 90/85. Commit.
+
+#### 3a.iv ElasticSearch *(follows T022–T025 template)*
+- [ ] T034-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit/` with `ElasticSearchFixtureOptionsTests`, `ElasticSearchRigBuilderTests`, `UseElasticSearchExtensionsTests`, `IndexRefreshHelperTests` (mocks `ElasticsearchClient` response — asserts throw on invalid response, no-op on valid), `DslAssertTests` (mocks search response with known hit count — asserts `HitsAsync` returns expected total). Integration: `IndexRefreshLiveTests.cs` + `DslAssertLiveTests.cs` against live Elastic container. Benchmark: `ElasticSearchBenchmarks.cs`. Verify RED.
+- [ ] T034-GREEN [depends: T034-RED] Write `Options/ElasticSearchFixtureOptions.cs`. GREEN options tests.
+- [ ] T035-GREEN [depends: T034-GREEN] Write `Builder/ElasticSearchRigBuilder.cs` + `Builder/ElasticSearchRigBuilderExtensions.cs`. GREEN builder/extension tests.
+- [ ] T036-GREEN [depends: T035-GREEN] Write `Helpers/IndexRefreshHelper.cs` + `Assertions/DslAssert.cs`. GREEN helper/assertion tests.
+- [ ] T037 [depends: T036-GREEN] Add `README.md`. Remove ElasticSearch from skip lists. Coverage ≥ 90/85. Commit.
+
+#### 3a.v KurrentDb *(was EventStore — package renamed in Phase 1 T002c; follows T022–T025 template)*
+- [ ] T038-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Unit/` with `KurrentDbFixtureOptionsTests`, `KurrentDbRigBuilderTests`, `UseKurrentDbExtensionsTests`, `StreamAssertTests` (mocks `KurrentDBClient` — asserts `EventsAppended(streamId, count)` reports correct count), `ProjectionAssertTests` (mocks projection-manager — asserts state matches). Integration: `KurrentDbLiveTests.cs` (append + read-stream round-trip against live container, image `kurrentplatform/kurrentdb:25.1`). Benchmark: `KurrentDbBenchmarks.cs`. Verify RED.
+- [ ] T038-GREEN [depends: T038-RED] Write `Options/KurrentDbFixtureOptions.cs`.
+- [ ] T039-GREEN [depends: T038-GREEN] Write `Builder/KurrentDbRigBuilder.cs` + `Builder/KurrentDbRigBuilderExtensions.cs`.
+- [ ] T040-GREEN [depends: T039-GREEN] Write `Assertions/StreamAssert.cs` + `Assertions/ProjectionAssert.cs` — built against `KurrentDB.Client 1.3.x`.
+- [ ] T041 [depends: T040-GREEN] Add `README.md` (cite upstream rebrand + image). Remove KurrentDb from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3b Messaging
 
 Contract suite: `MessagingRigContract`.
 
+**TDD GATE APPLIES**: every task below follows the Phase 3a.i Mongo template (T022–T025) — each `RED→GREEN` line represents a two-commit pair (RED test commit first; GREEN impl commit second). For each provider:
+- New `tests/Rig.TUnit.Messaging.{Provider}.Tests.Unit/` project with tests for Options (if added), RigBuilder (sealed, CRTP, ctor null-guards), `Use{Provider}` extension (fluent + null-guards), and helper unit tests (see provider-specific lines below).
+- Integration tests in existing `tests/Rig.TUnit.Messaging.{Provider}.Tests.Integration/` for container-backed helpers (Listener/Sender exercised against live broker).
+- Contract: existing `{Provider}Contract.cs` inherits `MessagingRigContract`.
+- Benchmark: `tests/Rig.TUnit.Benchmarks/{Provider}MessagingBenchmarks.cs` (allocation + throughput of Listener / Sender).
+- Coverage ≥ 90 %/85 %.
+
 #### 3b.i Kafka
-- [ ] T042 [P] RED→GREEN `KafkaRigBuilder` + `UseKafka` extension.
+- [ ] T042-RED [P] Write unit tests (KafkaRigBuilderTests, UseKafkaExtensionsTests) + integration stubs (KafkaListenerLiveTests, KafkaEventSenderLiveTests) + benchmark (KafkaMessagingBenchmarks.cs). Verify RED.
+- [ ] T042-GREEN [depends: T042-RED] Write `KafkaRigBuilder.cs` + `KafkaRigBuilderExtensions.cs`. GREEN.
   Files: `src/Rig.TUnit.Messaging.Kafka/Builder/KafkaRigBuilder.cs`, `KafkaRigBuilderExtensions.cs`
-- [ ] T043 [depends: T042] RED→GREEN `KafkaListener : ListenerBase` + `KafkaEventSender : EventSenderBase`.
-  Files: `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs`, `KafkaEventSender.cs`
-- [ ] T044 [depends: T043] Add README + `KafkaContractTests : MessagingRigContract<KafkaFixture>`. Remove from skip list.
+- [ ] T043-GREEN [depends: T042-GREEN] Write `Helpers/KafkaListener.cs` + `Helpers/KafkaEventSender.cs`. GREEN listener/sender tests.
+- [ ] T044 [depends: T043-GREEN] Add `README.md`. Remove Kafka from skip lists. Coverage ≥ 90/85. Commit.
 
-#### 3b.ii RabbitMq
-- [ ] T045 [P] RED→GREEN `RabbitMqRigBuilder` + `UseRabbitMq` extension.
-  Files: `src/Rig.TUnit.Messaging.RabbitMq/Builder/RabbitMqRigBuilder.cs`, `RabbitMqRigBuilderExtensions.cs`
-- [ ] T046 [depends: T045] RED→GREEN `RabbitMqListener` + `RabbitMqEventSender`.
-- [ ] T047 [depends: T046] Add README + `RabbitMqContractTests`. Remove from skip list.
+#### 3b.ii RabbitMq *(TDD template)*
+- [ ] T045-RED [P] Unit tests (RabbitMqRigBuilderTests, UseRabbitMqExtensionsTests, RabbitMqListenerTests, RabbitMqEventSenderTests) + integration live tests + `RabbitMqMessagingBenchmarks.cs`. Verify RED.
+- [ ] T045-GREEN [depends: T045-RED] Write `RabbitMqRigBuilder.cs` + `RabbitMqRigBuilderExtensions.cs`. GREEN.
+- [ ] T046-GREEN [depends: T045-GREEN] Write `RabbitMqListener.cs` + `RabbitMqEventSender.cs`. GREEN.
+- [ ] T047 [depends: T046-GREEN] Add `README.md`. Remove RabbitMq from skip lists. Coverage ≥ 90/85. Commit.
 
-#### 3b.iii Nats
-- [ ] T048 [P] RED→GREEN `NatsFixtureOptions`.
-  File: `src/Rig.TUnit.Messaging.Nats/Options/NatsFixtureOptions.cs`
-- [ ] T049 [depends: T048] RED→GREEN `NatsRigBuilder` + `UseNats` extension.
-- [ ] T050 [depends: T049] RED→GREEN `NatsListener` + `NatsEventSender`.
-- [ ] T051 [depends: T050] Add README + `NatsContractTests`. Remove from skip list.
+#### 3b.iii Nats *(TDD template)*
+- [ ] T048-RED [P] Unit tests for Options + RigBuilder + Use extension + Listener + Sender. Integration live + benchmark. Verify RED.
+- [ ] T048-GREEN [depends: T048-RED] Write `Options/NatsFixtureOptions.cs`.
+- [ ] T049-GREEN [depends: T048-GREEN] Write `NatsRigBuilder.cs` + `NatsRigBuilderExtensions.cs`.
+- [ ] T050-GREEN [depends: T049-GREEN] Write `NatsListener.cs` + `NatsEventSender.cs`.
+- [ ] T051 [depends: T050-GREEN] Add README. Remove Nats from skip lists. Coverage ≥ 90/85. Commit.
 
-#### 3b.iv Sqs
-- [ ] T052 [P] RED→GREEN `SqsFixtureOptions`.
-  File: `src/Rig.TUnit.Messaging.Sqs/Options/SqsFixtureOptions.cs`
-- [ ] T053 [depends: T052] RED→GREEN `SqsRigBuilder` + `UseSqs` extension (LocalStack-backed).
-- [ ] T054 [depends: T053] RED→GREEN `SqsListener` + `SqsEventSender`.
-- [ ] T055 [depends: T054] Add README + `SqsContractTests`. Remove from skip list.
+#### 3b.iv Sqs *(LocalStack-backed; TDD template)*
+- [ ] T052-RED [P] Unit tests for Options + RigBuilder + Use + Listener + Sender. Integration live (LocalStack) + benchmark. Verify RED.
+- [ ] T052-GREEN [depends: T052-RED] Write `Options/SqsFixtureOptions.cs`.
+- [ ] T053-GREEN [depends: T052-GREEN] Write `SqsRigBuilder.cs` + `SqsRigBuilderExtensions.cs` (LocalStack-backed).
+- [ ] T054-GREEN [depends: T053-GREEN] Write `SqsListener.cs` + `SqsEventSender.cs`.
+- [ ] T055 [depends: T054-GREEN] Add README. Remove Sqs from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3c Caching
 
@@ -227,90 +318,93 @@ Contract suite: `CacheRigContract`.
   File: `src/Rig.TUnit.Caching.Memory/Builder/MemoryCacheRigBuilderExtensions.cs`
 - [x] T057 [depends: T056] Add README + verify `MemoryCacheContractTests` passes. (README already shipped from 003 — 538 chars. No additional work needed. Memory stays in ProviderCompletenessTests.SkipUntilFixed as "by-design" — in-process caches have no FixtureOptions by design. Marked complete 2026-04-18.)
 
-#### 3c.ii Hybrid
-- [ ] T058 [P] RED→GREEN `HybridCacheFixtureOptions`.
-  File: `src/Rig.TUnit.Caching.Hybrid/Options/HybridCacheFixtureOptions.cs`
-- [ ] T059 [depends: T058] RED→GREEN `HybridCacheRigBuilder` + `UseHybridCache` extension.
-  Files: `src/Rig.TUnit.Caching.Hybrid/Builder/HybridCacheRigBuilder.cs`, `HybridCacheRigBuilderExtensions.cs`
-- [ ] T060 [depends: T059] Add README + `HybridCacheContractTests`. Remove from skip list.
+**TDD GATE APPLIES to §3c.ii/3c.iii**: same 4-test cadence (Unit / Integration / Contract / Benchmark) + RED→GREEN two-commit cycle per task.
 
-#### 3c.iii Fusion
-- [ ] T061 [P] RED→GREEN `FusionCacheFixtureOptions`.
-  File: `src/Rig.TUnit.Caching.Fusion/Options/FusionCacheFixtureOptions.cs`
-- [ ] T062 [depends: T061] RED→GREEN `FusionCacheRigBuilder` + `UseFusionCache` extension.
-- [ ] T063 [depends: T062] RED→GREEN fail-safe helper + eager-refresh helper per 003 §4.6.
-  Files: `src/Rig.TUnit.Caching.Fusion/Helpers/FailSafeHelper.cs`, `EagerRefreshHelper.cs`
-- [ ] T064 [depends: T063] Add README + `FusionCacheContractTests`. Remove from skip list.
+#### 3c.ii Hybrid *(TDD template)*
+- [ ] T058-RED [P] Create `tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/` with `HybridCacheFixtureOptionsTests`, `HybridCacheRigBuilderTests`, `UseHybridCacheExtensionsTests`. Integration live + `HybridCacheBenchmarks.cs`. Verify RED.
+- [ ] T058-GREEN [depends: T058-RED] Write `Options/HybridCacheFixtureOptions.cs`.
+- [ ] T059-GREEN [depends: T058-GREEN] Write `Builder/HybridCacheRigBuilder.cs` + `HybridCacheRigBuilderExtensions.cs`.
+- [ ] T060 [depends: T059-GREEN] Add README. Remove Hybrid from skip lists. Coverage ≥ 90/85. Commit.
+
+#### 3c.iii Fusion *(TDD template)*
+- [ ] T061-RED [P] Create `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/` with `FusionCacheFixtureOptionsTests`, `FusionCacheRigBuilderTests`, `UseFusionCacheExtensionsTests`, `FailSafeHelperTests` (pure), `EagerRefreshHelperTests` (pure). Integration live + `FusionCacheBenchmarks.cs`. Verify RED.
+- [ ] T061-GREEN [depends: T061-RED] Write `Options/FusionCacheFixtureOptions.cs`.
+- [ ] T062-GREEN [depends: T061-GREEN] Write `Builder/FusionCacheRigBuilder.cs` + `FusionCacheRigBuilderExtensions.cs`.
+- [ ] T063-GREEN [depends: T062-GREEN] Write `Helpers/FailSafeHelper.cs` + `Helpers/EagerRefreshHelper.cs` (per 003 §4.6).
+- [ ] T064 [depends: T063-GREEN] Add README. Remove Fusion from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3d Storage
 
 Contract suite: `StorageRigContract`.
 
-#### 3d.i AzureBlob
-- [ ] T065 [P] RED→GREEN `AzureBlobRigBuilder` + `UseAzureBlob` extension.
-  Files: `src/Rig.TUnit.Storage.AzureBlob/Builder/AzureBlobRigBuilder.cs`, `AzureBlobRigBuilderExtensions.cs`
-- [ ] T066 [depends: T065] RED→GREEN `AzureBlobSasBuilder`.
-  File: `src/Rig.TUnit.Storage.AzureBlob/Helpers/AzureBlobSasBuilder.cs`
-- [ ] T067 [depends: T066] Add README + `AzureBlobContractTests : StorageRigContract<AzureBlobFixture>`.
+**TDD GATE APPLIES**: same 4-test cadence (Unit / Integration / Contract / Benchmark) + RED→GREEN pairs per task. Every provider gets a `Rig.TUnit.Storage.{Provider}.Tests.Unit/` project and a `{Provider}StorageBenchmarks.cs` entry in `Rig.TUnit.Benchmarks/`.
 
-#### 3d.ii S3
-- [ ] T068 [P] RED→GREEN `S3RigBuilder` + `UseS3` extension.
-- [ ] T069 [depends: T068] RED→GREEN `S3SasBuilder`.
-- [ ] T070 [depends: T069] Add README + `S3ContractTests`.
+#### 3d.i AzureBlob *(TDD template)*
+- [ ] T065-RED [P] Unit tests (RigBuilder, UseAzureBlob, `AzureBlobSasBuilderTests` mocking the SAS token math). Integration live (Azurite) + benchmark. Verify RED.
+- [ ] T065-GREEN [depends: T065-RED] Write `Builder/AzureBlobRigBuilder.cs` + `AzureBlobRigBuilderExtensions.cs`.
+- [ ] T066-GREEN [depends: T065-GREEN] Write `Helpers/AzureBlobSasBuilder.cs`.
+- [ ] T067 [depends: T066-GREEN] Add README. Remove AzureBlob from skip lists. Coverage ≥ 90/85. Commit.
 
-#### 3d.iii MinIO
-- [ ] T071 [P] RED→GREEN `MinIOFixtureOptions`.
-  File: `src/Rig.TUnit.Storage.MinIO/Options/MinIOFixtureOptions.cs`
-- [ ] T072 [depends: T071] RED→GREEN `MinIORigBuilder` + `UseMinIO` extension.
-- [ ] T073 [depends: T072] RED→GREEN `MinIOSasBuilder`.
-- [ ] T074 [depends: T073] Add README + `MinIOContractTests`.
+#### 3d.ii S3 *(TDD template; LocalStack-backed)*
+- [ ] T068-RED [P] Unit tests (RigBuilder, UseS3, `S3SasBuilderTests`). Integration live (LocalStack) + benchmark. Verify RED.
+- [ ] T068-GREEN [depends: T068-RED] Write `Builder/S3RigBuilder.cs` + `S3RigBuilderExtensions.cs`.
+- [ ] T069-GREEN [depends: T068-GREEN] Write `Helpers/S3SasBuilder.cs`.
+- [ ] T070 [depends: T069-GREEN] Add README. Remove S3 from skip lists. Coverage ≥ 90/85. Commit.
 
-#### 3d.iv FileSystem
-- [ ] T075 [P] RED→GREEN `FileSystemFixtureOptions`.
-- [ ] T076 [depends: T075] RED→GREEN `FileSystemRigBuilder` + `UseFileSystem` extension.
-- [ ] T077 [depends: T076] RED→GREEN `PathSandboxHelper` (N/A for SAS — sandboxed temp-dir isolation).
-  File: `src/Rig.TUnit.Storage.FileSystem/Helpers/PathSandboxHelper.cs`
-- [ ] T078 [depends: T077] Add README + `FileSystemContractTests`.
+#### 3d.iii MinIO *(TDD template)*
+- [ ] T071-RED [P] Unit tests (Options, RigBuilder, UseMinIO, `MinIOSasBuilderTests`). Integration live + benchmark. Verify RED.
+- [ ] T071-GREEN [depends: T071-RED] Write `Options/MinIOFixtureOptions.cs`.
+- [ ] T072-GREEN [depends: T071-GREEN] Write `Builder/MinIORigBuilder.cs` + `MinIORigBuilderExtensions.cs`.
+- [ ] T073-GREEN [depends: T072-GREEN] Write `Helpers/MinIOSasBuilder.cs`.
+- [ ] T074 [depends: T073-GREEN] Add README. Remove MinIO from skip lists. Coverage ≥ 90/85. Commit.
+
+#### 3d.iv FileSystem *(no container — pure filesystem sandbox; TDD template)*
+- [ ] T075-RED [P] Unit tests (Options, RigBuilder, UseFileSystem, `PathSandboxHelperTests` — pure: asserts path traversal prevented, dispose deletes sandbox). Integration = full filesystem operations (no Docker) + benchmark. Verify RED.
+- [ ] T075-GREEN [depends: T075-RED] Write `Options/FileSystemFixtureOptions.cs`.
+- [ ] T076-GREEN [depends: T075-GREEN] Write `Builder/FileSystemRigBuilder.cs` + `FileSystemRigBuilderExtensions.cs`.
+- [ ] T077-GREEN [depends: T076-GREEN] Write `Helpers/PathSandboxHelper.cs` (sandboxed temp-dir isolation — N/A for SAS).
+- [ ] T078 [depends: T077-GREEN] Add README. Remove FileSystem from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3e Security
 
 Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` base.
 
-#### 3e.i Jwt
-- [ ] T079 [P] RED→GREEN `JwtRigBuilder : SecurityRigBuilder<JwtRigBuilder>` + `UseJwt` extension. Do NOT rename existing `JwtBuilder` (token builder).
-  Files: `src/Rig.TUnit.Security.Jwt/Builder/JwtRigBuilder.cs`, `JwtRigBuilderExtensions.cs`
-- [ ] T080 [depends: T079] Add README; remove Jwt from skip list.
+**TDD GATE APPLIES**: same 4-test cadence per task. **Spec-rule reconciliation** (added 2026-04-18): FR-008 mandates RigBuilder + Use extension for Security providers; it does NOT mandate a `{Provider}Fixture` for Jwt/OAuth (these are in-process — no container). `ProviderCompletenessTests` must be relaxed for Security: when the provider has no container, `Fixture` check is waived (`FixtureName` is nullable in the `ProviderEntry` record). T079 updates the rule ahead of moving Jwt/OAuth into `RequiredProviders`. Mtls + Policies add `{Provider}Fixture` per T084/T088.
 
-#### 3e.ii OAuth
-- [ ] T081 [P] RED→GREEN `OAuthRigBuilder : SecurityRigBuilder<OAuthRigBuilder>` + `UseOAuthServer` extension (wraps existing `MockOAuthServer`).
-- [ ] T082 [depends: T081] Add README; remove OAuth from skip list.
+#### 3e.i Jwt *(TDD template; in-process — no Fixture)*
+- [ ] T079-RED [P] Create `tests/Rig.TUnit.Security.Jwt.Tests.Unit/` with `JwtRigBuilderTests` (sealed, `: SecurityRigBuilder<JwtRigBuilder>`, ctor null-guards), `UseJwtExtensionsTests` (fluent + null-guards). Update `ProviderCompletenessTests` to make `FixtureName` nullable in `ProviderEntry` — add test `Security_ProvidersWithoutContainer_NeedNoFixture`. Benchmark: `JwtBenchmarks.cs` (token-sign/verify allocation). No new integration test — `JwtBuilder` (token builder) is already exercised in `Rig.TUnit.Security.Jwt.Tests.Integration/`. Verify RED.
+- [ ] T079-GREEN [depends: T079-RED] Write `src/Rig.TUnit.Security.Jwt/Builder/JwtRigBuilder.cs` + `JwtRigBuilderExtensions.cs`. Update `ProviderCompletenessTests.ProviderEntry.FixtureName` to `string?` + implementation to skip Fixture check when null. Do NOT rename existing `JwtBuilder` (token builder). GREEN.
+- [ ] T080 [depends: T079-GREEN] Add README. Promote Jwt in `ProviderCompletenessTests.RequiredProviders` with `FixtureName: null`. Coverage ≥ 90/85. Commit.
 
-#### 3e.iii Mtls
-- [ ] T083 [P] RED→GREEN `MtlsFixtureOptions`.
-  File: `src/Rig.TUnit.Security.Mtls/Options/MtlsFixtureOptions.cs`
-- [ ] T084 [depends: T083] RED→GREEN `MtlsFixture : SecurityFixtureBase` (generates CA + leaf cert on initialize).
-  File: `src/Rig.TUnit.Security.Mtls/Fixtures/MtlsFixture.cs`
-- [ ] T085 [depends: T084] RED→GREEN `MtlsRigBuilder` + `UseMtls` extension. Keep existing `MtlsCertificateBuilder` as helper.
-- [ ] T086 [depends: T085] Add README; remove Mtls from skip list.
+#### 3e.ii OAuth *(TDD template; in-process — wraps existing `MockOAuthServer` as its fixture surrogate)*
+- [ ] T081-RED [P] Create `tests/Rig.TUnit.Security.OAuth.Tests.Unit/` with `OAuthRigBuilderTests` + `UseOAuthServerExtensionsTests`. Benchmark: `OAuthBenchmarks.cs` (JWKS resolution). Verify RED.
+- [ ] T081-GREEN [depends: T081-RED] Write `OAuthRigBuilder : SecurityRigBuilder<OAuthRigBuilder>` + `UseOAuthServer` extension wrapping the existing `MockOAuthServer`. GREEN.
+- [ ] T082 [depends: T081-GREEN] Add README. Promote OAuth in `RequiredProviders` (Fixture: `MockOAuthServer` — already present as the wrapper). Coverage ≥ 90/85. Commit.
 
-#### 3e.iv Policies
-- [ ] T087 [P] RED→GREEN `PolicyFixtureOptions`.
-- [ ] T088 [depends: T087] RED→GREEN `PolicyFixture : SecurityFixtureBase` (registers in-memory `IAuthorizationService`).
-  File: `src/Rig.TUnit.Security.Policies/Fixtures/PolicyFixture.cs`
-- [ ] T089 [depends: T088] RED→GREEN `PolicyRigBuilder` + `UsePolicies` extension. Keep `PolicyAssert` untouched.
-- [ ] T090 [depends: T089] Add README; remove Policies from skip list.
+#### 3e.iii Mtls *(TDD template; ADDS a new `MtlsFixture`)*
+- [ ] T083-RED [P] Create `tests/Rig.TUnit.Security.Mtls.Tests.Unit/` with `MtlsFixtureOptionsTests`, `MtlsFixtureTests` (generates CA + leaf cert on initialize, assertions on cert chain/expiry — pure X509 math, no container), `MtlsRigBuilderTests`, `UseMtlsExtensionsTests`. Integration: `MtlsFixtureLiveTests.cs` (cert round-trip via Kestrel mTLS endpoint). Benchmark: `MtlsBenchmarks.cs`. Verify RED.
+- [ ] T083-GREEN [depends: T083-RED] Write `Options/MtlsFixtureOptions.cs`.
+- [ ] T084-GREEN [depends: T083-GREEN] Write `Fixtures/MtlsFixture.cs : SecurityFixtureBase` — generates CA + leaf cert on initialize.
+- [ ] T085-GREEN [depends: T084-GREEN] Write `Builder/MtlsRigBuilder.cs` + `MtlsRigBuilderExtensions.cs`. Keep existing `MtlsCertificateBuilder` as helper.
+- [ ] T086 [depends: T085-GREEN] Add README. Remove Mtls from skip lists. Coverage ≥ 90/85. Commit.
+
+#### 3e.iv Policies *(TDD template; ADDS a new `PolicyFixture`)*
+- [ ] T087-RED [P] Create `tests/Rig.TUnit.Security.Policies.Tests.Unit/` with `PolicyFixtureOptionsTests`, `PolicyFixtureTests` (registers in-memory `IAuthorizationService` — tests assert a known-good/known-bad policy decision), `PolicyRigBuilderTests`, `UsePoliciesExtensionsTests`. Benchmark: `PolicyBenchmarks.cs`. Verify RED.
+- [ ] T087-GREEN [depends: T087-RED] Write `Options/PolicyFixtureOptions.cs`.
+- [ ] T088-GREEN [depends: T087-GREEN] Write `Fixtures/PolicyFixture.cs : SecurityFixtureBase` (registers in-memory `IAuthorizationService`).
+- [ ] T089-GREEN [depends: T088-GREEN] Write `Builder/PolicyRigBuilder.cs` + `UsePolicies` extension. Keep `PolicyAssert` untouched.
+- [ ] T090 [depends: T089-GREEN] Add README. Remove Policies from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3f Observability.Metrics
 
-- [ ] T091 [P] RED→GREEN `MetricsFixtureOptions`.
-  File: `src/Rig.TUnit.Observability.Metrics/Options/MetricsFixtureOptions.cs`
-- [ ] T092 [depends: T091] RED→GREEN `MetricsFixture : TelemetryFixtureBase` wrapping `System.Diagnostics.Metrics.MeterListener`.
-  File: `src/Rig.TUnit.Observability.Metrics/Fixtures/MetricsFixture.cs`
-- [ ] T093 [depends: T092] RED→GREEN `MetricsRigBuilder : TelemetryRigBuilder<MetricsRigBuilder>` + `UseMetricsCapture` extension.
-  Files: `src/Rig.TUnit.Observability.Metrics/Builder/MetricsRigBuilder.cs`, `MetricsRigBuilderExtensions.cs`
-- [ ] T094 [depends: T093] RED→GREEN `TagCardinalityGuard` helper (default N=100).
-  File: `src/Rig.TUnit.Observability.Metrics/Helpers/TagCardinalityGuard.cs`
-- [ ] T095 [depends: T094] Add README; remove Metrics from skip list.
+**TDD GATE APPLIES**: same 4-test cadence per task.
+
+- [ ] T091-RED [P] Create `tests/Rig.TUnit.Observability.Metrics.Tests.Unit/` with `MetricsFixtureOptionsTests`, `MetricsFixtureTests` (pure — tests `MeterListener` captures a known counter emission), `MetricsRigBuilderTests`, `UseMetricsCaptureExtensionsTests`, `TagCardinalityGuardTests` (pure: asserts throws when N distinct tag values exceeded). Integration: `MetricsFixtureLiveTests.cs` (end-to-end via a dummy `Meter` + `MeterListener`). Benchmark: `MetricsBenchmarks.cs`. Verify RED.
+- [ ] T091-GREEN [depends: T091-RED] Write `Options/MetricsFixtureOptions.cs`.
+- [ ] T092-GREEN [depends: T091-GREEN] Write `Fixtures/MetricsFixture.cs : TelemetryFixtureBase` wrapping `System.Diagnostics.Metrics.MeterListener`.
+- [ ] T093-GREEN [depends: T092-GREEN] Write `Builder/MetricsRigBuilder.cs` + `MetricsRigBuilderExtensions.cs`.
+- [ ] T094-GREEN [depends: T093-GREEN] Write `Helpers/TagCardinalityGuard.cs` (default N=100).
+- [ ] T095 [depends: T094-GREEN] Add README. Remove Metrics from skip lists. Coverage ≥ 90/85. Commit.
 
 ### Phase 3 gate
 
@@ -333,65 +427,72 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 **Goal**: 4 new packages ship with canonical shape; Docker template completed. Exit gate: all 5 registered in slnx; `ProviderCompletenessTests` GREEN for all 5; quirk tests pass.
 
-### 4a `Rig.TUnit.Databases.Sql.MySql`
+**TDD GATE APPLIES — NO EXCEPTIONS.** Every new package (MySql, Oracle, Cosmos, AppInsights, Docker-completion) MUST ship with all four test categories in the SAME set of commits, enforced by the RED→GREEN cadence:
 
-- [ ] T100 [P] Scaffold `src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj` with ProjectReference to `Rig.TUnit.Databases.Sql`. Register in `Rig.TUnit.slnx`.
-- [ ] T101 [depends: T100] RED→GREEN `MySqlFixtureOptions`.
-- [ ] T102 [depends: T101] RED→GREEN `MySqlFixture : SqlFixtureBase` using `Testcontainers.MySql` 4.11.
-  File: `src/Rig.TUnit.Databases.Sql.MySql/Fixtures/MySqlFixture.cs`
-- [ ] T103 [depends: T102] RED→GREEN `MySqlRigBuilder : SqlRigBuilder<MySqlRigBuilder>` overriding `UseProvider` to call `options.UseMySql(connectionString, ServerVersion.AutoDetect(...))` via Pomelo 9.
-- [ ] T104 [depends: T103] RED→GREEN `MySqlRigBuilderExtensions.UseMySql(...)`.
-- [ ] T105 [depends: T104] RED→GREEN `MySqlBuilderExtensions` — EF Core wrapper convenience (cites Pomelo PR #2019 in a class-level comment).
-- [ ] T106 [depends: T105] Create `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Integration/` with `MySqlContractTests : SqlRigContract<MySqlFixture>` + `MySqlParallelIsolationTests : ParallelIsolationContract<MySqlFixture>` + `MySqlQuirkTests` (AUTO_INCREMENT, timestamp behaviour).
-- [ ] T107 [depends: T106] Add README; remove MySql from `ProviderCompletenessTests` skip list; confirm GREEN.
+- `tests/Rig.TUnit.{Family}.{Provider}.Tests.Unit/` — NEW project per package; tests for Options (SectionName + [Required] validation), RigBuilder (sealed + CRTP), `Use{Provider}` (fluent + null-guards), and any pure-function helper (`RuChargeCapture`, `PartitionKeyDistributionChecker`, `CapturingTelemetryChannel` enqueue/dequeue semantics, `TagCardinalityGuard`, etc.). Register in slnx.
+- `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/` — contract suite inheritance (`{Family}RigContract`), parallel-isolation smoke (`ParallelIsolationContract<{Provider}Fixture>`), and `{Provider}QuirkTests.cs` for provider-specific behaviours (MySql AUTO_INCREMENT, Oracle PL/SQL, Cosmos RU-charge + partition distribution, AppInsights in-process telemetry capture, Docker compose).
+- Contract test: `{Provider}Contract : {Family}RigContract`.
+- Benchmark: `tests/Rig.TUnit.Benchmarks/{Provider}Benchmarks.cs` — measures fixture start cost (cached image; second+ run), helper allocations, and any hot-path public API.
 
-### 4b `Rig.TUnit.Databases.Sql.Oracle`
+**Scaffold tasks that only create the csproj retain their scaffolding nature** — the RED→GREEN cadence begins at the first task that adds a `.cs` under `src/`. Scaffolding commits use `chore(004): T{NNN} — scaffold {package}.csproj + slnx registration` (no test required because no src code is added).
 
-- [ ] T108 [P] Scaffold `src/Rig.TUnit.Databases.Sql.Oracle/Rig.TUnit.Databases.Sql.Oracle.csproj`. Register in slnx.
-- [ ] T109 [depends: T108] RED→GREEN `OracleFixtureOptions`.
-- [ ] T110 [depends: T109] RED→GREEN `OracleFixture : SqlFixtureBase` — image `gvenzl/oracle-free:23.5-slim-faststart`, `Wait.ForListeningPorts()`, 5-min startup timeout (aspire#12036).
-- [ ] T111 [depends: T110] RED→GREEN `OracleRigBuilder : SqlRigBuilder<OracleRigBuilder>` overriding `UseProvider` to call `options.UseOracle(connectionString)`.
-- [ ] T112 [depends: T111] RED→GREEN `OracleRigBuilderExtensions.UseOracle(...)`.
-- [ ] T113 [depends: T112] RED→GREEN `OracleBuilderExtensions` — EF Core wrapper.
-- [ ] T114 [depends: T113] Create `tests/Rig.TUnit.Databases.Sql.Oracle.Tests.Integration/` with contract + parallel-isolation + `OracleQuirkTests` (PL/SQL specifics).
-- [ ] T115 [depends: T114] Add README; remove from skip list; confirm GREEN.
+### 4a `Rig.TUnit.Databases.Sql.MySql` *(TDD template — every RED→GREEN task splits into two commits)*
 
-### 4c `Rig.TUnit.Databases.NoSql.Cosmos`
+- [ ] T100 [P] Scaffold `src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Unit/` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Integration/` csprojs. Register all three in `Rig.TUnit.slnx`. Add `Rig.TUnit.Benchmarks/MySqlBenchmarks.cs` placeholder + ProjectReference.  *Scaffold-only; no src code under src/ yet — no RED required.* Commit: `chore(004): T100 — scaffold Rig.TUnit.Databases.Sql.MySql`.
+- [ ] T101-RED [depends: T100] Write unit tests: `MySqlFixtureOptionsTests` (SectionName + [Required] + defaults), `MySqlRigBuilderTests`, `UseMySqlExtensionsTests` (both fluent + EF wrapper). Write integration: `MySqlContract : SqlRigContract` wired to `SharedMySqlFixture`, `MySqlParallelIsolationTests : ParallelIsolationContract`, `MySqlQuirkTests` for AUTO_INCREMENT + timestamp behaviour. Write benchmark: `MySqlBenchmarks.cs` (fixture start + query throughput). Verify RED.
+- [ ] T101-GREEN [depends: T101-RED] Write `Options/MySqlFixtureOptions.cs`.
+- [ ] T102-GREEN [depends: T101-GREEN] Write `Fixtures/MySqlFixture.cs : SqlFixtureBase` using `Testcontainers.MySql 4.11` (image passed to ctor).
+- [ ] T103-GREEN [depends: T102-GREEN] Write `Builder/MySqlRigBuilder.cs : SqlRigBuilder<MySqlRigBuilder>` overriding `UseProvider` → `options.UseMySql(connectionString, ServerVersion.AutoDetect(...))` via Pomelo 9.
+- [ ] T104-GREEN [depends: T103-GREEN] Write `Builder/MySqlRigBuilderExtensions.UseMySql(...)`.
+- [ ] T105-GREEN [depends: T104-GREEN] Write `Extensions/MySqlBuilderExtensions.cs` — EF Core wrapper convenience (cites Pomelo PR #2019 in a class-level comment).
+- [ ] T106 [depends: T105-GREEN] Run full Integration suite (Docker up) — all contract + quirk + parallel-isolation tests GREEN. Coverage ≥ 90/85.
+- [ ] T107 [depends: T106] Add README. Promote MySql to `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
 
-- [ ] T116 [P] Scaffold `src/Rig.TUnit.Databases.NoSql.Cosmos/Rig.TUnit.Databases.NoSql.Cosmos.csproj`. Register in slnx.
-- [ ] T117 [depends: T116] RED→GREEN `CosmosFixtureOptions`.
-- [ ] T118 [depends: T117] RED→GREEN `CosmosFixture : DocumentFixtureBase` using **`Testcontainers.GenericContainer` (from the base `Testcontainers` package) — NOT the `Testcontainers.CosmosDb` module**, which targets the legacy Windows emulator and hard-codes an incompatible image path. Image: `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview`. Wait strategy: custom `IWaitUntil` that HTTP-GETs `https://localhost:{port}/_explorer/emulator.pem` with `ServerCertificateCustomValidationCallback` trust-all (testcontainers-dotnet#1306 workaround). After T140, remove `Testcontainers.CosmosDb 4.6.0` from `Directory.Packages.props` if no production code references it — it becomes dead weight in the transitive graph.
-- [ ] T119 [depends: T118] RED→GREEN `CosmosRigBuilder : NoSqlRigBuilder<CosmosRigBuilder>` + `UseCosmos` extension.
-- [ ] T120 [depends: T119] RED→GREEN `RuChargeCapture` helper.
-  File: `src/Rig.TUnit.Databases.NoSql.Cosmos/Helpers/RuChargeCapture.cs`
-- [ ] T121 [depends: T120] RED→GREEN `PartitionKeyDistributionChecker` helper.
-- [ ] T122 [depends: T121] Create `tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration/` with `CosmosContractTests : NoSqlRigContract<CosmosFixture>` + `CosmosParallelIsolationTests : ParallelIsolationContract<CosmosFixture>` + `CosmosQuirkTests` (RU-charge via `RuChargeCapture`, partition-distribution via `PartitionKeyDistributionChecker`). Gate Windows runners with `[Category("cosmos")]` + runtime `OperatingSystem.IsWindows()` skip with clear reason (Linux-only emulator).
-- [ ] T123 [depends: T122] Add README; remove from skip list; confirm GREEN.
+### 4b `Rig.TUnit.Databases.Sql.Oracle` *(TDD template — RED→GREEN pairs)*
 
-### 4d `Rig.TUnit.Observability.AppInsights`
+- [ ] T108 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`OracleBenchmarks.cs`). Commit: `chore(004): T108 — scaffold Rig.TUnit.Databases.Sql.Oracle`.
+- [ ] T109-RED [depends: T108] Write unit + integration + benchmark tests (Options, RigBuilder, UseOracle, EF wrapper, OracleQuirkTests for PL/SQL specifics, `OracleContract : SqlRigContract`, `OracleParallelIsolationTests`). Verify RED.
+- [ ] T109-GREEN [depends: T109-RED] Write `Options/OracleFixtureOptions.cs`.
+- [ ] T110-GREEN [depends: T109-GREEN] Write `Fixtures/OracleFixture.cs : SqlFixtureBase` — image `gvenzl/oracle-free:23.5-slim-faststart`, `Wait.ForListeningPorts()`, 5-min startup timeout (aspire#12036).
+- [ ] T111-GREEN [depends: T110-GREEN] Write `Builder/OracleRigBuilder.cs : SqlRigBuilder<OracleRigBuilder>` overriding `UseProvider` → `options.UseOracle(connectionString)`.
+- [ ] T112-GREEN [depends: T111-GREEN] Write `Builder/OracleRigBuilderExtensions.UseOracle(...)`.
+- [ ] T113-GREEN [depends: T112-GREEN] Write `Extensions/OracleBuilderExtensions.cs` — EF Core wrapper.
+- [ ] T114 [depends: T113-GREEN] Run full Integration suite (Docker up). Coverage ≥ 90/85.
+- [ ] T115 [depends: T114] Add README. Promote Oracle in `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
 
-- [ ] T124 [P] Scaffold `src/Rig.TUnit.Observability.AppInsights/Rig.TUnit.Observability.AppInsights.csproj`. Register in slnx.
-- [ ] T125 [depends: T124] RED→GREEN `AppInsightsFixtureOptions`.
-- [ ] T126 [depends: T125] RED→GREEN `CapturingTelemetryChannel : ITelemetryChannel` (internal, thread-safe `ConcurrentQueue<ITelemetry>` capture).
-  File: `src/Rig.TUnit.Observability.AppInsights/Fixtures/CapturingTelemetryChannel.cs`
-- [ ] T127 [depends: T126] RED→GREEN `AppInsightsFixture : TelemetryFixtureBase` — no container, in-process TelemetryClient with custom channel.
-- [ ] T128 [depends: T127] RED→GREEN `AppInsightsRigBuilder : TelemetryRigBuilder<AppInsightsRigBuilder>` + `UseAppInsights` extension.
-- [ ] T129 [depends: T128] RED→GREEN `AppInsightsAssert` mirroring `TraceAssert` / `MetricAssert` surface.
-  File: `src/Rig.TUnit.Observability.AppInsights/Assertions/AppInsightsAssert.cs`
-- [ ] T130 [depends: T129] Create `tests/Rig.TUnit.Observability.AppInsights.Tests.Integration/` with `AppInsightsContractTests : TelemetryRigContract<AppInsightsFixture>` + `AppInsightsParallelIsolationTests : ParallelIsolationContract<AppInsightsFixture>` (20 parallel in-process fixtures with zero captured-telemetry cross-talk).
-- [ ] T131 [depends: T130] Add README; remove from skip list; confirm GREEN.
+### 4c `Rig.TUnit.Databases.NoSql.Cosmos` *(TDD template)*
 
-### 4e `Rig.TUnit.Docker` (complete template)
+- [ ] T116 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`CosmosBenchmarks.cs`). Commit: `chore(004): T116 — scaffold Cosmos`.
+- [ ] T117-RED [depends: T116] Write unit tests (Options, RigBuilder, UseCosmos, `RuChargeCaptureTests` pure, `PartitionKeyDistributionCheckerTests` pure). Integration: `CosmosContract : NoSqlRigContract`, `CosmosParallelIsolationTests`, `CosmosQuirkTests` (RU-charge + partition-distribution gated with `[Category("cosmos")]` + runtime `OperatingSystem.IsWindows()` skip). Benchmark. Verify RED.
+- [ ] T117-GREEN [depends: T117-RED] Write `Options/CosmosFixtureOptions.cs`.
+- [ ] T118-GREEN [depends: T117-GREEN] Write `Fixtures/CosmosFixture.cs : DocumentFixtureBase` using **`Testcontainers.GenericContainer` (base `Testcontainers` package) — NOT `Testcontainers.CosmosDb`** (legacy Windows emulator, incompatible). Image: `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview`. Wait strategy: custom `IWaitUntil` HTTP-GETing `https://localhost:{port}/_explorer/emulator.pem` with `ServerCertificateCustomValidationCallback` trust-all (testcontainers-dotnet#1306). After T140, remove `Testcontainers.CosmosDb` from `Directory.Packages.props` if unused.
+- [ ] T119-GREEN [depends: T118-GREEN] Write `Builder/CosmosRigBuilder.cs : NoSqlRigBuilder<CosmosRigBuilder>` + `UseCosmos` extension.
+- [ ] T120-GREEN [depends: T119-GREEN] Write `Helpers/RuChargeCapture.cs`.
+- [ ] T121-GREEN [depends: T120-GREEN] Write `Helpers/PartitionKeyDistributionChecker.cs`.
+- [ ] T122 [depends: T121-GREEN] Run full Integration suite on Linux runner (Windows runners gated-skip). Coverage ≥ 90/85.
+- [ ] T123 [depends: T122] Add README. Promote Cosmos. Remove from skip lists. Commit.
 
-- [ ] T132 [P] [depends: T099] Verify existing `src/Rig.TUnit.Docker/Fixtures/ContainerFixture.cs` compiles cleanly under Testcontainers 4.11.
-- [ ] T133 [depends: T132] RED→GREEN `DockerFixtureOptions` (image-pull cache reuse, per-test networks, healthcheck ready-detection toggles).
-  File: `src/Rig.TUnit.Docker/Options/DockerFixtureOptions.cs`
-- [ ] T134 [depends: T133] RED→GREEN `DockerRigBuilder` + `UseDocker` extension (no family base — ships its own fluent surface).
-  Files: `src/Rig.TUnit.Docker/Builder/DockerRigBuilder.cs`, `DockerRigBuilderExtensions.cs`
-- [ ] T135 [depends: T134] RED→GREEN `DockerComposeFixture` — primary `Testcontainers` native compose; fallback to `Ductus.FluentDocker` only if regressed (documented activation criteria in README).
-  File: `src/Rig.TUnit.Docker/Fixtures/DockerComposeFixture.cs`
-- [ ] T136 [depends: T135] Create `tests/Rig.TUnit.Docker.Tests.Integration/` with basic `alpine:3` echo container test + 2-container compose test + `DockerParallelIsolationTests : ParallelIsolationContract<ContainerFixture>` (20 parallel `alpine:3` containers, distinct `IsolationKey`, zero cross-talk on per-test networks). Register in slnx.
-- [ ] T137 [depends: T136] Add README (document compose-backend activation criteria); confirm `ProviderCompletenessTests` GREEN for Docker.
+### 4d `Rig.TUnit.Observability.AppInsights` *(TDD template; in-process — no container)*
+
+- [ ] T124 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`AppInsightsBenchmarks.cs`). Commit: `chore(004): T124 — scaffold AppInsights`.
+- [ ] T125-RED [depends: T124] Write unit tests (Options, RigBuilder, UseAppInsights, `CapturingTelemetryChannelTests` pure: enqueue/dequeue thread-safety, `AppInsightsAssertTests` with mocked telemetry items). Integration: `AppInsightsContract : TelemetryRigContract`, `AppInsightsParallelIsolationTests` (20 parallel in-process fixtures, zero captured-telemetry cross-talk). Benchmark. Verify RED.
+- [ ] T125-GREEN [depends: T125-RED] Write `Options/AppInsightsFixtureOptions.cs`.
+- [ ] T126-GREEN [depends: T125-GREEN] Write `Fixtures/CapturingTelemetryChannel.cs : ITelemetryChannel` (internal, thread-safe `ConcurrentQueue<ITelemetry>`).
+- [ ] T127-GREEN [depends: T126-GREEN] Write `Fixtures/AppInsightsFixture.cs : TelemetryFixtureBase` — no container, in-process `TelemetryClient` with custom channel.
+- [ ] T128-GREEN [depends: T127-GREEN] Write `Builder/AppInsightsRigBuilder.cs : TelemetryRigBuilder<AppInsightsRigBuilder>` + `UseAppInsights` extension.
+- [ ] T129-GREEN [depends: T128-GREEN] Write `Assertions/AppInsightsAssert.cs` mirroring `TraceAssert` / `MetricAssert` surface.
+- [ ] T130 [depends: T129-GREEN] Run full Integration suite (no Docker needed — in-process). Coverage ≥ 90/85.
+- [ ] T131 [depends: T130] Add README. Promote AppInsights. Remove from skip lists. Commit.
+
+### 4e `Rig.TUnit.Docker` (complete template) *(TDD template)*
+
+- [ ] T132 [P] [depends: T099] Scaffold `tests/Rig.TUnit.Docker.Tests.Unit/` + `tests/Rig.TUnit.Docker.Tests.Integration/` csprojs (ContainerFixture is pre-existing; we're completing the template). Register in slnx. Benchmark placeholder (`DockerBenchmarks.cs`). Verify existing `ContainerFixture.cs` compiles cleanly under Testcontainers 4.11. Commit: `chore(004): T132 — scaffold Docker Tests.Unit/Integration + Benchmarks wiring`.
+- [ ] T133-RED [depends: T132] Write unit tests (`DockerFixtureOptionsTests`, `DockerRigBuilderTests`, `UseDockerExtensionsTests`, `DockerComposeFixtureTests` — compose-file parser, no Docker). Integration: basic `alpine:3` echo container test + 2-container compose test + `DockerParallelIsolationTests : ParallelIsolationContract<ContainerFixture>` (20 parallel `alpine:3` containers, distinct `IsolationKey`, zero cross-talk on per-test networks). Benchmark: container start cost, compose up/down cost. Verify RED.
+- [ ] T133-GREEN [depends: T133-RED] Write `Options/DockerFixtureOptions.cs` (image-pull cache reuse, per-test networks, healthcheck ready-detection toggles).
+- [ ] T134-GREEN [depends: T133-GREEN] Write `Builder/DockerRigBuilder.cs` + `DockerRigBuilderExtensions.cs` (no family base — ships its own fluent surface).
+- [ ] T135-GREEN [depends: T134-GREEN] Write `Fixtures/DockerComposeFixture.cs` — primary `Testcontainers` native compose; fallback to `Ductus.FluentDocker` only if regressed (activation criteria documented in README).
+- [ ] T136 [depends: T135-GREEN] Run full Integration suite. Coverage ≥ 90/85.
+- [ ] T137 [depends: T136] Add README (document compose-backend activation criteria). Promote Docker. Remove from skip lists. Commit.
 
 ### Phase 4 gate
 
@@ -406,30 +507,34 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 **Goal**: EventSourcing, Saga, Contracts packages gain the richer surface per 003 §4.11. Exit gate: new types tested + integration tests GREEN.
 
+**TDD GATE APPLIES — NO EXCEPTIONS.** Every `RED→GREEN` task splits into two commits. For each Microservices package:
+
+- `tests/Rig.TUnit.Microservices.{Package}.Tests.Unit/` — NEW project per package (if not already present); tests for pure-function helpers (`AggregateAssert` fluent chain, `SagaAssert` step/compensation logic, `PactBrokerClientStub` file parse, `SchemaEvolutionHelper` JSON-drift detection).
+- `tests/Rig.TUnit.Microservices.{Package}.Tests.Integration/` — already exists; extend with end-to-end exercises of the new surface.
+- Contract-style reusability is already covered by the Microservices base packages; no separate contract project needed.
+- Benchmark: `tests/Rig.TUnit.Benchmarks/{Package}Benchmarks.cs` — measure allocation of new Asserts/Helpers. Add ProjectReference in `Rig.TUnit.Benchmarks.csproj` per package.
+
 ### 5a EventSourcing
 
-- [ ] T142 [P] RED→GREEN `AggregateAssert` fluent: `AggregateAssert.For(aggregate).Raised<TEvent>().WithData(predicate)`.
-  File: `src/Rig.TUnit.Microservices.EventSourcing/Assertions/AggregateAssert.cs`
-- [ ] T143 [depends: T142] RED→GREEN `EventCatalogueVerifier` — walks every event type in the catalogue and confirms each is producible through its factory.
-  File: `src/Rig.TUnit.Microservices.EventSourcing/Helpers/EventCatalogueVerifier.cs`
-- [ ] T144 [depends: T143] RED→GREEN `SchemaEvolutionHelper` — loads legacy-JSON payload, asserts current type deserializes without data loss.
-- [ ] T145 [depends: T144] Extend `tests/Rig.TUnit.Microservices.EventSourcing.Tests.Integration/` with coverage for all three new surfaces. Add README.
+- [ ] T142-RED [P] Create `tests/Rig.TUnit.Microservices.EventSourcing.Tests.Unit/` with `AggregateAssertTests` (fluent `.For(agg).Raised<TEvent>().WithData(pred)` — pure, exhaustive matcher coverage), `EventCatalogueVerifierTests` (discovers event factories via reflection — uses a fake catalogue), `SchemaEvolutionHelperTests` (loads fixture JSON with missing/added/renamed fields — pure). Integration: extend existing Integration project with `AggregateAssertLiveTests.cs`, `EventCatalogueVerifierLiveTests.cs`, `SchemaEvolutionHelperLiveTests.cs` against a real aggregate. Benchmark: `EventSourcingBenchmarks.cs`. Verify RED.
+- [ ] T142-GREEN [depends: T142-RED] Write `src/Rig.TUnit.Microservices.EventSourcing/Assertions/AggregateAssert.cs`.
+- [ ] T143-GREEN [depends: T142-GREEN] Write `Helpers/EventCatalogueVerifier.cs` — walks every event type in the catalogue and confirms producibility.
+- [ ] T144-GREEN [depends: T143-GREEN] Write `Helpers/SchemaEvolutionHelper.cs` — loads legacy-JSON payload, asserts current type deserializes without data loss.
+- [ ] T145 [depends: T144-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### 5b Saga
 
-- [ ] T146 [P] RED→GREEN `SagaAssert` fluent: `SagaAssert.For(history).Step(name).Compensated()`.
-  File: `src/Rig.TUnit.Microservices.Saga/Assertions/SagaAssert.cs`
-- [ ] T147 [depends: T146] RED→GREEN `SagaTimeoutHelper` — advances injected `TimeProvider` until saga timeout fires, asserts correct compensation.
-  File: `src/Rig.TUnit.Microservices.Saga/Helpers/SagaTimeoutHelper.cs`
-- [ ] T148 [depends: T147] Extend `tests/Rig.TUnit.Microservices.Saga.Tests.Integration/`. Add README.
+- [ ] T146-RED [P] Create `tests/Rig.TUnit.Microservices.Saga.Tests.Unit/` with `SagaAssertTests` (`.For(history).Step(name).Compensated()` — pure), `SagaTimeoutHelperTests` (uses `FakeTimeProvider` — pure). Integration: extend existing Integration project. Benchmark: `SagaBenchmarks.cs`. Verify RED.
+- [ ] T146-GREEN [depends: T146-RED] Write `Assertions/SagaAssert.cs`.
+- [ ] T147-GREEN [depends: T146-GREEN] Write `Helpers/SagaTimeoutHelper.cs` — advances injected `TimeProvider` until saga timeout fires, asserts correct compensation.
+- [ ] T148 [depends: T147-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### 5c Contracts
 
-- [ ] T149 [P] RED→GREEN `PactBrokerClientStub` — file-based (reads `TestInfrastructure/Pacts/*.json` per C-002). No HTTP, no HAL emulation.
-  File: `src/Rig.TUnit.Microservices.Contracts/Helpers/PactBrokerClientStub.cs`
-- [ ] T150 [depends: T149] RED→GREEN `ProviderVerificationFixture` — loads Pact, stands up producer endpoints, verifies every interaction.
-  File: `src/Rig.TUnit.Microservices.Contracts/Fixtures/ProviderVerificationFixture.cs`
-- [ ] T151 [depends: T150] Extend `tests/Rig.TUnit.Microservices.Contracts.Tests.Integration/`. Add README. Seed `TestInfrastructure/Pacts/sample.json` fixture.
+- [ ] T149-RED [P] Create `tests/Rig.TUnit.Microservices.Contracts.Tests.Unit/` with `PactBrokerClientStubTests` (file-based reads, C-002 compliant — pure, no HTTP), `ProviderVerificationFixtureTests` (mocks producer endpoints, verifies every interaction). Integration: extend existing project with end-to-end verification using a seeded `TestInfrastructure/Pacts/sample.json`. Benchmark: `ContractsBenchmarks.cs`. Verify RED.
+- [ ] T149-GREEN [depends: T149-RED] Write `Helpers/PactBrokerClientStub.cs` — file-based (reads `TestInfrastructure/Pacts/*.json`). No HTTP, no HAL emulation.
+- [ ] T150-GREEN [depends: T149-GREEN] Write `Fixtures/ProviderVerificationFixture.cs` — loads Pact, stands up producer endpoints, verifies every interaction.
+- [ ] T151 [depends: T150-GREEN] Seed `tests/.../TestInfrastructure/Pacts/sample.json`. Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### Phase 5 gate
 
@@ -440,7 +545,9 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ## Phase 6 — Polish & CI
 
-**Goal**: every provider ships README; `ReadmeCompletenessTests` fully enforced; `Rig.TUnit.All` transitively covers everything; CI matrix extended. Exit gate: all SC-001..SC-011 met.
+**Goal**: every provider ships README; `ReadmeCompletenessTests` fully enforced; `Rig.TUnit.All` transitively covers everything; CI matrix extended; **every provider has a Tests.Unit project, an Integration project, a contract test, and a Benchmark class (4-test rule enforced)**. Exit gate: all SC-001..SC-011 met + 4-test completeness verified.
+
+**TDD GATE APPLIES**: tasks that touch src in Phase 6 (rare — mostly polish) still follow RED→GREEN. New architecture rule `TestCompletenessTests` lands in T157a below to codify the 4-test requirement as enforcement rather than convention.
 
 ### 6a README coverage
 
@@ -449,6 +556,11 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
   Files: `src/Rig.TUnit.{various}/README.md`
 - [ ] T156 [depends: T155] Remove all `[Category("SkipUntilFixed")]` markers from `ReadmeCompletenessTests`.
 - [ ] T157 [depends: T156] Run full `dotnet test`. Confirm `ReadmeCompletenessTests` fully GREEN.
+
+### 6a-bis TestCompletenessTests (new architecture rule)
+
+- [ ] T157a-RED [depends: T157] Write `tests/Rig.TUnit.Architecture.Tests/Rules/TestCompletenessTests.cs` — rule MUST fail when any `src/Rig.TUnit.{Family}.{Provider}/` folder lacks any of: (a) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Unit/` project, (b) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/` project, (c) matching `{Provider}Contract.cs` inside the Integration project, (d) at least one `{Provider}*Benchmarks.cs` in `tests/Rig.TUnit.Benchmarks/`. Initial skip list empty — every provider must pass. Verify RED (test itself passes — no unit-under-test yet; the failing assertions will drive Phase 6 completion). Commit: `test(004): T157a — RED TestCompletenessTests`.
+- [ ] T157a-GREEN [depends: T157a-RED] Ensure every provider has the 4 artefacts listed above (back-fill any missing Unit project / Benchmark class discovered by the rule). Once all 4 pass per provider, commit: `feat(004): T157a — GREEN TestCompletenessTests (4-test completeness enforced repo-wide)`.
 
 ### 6b Meta-package sync
 
@@ -474,10 +586,19 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 ## Pre-PR final gate
 
 - [ ] T168 [depends: T167] Run `dotnet format --verify-no-changes` — clean.
-- [ ] T169 [depends: T168] Run `dotnet build` — zero new warnings.
-- [ ] T170 [depends: T169] Run full `dotnet test` — all tests green, coverage gates met.
-- [ ] T171 [depends: T170] Verify commit log shows RED → GREEN → REFACTOR order across all production changes (`git log --oneline --grep='— RED'` and `— GREEN` counts match within each phase).
-- [ ] T172 [depends: T171] Open PR against `master`. Title: `feat(004): Provider Consistency Remediation — uniform provider shape + 4 new packages + architecture-test enforcement`.
+- [ ] T169 [depends: T168] Run `dotnet build Rig.TUnit.slnx` — zero new warnings under `TreatWarningsAsErrors=true`.
+- [ ] T170 [depends: T169] Run full `dotnet test` across **unit + integration + contract** projects (Docker up). All green. Coverage gates met (line ≥ 90 %, branch ≥ 85 %) per package.
+- [ ] T170a [depends: T170] Run the full Benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks --` (no filter). Record summary output in `PR description` — any regression ≥ 20 % vs Phase-3 baseline MUST be root-caused before merge.
+- [ ] T171 [depends: T170a] Verify commit log shows RED → GREEN order across all production changes. Run:
+  ```bash
+  git log master..HEAD --oneline --grep='— RED'  | wc -l   # count of RED commits
+  git log master..HEAD --oneline --grep='— GREEN' | wc -l   # count of GREEN commits
+  # For Phase 3/4/5/6 these MUST be within +/- 1 of each other
+  # (a RED may cover multiple test files feeding one GREEN, but every GREEN MUST trace to a preceding RED)
+  git log master..HEAD --oneline --grep='T[0-9]\+-GREEN'    # list every GREEN commit — each MUST have a matching TNNN-RED before it
+  ```
+- [ ] T171a [depends: T171] `TestCompletenessTests` (T157a) GREEN — every provider has unit + integration + contract + benchmark test file. No exceptions.
+- [ ] T172 [depends: T171a] Open PR against `master`. Title: `feat(004): Provider Consistency Remediation — uniform provider shape + 4 new packages + architecture-test enforcement (unit + integration + contract + benchmark per provider, 90/85 coverage)`.
 - [ ] T173 [depends: T172] Update `.dotnet-ai-kit/features/004-provider-consistency-remediation/spec.md` — change Status from `Draft` to `Shipped` once PR merges.
 
 ---

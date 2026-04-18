@@ -41,7 +41,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        ("Rig.TUnit.Caching.Fusion",              "T064"),
         ("Rig.TUnit.Docker",                      "T137"),
         ("Rig.TUnit.Observability.Metrics",       "T095"),
         ("Rig.TUnit.Security.Mtls",               "T086"),

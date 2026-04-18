@@ -3,6 +3,8 @@
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="ZiggyCreatures.FusionCache" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rig.TUnit.Caching\Rig.TUnit.Caching.csproj" />

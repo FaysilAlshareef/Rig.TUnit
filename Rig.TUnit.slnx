@@ -133,5 +133,6 @@
     <Project Path="tests/Rig.TUnit.Messaging.Nats.Tests.Unit/Rig.TUnit.Messaging.Nats.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/Rig.TUnit.Messaging.Sqs.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/Rig.TUnit.Caching.Hybrid.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Caching.Fusion.Tests.Unit/Rig.TUnit.Caching.Fusion.Tests.Unit.csproj" />
   </Folder>
 </Solution>

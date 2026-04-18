@@ -413,3 +413,46 @@ All five NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb) no
 - Benchmarks: 2/2 executed via InProcessEmitToolchain (Options ctor allocations).
 
 ProviderCompletenessTests.RequiredProviders: 14 → 15 · ReadmeCompletenessTests.SkipUntilFixed: 10 → 9.
+
+## T061/T062/T063/T064 — Fusion Caching GREEN (Phase 3c.iii, strict TDD)
+**Timestamp**: 2026-04-19
+**Repo**: primary
+**Status**: OK
+
+**RED sequence** (executed first — arch + unit + integration + benchmark failing before any src touched):
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Fusion moved from SkipUntilFixed → RequiredProviders (16 required now).
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — Fusion removed from SkipUntilFixed (8 remaining).
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/Rig.TUnit.Caching.Fusion.Tests.Unit.csproj`
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/FusionCacheRigBuilderTests.cs` (sealed/CRTP/null-guards)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/UseFusionCacheExtensionsTests.cs` (6 tests)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/FusionCacheFixtureOptionsTests.cs` (7 tests — SectionName + defaults + overrides + validation + range guards)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/FusionCacheRigBuilderConnectionStringTests.cs` (2 tests)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/FusionCacheFixtureTests.cs` (9 tests — ctor variants, pre-init Cache throws, dispose safe)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/FailSafeHelperTests.cs` (6 pure-function tests — disabled returns false; within-max returns true; at-exact-max inclusive; beyond-max false; null-options + negative-elapsed guards)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Unit/EagerRefreshHelperTests.cs` (7 pure-function tests — threshold-not-set / below-window / inside-window / at-threshold / beyond-duration / null-options + negative-elapsed guards)
+- created: `tests/Rig.TUnit.Caching.Fusion.Tests.Integration/UseFusionCacheFluentTests.cs` (3 integration tests — fluent wiring + GetOrSet round-trip + helpers-agree-with-fixture-config)
+- created: `tests/Rig.TUnit.Benchmarks/FusionCacheBenchmarks.cs` ([Config(InProcessEmitBenchmarkConfig)])
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added `ZiggyCreatures.FusionCache` PackageReference + `Rig.TUnit.Caching.Fusion` ProjectReference
+- modified: `Rig.TUnit.slnx` — registered new Fusion Tests.Unit project
+
+**RED evidence**: `dotnet build tests/Rig.TUnit.Caching.Fusion.Tests.Unit/…` produced 7 × CS0234 (`namespace Rig.TUnit.Caching.Fusion.{Builder,Options,Helpers}` missing).
+
+**GREEN sequence**:
+- created: `src/Rig.TUnit.Caching.Fusion/Options/FusionCacheFixtureOptions.cs` (SectionName="RigTUnit:FusionCache"; DefaultDurationSeconds + IsFailSafeEnabled + FailSafeMaxDurationSeconds + EagerRefreshThreshold with `[Range]` validation)
+- created: `src/Rig.TUnit.Caching.Fusion/Builder/FusionCacheRigBuilder.cs` (sealed CRTP of `CacheRigBuilder<FusionCacheRigBuilder>`, `ConnectionString` passthrough)
+- created: `src/Rig.TUnit.Caching.Fusion/Builder/FusionCacheRigBuilderExtensions.cs` (`UseFusionCache` fluent extension with ArgumentNullException.ThrowIfNull for rig/source/configure)
+- created: `src/Rig.TUnit.Caching.Fusion/Helpers/FailSafeHelper.cs` (pure-function `IsFailSafeApplicable(FusionCacheEntryOptions, TimeSpan)` with null-option + non-negative-elapsed guards)
+- created: `src/Rig.TUnit.Caching.Fusion/Helpers/EagerRefreshHelper.cs` (pure-function `ShouldEagerRefresh(FusionCacheEntryOptions, TimeSpan)` — returns true when `elapsed ∈ [Duration × Threshold, Duration)`)
+- modified: `src/Rig.TUnit.Caching.Fusion/Fixtures/FusionCacheFixture.cs` — added ctor variants (parameterless/IOptions/direct) + null-guards; FusionCacheEntryOptions now wired from options (Duration, IsFailSafeEnabled, FailSafeMaxDuration, EagerRefreshThreshold)
+- modified: `src/Rig.TUnit.Caching.Fusion/Rig.TUnit.Caching.Fusion.csproj` — added `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences
+- created: `src/Rig.TUnit.Caching.Fusion/README.md` (install + usage + fluent wiring + helpers section + options)
+
+**Verification (fresh)**:
+- Full solution build: 125 projects, 0 warnings, 0 errors (Debug + Release).
+- Unit: Fusion 41/41 GREEN (no Docker).
+- Integration: Fusion 19/19 GREEN (in-process — FusionContract + FusionCacheQuirkTests + UseFusionCacheFluentTests).
+- Architecture: 16/16 GREEN.
+- Benchmarks: 4/4 executed via InProcessEmitToolchain (Options ctor + helpers allocation).
+
+ProviderCompletenessTests.RequiredProviders: 15 → 16 · ReadmeCompletenessTests.SkipUntilFixed: 9 → 8.
+**Phase 3c (Caching) complete** — Memory (by-design) + Hybrid + Fusion all ship canonical shape. Next up: Phase 3d (Storage — AzureBlob/S3/MinIO/FileSystem).

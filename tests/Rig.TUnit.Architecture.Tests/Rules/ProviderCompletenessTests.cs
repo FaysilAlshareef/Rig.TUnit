@@ -48,6 +48,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Messaging.Sqs",            "SqsFixture",        "SqsFixtureOptions",        "SqsRigBuilder",        "UseSqs"),
         new("Rig.TUnit.Caching.Redis",            "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
         new("Rig.TUnit.Caching.Hybrid",           "HybridCacheFixture","HybridCacheFixtureOptions","HybridCacheRigBuilder","UseHybridCache"),
+        new("Rig.TUnit.Caching.Fusion",           "FusionCacheFixture","FusionCacheFixtureOptions","FusionCacheRigBuilder","UseFusionCache"),
     ];
 
     /// <summary>
@@ -59,7 +60,6 @@ public sealed class ProviderCompletenessTests
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
-        ("Rig.TUnit.Caching.Fusion",                  "T061-T064"),
         ("Rig.TUnit.Storage.AzureBlob",               "T065-T067"),
         ("Rig.TUnit.Storage.S3",                      "T068-T070"),
         ("Rig.TUnit.Storage.MinIO",                   "T071-T074"),

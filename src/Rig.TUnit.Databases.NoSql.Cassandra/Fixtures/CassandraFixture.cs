@@ -15,7 +15,7 @@ public sealed class CassandraFixture : DocumentFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new CassandraBuilder().WithImage("cassandra:5").Build();
+        _container = new CassandraBuilder("cassandra:5").Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
         await _container.StartAsync(cts.Token);
     }

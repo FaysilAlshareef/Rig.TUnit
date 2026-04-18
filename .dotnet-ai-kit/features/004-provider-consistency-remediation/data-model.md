@@ -76,7 +76,7 @@ SQL additionally adds `ReplaceDbContext<TContext>()`, promoted to the base.
 | Cassandra | **Add** `CassandraFixtureOptions` | **Add** `CassandraRigBuilder` | **Add** `UseCassandra` | `KeyspacePerTestHelper` |
 | Dynamo | **Add** `DynamoFixtureOptions` | **Add** `DynamoRigBuilder` | **Add** `UseDynamo` | `GsiVerifier` (LocalStack) |
 | ElasticSearch | **Add** `ElasticSearchFixtureOptions` | **Add** `ElasticSearchRigBuilder` | **Add** `UseElasticSearch` | `IndexRefreshHelper`, `DslAssert` |
-| EventStore | **Add** `EventStoreFixtureOptions` | **Add** `EventStoreRigBuilder` | **Add** `UseEventStore` | `StreamAssert`, `ProjectionAssert` |
+| KurrentDb (was EventStore) | **Add** `KurrentDbFixtureOptions` | **Add** `KurrentDbRigBuilder` | **Add** `UseKurrentDb` | `StreamAssert`, `ProjectionAssert` — built against `KurrentDB.Client 1.3.x` (drop-in replacement for the obsolete `EventStore.Client.Grpc.Streams`). Package renamed in Phase 1 T002c per the upstream KurrentDB rebrand. |
 
 ### E3.b Messaging (Phase 3)
 

@@ -42,8 +42,7 @@ public sealed class ServiceBusFixture : MessagingFixtureBase
             return;
         }
 
-        _container = new ServiceBusBuilder()
-            .WithImage($"mcr.microsoft.com/azure-messaging/servicebus-emulator:{_options.ImageTag}")
+        _container = new ServiceBusBuilder($"mcr.microsoft.com/azure-messaging/servicebus-emulator:{_options.ImageTag}")
             .WithAcceptLicenseAgreement(_options.AcceptEula)
             .Build();
 

@@ -38,8 +38,7 @@ public sealed class RedisFixture : CacheFixtureBase
             return;
         }
 
-        _container = new RedisBuilder()
-            .WithImage($"redis:{_options.ImageTag}")
+        _container = new RedisBuilder($"redis:{_options.ImageTag}")
             .Build();
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));

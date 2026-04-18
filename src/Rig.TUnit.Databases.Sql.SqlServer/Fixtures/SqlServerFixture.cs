@@ -41,8 +41,7 @@ public sealed class SqlServerFixture : SqlFixtureBase
             return;
         }
 
-        _container = new MsSqlBuilder()
-            .WithImage($"mcr.microsoft.com/mssql/server:{_options.ImageTag}")
+        _container = new MsSqlBuilder($"mcr.microsoft.com/mssql/server:{_options.ImageTag}")
             .WithPassword(_options.SaPassword)
             .Build();
 

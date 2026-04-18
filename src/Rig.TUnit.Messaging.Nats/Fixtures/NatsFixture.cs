@@ -13,7 +13,7 @@ public sealed class NatsFixture : MessagingFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new NatsBuilder().WithImage("nats:2.10-alpine").Build();
+        _container = new NatsBuilder("nats:2.10-alpine").Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
         await _container.StartAsync(cts.Token);
     }

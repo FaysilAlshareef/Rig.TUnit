@@ -40,8 +40,7 @@ public class SeqFixture : TelemetryFixtureBase
     {
         if (_initialized) return;
 
-        _container = new ContainerBuilder()
-            .WithImage($"datalust/seq:{_options.ImageTag}")
+        _container = new ContainerBuilder($"datalust/seq:{_options.ImageTag}")
             .WithEnvironment("ACCEPT_EULA", "Y")
             .WithEnvironment("SEQ_FIRSTRUN_NOAUTHENTICATION", "True")
             .WithPortBinding(80, assignRandomHostPort: true)

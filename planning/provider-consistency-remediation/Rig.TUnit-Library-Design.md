@@ -19,7 +19,7 @@ The 003 design doc specifies every provider ships `Fixture + Options + Builder (
 | Family | Complete | Missing builder | Fixture-only (minimum) |
 |---|---|---|---|
 | **Databases.Sql** | SqlServer, Sqlite | Postgresql (no extensions file) | — |
-| **Databases.NoSql** | Redis (KV, no fixture — borrows `Caching.Redis`) | Mongo | **Cassandra, Dynamo, ElasticSearch, EventStore** |
+| **Databases.NoSql** | Redis (KV, no fixture — borrows `Caching.Redis`) | Mongo | **Cassandra, Dynamo, ElasticSearch, KurrentDb (was EventStore — renamed Phase 1 T002c per upstream Kurrent rebrand)** |
 | **Messaging** | ServiceBus | Kafka, RabbitMq | **Nats, Sqs** |
 | **Caching** | Redis, Memory, Hybrid | — | **Fusion** |
 | **Storage** | — | AzureBlob, S3 | **FileSystem, MinIO** |
@@ -123,7 +123,7 @@ A provider is "complete" iff every file in its family template compiles, its ext
 | Cassandra | ✓ | **add** | **add** | **add** | **add** `KeyspacePerTestHelper` |
 | Dynamo | ✓ | **add** | **add** | **add** | **add** `GsiVerifier` (LocalStack) |
 | ElasticSearch | ✓ | **add** | **add** | **add** | **add** `IndexRefreshHelper` + `DslAssert` |
-| EventStore | ✓ | **add** | **add** | **add** | **add** `StreamAssert`, `ProjectionAssert` |
+| KurrentDb (renamed from EventStore in Phase 1 T002c — package + namespace + class rename per upstream rebrand) | ✓ (rewritten on `KurrentDbBuilder` + `KurrentDB.Client 1.3.x`, image `kurrentplatform/kurrentdb:25.1`) | **add** `KurrentDbFixtureOptions` | **add** `KurrentDbRigBuilder` | **add** `UseKurrentDb` | **add** `StreamAssert`, `ProjectionAssert` |
 | **Cosmos** (new) | — | — | — | — | — → full template; use `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview` |
 
 ### 4.3 Messaging
@@ -282,7 +282,7 @@ No phase starts before the previous is green + architecture tests passing.
 - Turn on `TestFileOrganizationTests` across every test project.
 
 ### Phase 3 — Close gaps in existing providers
-- Databases.NoSql: Mongo, Cassandra, Dynamo, ElasticSearch, EventStore — add builder + extension + helper.
+- Databases.NoSql: Mongo, Cassandra, Dynamo, ElasticSearch, **KurrentDb (was EventStore — renamed Phase 1 T002c)** — add builder + extension + helper.
 - Messaging: Kafka, RabbitMq, Nats, Sqs — add builder + extension + Listener/EventSender.
 - Storage: all four — add builder + extension + SasBuilder.
 - Caching: Hybrid, Fusion — complete template.

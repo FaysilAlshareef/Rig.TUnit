@@ -34,8 +34,7 @@ public sealed class MongoFixture : DocumentFixtureBase
     {
         if (_container is not null) return;
 
-        _container = new MongoDbBuilder()
-            .WithImage($"mongo:{_options.ImageTag}")
+        _container = new MongoDbBuilder($"mongo:{_options.ImageTag}")
             .WithUsername(_options.Username)
             .WithPassword(_options.Password)
             .Build();

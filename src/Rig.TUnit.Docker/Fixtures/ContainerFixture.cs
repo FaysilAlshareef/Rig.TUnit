@@ -38,7 +38,7 @@ public sealed class ContainerFixture : RigFixtureBase
     {
         if (_container is not null) return;
 
-        var builder = new ContainerBuilder().WithImage(_image);
+        var builder = new ContainerBuilder(_image);
         if (_env is not null) foreach (var kv in _env) builder = builder.WithEnvironment(kv.Key, kv.Value);
         if (_exposedPorts is not null) foreach (var p in _exposedPorts) builder = builder.WithPortBinding(p, assignRandomHostPort: true);
 

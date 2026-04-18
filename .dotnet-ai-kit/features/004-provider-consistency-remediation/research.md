@@ -11,14 +11,19 @@ Evidence-backed decisions driving the implementation plan. Cites issues/PRs wher
 
 **Current state:** `Directory.Packages.props` pins every `Testcontainers.*` package at `4.6.0`. Planning doc asks for `4.11+` for MySql/Oracle/Cosmos.
 
-**Decision:** Bump the whole family to `4.11.x` as Phase 1 commit 1.
+**Decision:** Bump the whole family to `4.11.0` as Phase 1 commit 1. Two caveats surfaced during execution (2026-04-18):
+
+1. **`Testcontainers.EventStoreDb` has no 4.11 release** — the latest stable is `4.9.0` (2025-11-23) and the module's Builder type was marked `[Obsolete]` in 4.9 per the upstream KurrentDB rebrand. Decision: retire the module entirely (see R15 below). Do not carry a 4.9.x pin forward.
+2. **Testcontainers 4.11 deprecated every `new XxxBuilder()` parameterless constructor** — they now require the image string upfront (`new XxxBuilder("image:tag")`). Under the repo's `TreatWarningsAsErrors=true` policy this manifested as 18 CS0618 build failures across existing provider fixtures. Fix bundled into the same T002 commit: move the image from `.WithImage(...)` into the constructor.
 
 **Evidence:**
 - `ManagePackageVersionsCentrally = true` + `CentralPackageTransitivePinningEnabled = true` in `Directory.Packages.props` — mixed versions would force transitive pins to the higher version anyway, producing obscure restore warnings.
-- `Testcontainers` 4.6 → 4.11 is all in-major (4.x) — no breaking API changes per the project's changelog cadence.
+- `Testcontainers` 4.6 → 4.11 is all in-major (4.x) — no breaking API changes per the project's changelog cadence (the builder-ctor deprecation is a soft break gated by `[Obsolete]`).
+- `testcontainers-dotnet` discussion [#1470 comment 15185721](https://github.com/testcontainers/testcontainers-dotnet/discussions/1470#discussioncomment-15185721) documents the image-in-constructor migration path.
 - The 219-test baseline from 003 exercises every existing Testcontainers-backed fixture; bumping first gives us an immediate signal before any provider work.
+- **Wildcard pins (`9.0.*`, `6.0.*`, `2.4.*`) require the `<CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>` opt-in** on NuGet CPM — verified by NU1011 during the first restore attempt. Added to `<PropertyGroup>` alongside the existing `ManagePackageVersionsCentrally` + `CentralPackageTransitivePinningEnabled` settings.
 
-**Rollback:** Single-line revert in `Directory.Packages.props` if a regression surfaces.
+**Rollback:** Single-line revert in `Directory.Packages.props` if a regression surfaces. The KurrentDb rename is a separate rollback (R15).
 
 ---
 
@@ -237,6 +242,33 @@ dotnet test --collect:"XPlat Code Coverage" \
 
 ---
 
+## R15 — Event Store → KurrentDB rebrand (added post-analysis 2026-04-18)
+
+**Current state:** `src/Rig.TUnit.Databases.NoSql.EventStore/` depends on `Testcontainers.EventStoreDb 4.6.0` + `EventStore.Client.Grpc.Streams 23.3.8`. Under Testcontainers 4.11 the `Testcontainers.EventStoreDb` package has no release beyond `4.9.0`, and in `4.9.0` the whole module is marked `[Obsolete]` — Event Store rebranded to **KurrentDB** on 2026-11-20 and upstream Testcontainers mirrors the rename as a separate module `Testcontainers.KurrentDb`.
+
+**Decision:** Rename the Rig.TUnit package alongside the upstream rebrand — this is **a deliberate breaking change** in Phase 1, announced in release notes. Scope:
+
+- `Testcontainers.EventStoreDb 4.9.0` → `Testcontainers.KurrentDb 4.11.0`
+- `EventStore.Client.Grpc.Streams 23.3.8` → `KurrentDB.Client 1.3.1`
+- `src/Rig.TUnit.Databases.NoSql.EventStore/` → `src/Rig.TUnit.Databases.NoSql.KurrentDb/`
+- `tests/…EventStore.Tests.Integration/` → `tests/…KurrentDb.Tests.Integration/`
+- Namespace suffix `.EventStore` → `.KurrentDb`; class `EventStoreFixture` → `KurrentDbFixture`
+- Slnx + `Rig.TUnit.All.csproj` + `AssemblyLoader.cs` seed list updated in lockstep
+
+**Why not preserve the old name behind the scenes?** Feature 004 is labelled Provider **Consistency** Remediation. The upstream vendor has renamed; every dependency pinned in `Directory.Packages.props` will read `Kurrent*`; every contributor reading the source will see `KurrentDbContainer` / `KurrentDB.Client`. Keeping the wrapper named `EventStore` while all its innards read `Kurrent` adds permanent cognitive tax and defeats the "consistency" goal. A one-shot rename aligned to the upstream event is cheaper than ongoing confusion.
+
+**Evidence:**
+- [Kurrent rebrand FAQ](https://www.kurrent.io/blog/kurrent-re-brand-faq) — Event Store rebranded to Kurrent on 2026-11-20; phased rollout through Q1 2025; EventStoreDB → KurrentDB; the rebrand does not change the underlying tech.
+- NuGet — `Testcontainers.KurrentDb 4.11.0` (2026-03-12) available; the matching `EventStoreDbBuilder` in 4.9 is marked with `[Obsolete]` pointing to the FAQ URL above.
+- NuGet — `KurrentDB.Client 1.3.1` (2026-03-24) available; [`kurrent-io/KurrentDB-Client-Dotnet`](https://github.com/kurrent-io/KurrentDB-Client-Dotnet) — the successor repo to `EventStore/EventStore-Client-Dotnet`. Client construction: `new KurrentDBClient(KurrentDBClientSettings.Create("kurrentdb://admin:changeit@host:port?tls=false"))`.
+- `Testcontainers.KurrentDb` source — default image `kurrentplatform/kurrentdb:25.1`; constructor signatures: `KurrentDbBuilder(string image)` and `KurrentDbBuilder(IImage image)` (parameterless is obsolete). `KurrentDbContainer.GetConnectionString()` returns the `kurrentdb://…?tls=false` scheme directly usable by `KurrentDB.Client`.
+
+**Rollback plan:** Two-step revert — (a) revert the T002b/T002c/T002d commits; (b) if upstream deprecates the EventStoreDb module entirely (expected by late 2026), there is no rollback target — forward-only.
+
+**Forward implication for Phase 3a.v:** `KurrentDbFixtureOptions`, `KurrentDbRigBuilder`, `UseKurrentDb`, `StreamAssert`, `ProjectionAssert` all use the Kurrent naming — helper types built against the 1.3.x client, image tag configurable via options (default `25.1`).
+
+---
+
 ## References
 
 - `planning/provider-consistency-remediation/*.md` — primary design + handoff docs
@@ -247,3 +279,7 @@ dotnet test --collect:"XPlat Code Coverage" \
 - [aspire#12036](https://github.com/dotnet/aspire/issues/12036)
 - [testcontainers-dotnet#1306](https://github.com/testcontainers/testcontainers-dotnet/discussions/1306)
 - [Azure Cosmos DB Linux emulator docs](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator-linux)
+- [Kurrent rebrand FAQ](https://www.kurrent.io/blog/kurrent-re-brand-faq)
+- [KurrentDB.Client 1.3.1](https://www.nuget.org/packages/KurrentDB.Client/1.3.1)
+- [Testcontainers.KurrentDb 4.11.0](https://www.nuget.org/packages/Testcontainers.KurrentDb/4.11.0)
+- [testcontainers-dotnet#1470 comment 15185721](https://github.com/testcontainers/testcontainers-dotnet/discussions/1470#discussioncomment-15185721) — image-in-ctor migration guide

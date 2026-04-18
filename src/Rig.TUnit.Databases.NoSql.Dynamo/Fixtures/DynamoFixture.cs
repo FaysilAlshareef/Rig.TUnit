@@ -20,7 +20,7 @@ public sealed class DynamoFixture : DocumentFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new LocalStackBuilder().WithImage("localstack/localstack:3").Build();
+        _container = new LocalStackBuilder("localstack/localstack:3").Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(3));
         await _container.StartAsync(cts.Token);
 

@@ -15,8 +15,7 @@ public sealed class ElasticSearchFixture : DocumentFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new ElasticsearchBuilder()
-            .WithImage("docker.elastic.co/elasticsearch/elasticsearch:8.15.3")
+        _container = new ElasticsearchBuilder("docker.elastic.co/elasticsearch/elasticsearch:8.15.3")
             .Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(6));
         await _container.StartAsync(cts.Token);

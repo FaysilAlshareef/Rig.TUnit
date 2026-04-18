@@ -29,8 +29,7 @@ public sealed class S3Fixture : StorageFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new LocalStackBuilder()
-            .WithImage($"localstack/localstack:{_options.ImageTag}")
+        _container = new LocalStackBuilder($"localstack/localstack:{_options.ImageTag}")
             .Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));
         await _container.StartAsync(cts.Token).ConfigureAwait(false);

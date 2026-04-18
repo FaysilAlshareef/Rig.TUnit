@@ -24,8 +24,7 @@ public sealed class RabbitMqFixture : MessagingFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new RabbitMqBuilder()
-            .WithImage($"rabbitmq:{_options.ImageTag}")
+        _container = new RabbitMqBuilder($"rabbitmq:{_options.ImageTag}")
             .WithUsername(_options.Username)
             .WithPassword(_options.Password)
             .Build();

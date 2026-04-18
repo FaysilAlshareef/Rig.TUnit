@@ -3,13 +3,13 @@ using Rig.TUnit.Databases.Contracts;
 using Rig.TUnit.Databases.NoSql.Contracts;
 using Rig.TUnit.Databases.NoSql.Tests.Contract;
 
-namespace Rig.TUnit.Databases.NoSql.EventStore.Tests.Integration;
+namespace Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration;
 
 [InheritsTests]
-public sealed class EventStoreContract : NoSqlRigContract
+public sealed class KurrentDbContract : NoSqlRigContract
 {
     protected override async ValueTask<INoSqlRig> CreateNoSqlRigAsync(CancellationToken ct)
-        => await SharedEventStoreFixture.GetAsync().ConfigureAwait(false);
+        => await SharedKurrentDbFixture.GetAsync().ConfigureAwait(false);
 
     protected override ValueTask DisposeRigAsync(IDbRig rig) => ValueTask.CompletedTask;
 

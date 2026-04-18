@@ -3,6 +3,7 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
 
   <ItemGroup Label="Test framework">
@@ -13,24 +14,26 @@
   </ItemGroup>
 
   <ItemGroup Label="Testcontainers">
-    <PackageVersion Include="Testcontainers" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.MsSql" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.MySql" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Oracle" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Redis" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.ServiceBus" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Kafka" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.MongoDb" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.CosmosDb" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Azurite" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.LocalStack" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Minio" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Elasticsearch" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Cassandra" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.EventStoreDb" Version="4.6.0" />
-    <PackageVersion Include="Testcontainers.Nats" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.MySql" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Oracle" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.ServiceBus" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Kafka" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.MongoDb" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.CosmosDb" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Azurite" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.LocalStack" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Minio" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Elasticsearch" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Cassandra" Version="4.11.0" />
+    <!-- Testcontainers.EventStoreDb module is obsolete from 4.9 per the Kurrent rebrand (see research.md §R15).
+         Replaced with Testcontainers.KurrentDb below. Do NOT reintroduce the old pin. -->
+    <PackageVersion Include="Testcontainers.KurrentDb" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.Nats" Version="4.11.0" />
   </ItemGroup>
 
   <ItemGroup Label="Entity Framework Core">
@@ -41,7 +44,8 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-    <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    <PackageVersion Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.*" />
+    <PackageVersion Include="MySqlConnector" Version="2.4.*" />
     <PackageVersion Include="Oracle.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
 
@@ -53,11 +57,11 @@
   <ItemGroup Label="ASP.NET Core / gRPC / WebAPI">
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
-    <PackageVersion Include="Grpc.AspNetCore" Version="2.66.0" />
-    <PackageVersion Include="Grpc.AspNetCore.Server" Version="2.66.0" />
-    <PackageVersion Include="Grpc.Net.Client" Version="2.66.0" />
-    <PackageVersion Include="Google.Protobuf" Version="3.28.3" />
-    <PackageVersion Include="Grpc.Tools" Version="2.66.0" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.67.0" />
+    <PackageVersion Include="Grpc.AspNetCore.Server" Version="2.67.0" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.67.0" />
+    <PackageVersion Include="Google.Protobuf" Version="3.32.1" />
+    <PackageVersion Include="Grpc.Tools" Version="2.67.0" />
   </ItemGroup>
 
   <ItemGroup Label="Logging / Observability">
@@ -66,12 +70,12 @@
     <PackageVersion Include="Serilog.Sinks.Seq" Version="8.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.InMemory" Version="0.11.0" />
-    <PackageVersion Include="OpenTelemetry" Version="1.9.0" />
-    <PackageVersion Include="OpenTelemetry.Api" Version="1.9.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.InMemory" Version="1.9.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+    <PackageVersion Include="OpenTelemetry" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Api" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.InMemory" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
     <PackageVersion Include="Microsoft.ApplicationInsights" Version="2.23.0" />
     <PackageVersion Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
   </ItemGroup>
@@ -135,6 +139,11 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
   </ItemGroup>
 
+  <ItemGroup Label="Coverage">
+    <PackageVersion Include="coverlet.collector" Version="6.0.*" />
+    <PackageVersion Include="coverlet.msbuild" Version="6.0.*" />
+  </ItemGroup>
+
   <ItemGroup Label="Benchmarking">
     <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
   </ItemGroup>
@@ -157,7 +166,8 @@
     <PackageVersion Include="AWSSDK.DynamoDBv2" Version="3.7.403" />
     <PackageVersion Include="CassandraCSharpDriver" Version="3.22.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="EventStore.Client.Grpc.Streams" Version="23.3.8" />
+    <!-- EventStore.Client.Grpc.Streams superseded by KurrentDB.Client per the Kurrent rebrand (research.md §R15). -->
+    <PackageVersion Include="KurrentDB.Client" Version="1.3.1" />
     <PackageVersion Include="Elastic.Clients.Elasticsearch" Version="8.17.0" />
   </ItemGroup>
 

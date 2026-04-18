@@ -32,8 +32,7 @@ public sealed class PostgresFixture : SqlFixtureBase
     {
         if (_container is not null) return;
 
-        _container = new PostgreSqlBuilder()
-            .WithImage($"postgres:{_options.ImageTag}")
+        _container = new PostgreSqlBuilder($"postgres:{_options.ImageTag}")
             .WithUsername(_options.Username)
             .WithPassword(_options.Password)
             .WithDatabase(_options.Database)

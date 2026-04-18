@@ -1,7 +1,7 @@
 # Tasks: Provider Consistency Remediation
 
 **Feature**: 004-provider-consistency-remediation | **Mode**: Generic (single-repo .NET 10 library)
-**Generated**: 2026-04-18 | **Revised**: 2026-04-18 (post-analysis + full-scan — Postgresql remediation added, ParallelIsolationContract explicit, Cosmos package clarified, coverage command specified, README counts corrected to 20-of-32 leaf providers, orphan 003-era dirs scheduled for cleanup at T003a, Rig.TUnit meta-package description at T004a)
+**Generated**: 2026-04-18 | **Revised**: 2026-04-18 (post-analysis + full-scan — Postgresql remediation added, ParallelIsolationContract explicit, Cosmos package clarified, coverage command specified, README counts corrected to 20-of-32 leaf providers, orphan 003-era dirs scheduled for cleanup at T003a, Rig.TUnit meta-package description at T004a, **Kurrent migration added at T002b/T002c** — Testcontainers 4.9+ marks the whole `EventStoreDb` module obsolete in favour of the upstream `KurrentDb` rename)
 **Source**: [spec.md](spec.md), [plan.md](plan.md), [data-model.md](data-model.md), [research.md](research.md)
 
 ## TDD cadence (applies to every task that creates or modifies production code)
@@ -19,25 +19,65 @@ Marker legend:
 
 **Goal**: bump Testcontainers, document canonical template, land the 3 new architecture rules initially RED. Exit gate: build green + 003 baseline (219 tests) still green.
 
-- [ ] T001 Branch already exists (`feat/provider-consistency-remediation`) — verify `git status` clean and up-to-date with `master`.
-- [ ] T002 **C-001 bump** `Testcontainers.*` family in `Directory.Packages.props` from `4.6.0` to `4.11.x` (every `Testcontainers.*` PackageVersion line — 17 entries). Add `MySqlConnector 2.4.*` pin. Bump `Pomelo.EntityFrameworkCore.MySql` from exact `9.0.0` to wildcard `9.0.*` (aligns with library-design §6.1 intent — auto-consumes 9.0.x servicing updates). Add `coverlet.collector 6.0.*` and `coverlet.msbuild 6.0.*` pins (required by the coverage-gate command in T097/T140/T152).
+- [x] T001 Branch already exists (`feat/provider-consistency-remediation`) — verify `git status` clean and up-to-date with `master`.
+- [x] T002 **C-001 bump** `Testcontainers.*` family in `Directory.Packages.props` from `4.6.0` to `4.11.0` (every `Testcontainers.*` PackageVersion line — 18 entries incl. the base `Testcontainers` package). **Exception**: `Testcontainers.EventStoreDb` has no 4.11 release and is removed in T002b; retain no pin. Add `MySqlConnector 2.4.*` pin. Bump `Pomelo.EntityFrameworkCore.MySql` from exact `9.0.0` to wildcard `9.0.*` (aligns with library-design §6.1 intent — auto-consumes 9.0.x servicing updates). Add `coverlet.collector 6.0.*` and `coverlet.msbuild 6.0.*` pins (required by the coverage-gate command in T097/T140/T152). Enable `<CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>` in the root `<PropertyGroup>` — NuGet CPM requires this opt-in before any `*.*` pattern is accepted (NU1011).
   File: `Directory.Packages.props`
-- [ ] T003 [depends: T002] Run full `dotnet test` against entire solution. Confirm 219-test baseline still green under Testcontainers 4.11.x. If any test regresses, root-cause and fix before Phase 1 continues.
-- [ ] T003a [P] [depends: T003] **003 hard-cutover residue cleanup.** Delete three orphan directories left behind by feature 003's hard-cutover (they contain only `obj/` build artefacts, are not in `Rig.TUnit.slnx`, and violate 003 spec US2 Scenario 1 which stated these MUST NOT exist): `src/Rig.TUnit.SqlServer/`, `src/Rig.TUnit.ServiceBus/`, `tests/Rig.TUnit.Redis.Tests.Integration/`. Use `git rm -rf` so the deletion is tracked. Verify `dotnet build` still clean (slnx already excludes them — the delete is a filesystem hygiene pass, zero code impact).
+  Also fix 18 existing fixtures whose `new XxxBuilder()` parameterless call became `[Obsolete]` in 4.11 (CS0618 under `TreatWarningsAsErrors=true`): move the image string from the subsequent `.WithImage(...)` call into the constructor — `new XxxBuilder($"image:tag")`. Affected: RedisFixture, PostgresFixture, CassandraFixture, MongoFixture, ContainerFixture (Docker), MinIOFixture, S3Fixture, AzureBlobFixture, ElasticSearchFixture, DynamoFixture, SqlServerFixture, RabbitMqFixture, KafkaFixture, ServiceBusFixture, NatsFixture, SqsFixture, SeqFixture — and EventStoreFixture handled separately in T002c.
+- [x] T002b [depends: T002] **KurrentDB dependency swap.** Testcontainers 4.9+ marks the entire `EventStoreDb` module `[Obsolete]` per the upstream rebrand (https://www.kurrent.io/blog/kurrent-re-brand-faq). Replace in `Directory.Packages.props`:
+  - Remove `<PackageVersion Include="Testcontainers.EventStoreDb" Version="4.9.0" />` → add `<PackageVersion Include="Testcontainers.KurrentDb" Version="4.11.0" />`
+  - Remove `<PackageVersion Include="EventStore.Client.Grpc.Streams" Version="23.3.8" />` → add `<PackageVersion Include="KurrentDB.Client" Version="1.3.1" />`
+
+  File: `Directory.Packages.props`
+- [x] T002c [depends: T002b] **Package rename + fixture migration.** Rename the Rig.TUnit package to align with the upstream rebrand (aborts the "preserve public API" compromise — caller-facing rename is now explicit feature scope). Execute as a single logical commit so the slnx + AssemblyLoader stay consistent:
+
+  1. `git mv src/Rig.TUnit.Databases.NoSql.EventStore/ src/Rig.TUnit.Databases.NoSql.KurrentDb/`
+  2. `git mv src/Rig.TUnit.Databases.NoSql.KurrentDb/Rig.TUnit.Databases.NoSql.EventStore.csproj src/Rig.TUnit.Databases.NoSql.KurrentDb/Rig.TUnit.Databases.NoSql.KurrentDb.csproj`
+  3. `git mv src/Rig.TUnit.Databases.NoSql.KurrentDb/Fixtures/EventStoreFixture.cs src/Rig.TUnit.Databases.NoSql.KurrentDb/Fixtures/KurrentDbFixture.cs`
+  4. `git mv tests/Rig.TUnit.Databases.NoSql.EventStore.Tests.Integration/ tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/`
+  5. `git mv tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/Rig.TUnit.Databases.NoSql.EventStore.Tests.Integration.csproj tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration.csproj`
+  6. `git mv tests/…/EventStoreContract.cs KurrentDbContract.cs` and `SharedEventStoreFixture.cs` → `SharedKurrentDbFixture.cs`
+
+  Update the renamed csproj's `<PackageReference>` lines: `Testcontainers.EventStoreDb` → `Testcontainers.KurrentDb`; `EventStore.Client.Grpc.Streams` → `KurrentDB.Client`.
+
+  Rewrite `KurrentDbFixture.cs`:
+  - `namespace Rig.TUnit.Databases.NoSql.EventStore.Fixtures;` → `namespace Rig.TUnit.Databases.NoSql.KurrentDb.Fixtures;`
+  - `using Testcontainers.EventStoreDb;` → `using Testcontainers.KurrentDb;`
+  - class name `EventStoreFixture` → `KurrentDbFixture`
+  - `EventStoreDbContainer? _container` → `KurrentDbContainer? _container`
+  - `new EventStoreDbBuilder().WithImage("eventstore/eventstore:24.10.0-bookworm-slim").Build()` → `new KurrentDbBuilder("kurrentplatform/kurrentdb:25.1").Build()` (KurrentDb 4.11 constructor takes image — parameterless ctor is obsolete; connection string `kurrentdb://admin:changeit@host:port?tls=false` is consumed directly by `KurrentDB.Client`).
+
+  Rewrite test files for the new namespace + class name:
+  - `SharedKurrentDbFixture.cs`: namespace + type `EventStoreFixture` → `KurrentDbFixture`; static class `SharedEventStoreFixture` → `SharedKurrentDbFixture`.
+  - `KurrentDbContract.cs`: namespace + class `EventStoreContract` → `KurrentDbContract`; update `SharedEventStoreFixture.GetAsync()` call → `SharedKurrentDbFixture.GetAsync()`.
+
+  Files: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Rig.TUnit.Databases.NoSql.KurrentDb.csproj`, `src/Rig.TUnit.Databases.NoSql.KurrentDb/Fixtures/KurrentDbFixture.cs`, `tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration.csproj`, `tests/…/KurrentDbContract.cs`, `tests/…/SharedKurrentDbFixture.cs`.
+
+- [x] T002d [depends: T002c] **Cross-reference update for the rename.** Update every remaining reference to the old package name in the active solution (004 scope only — historical 003 docs stay as-is):
+  - `Rig.TUnit.slnx` lines 52 + 117 — update both `<Project Path="...">` entries.
+  - `src/Rig.TUnit.All/Rig.TUnit.All.csproj` line 21 — update the `<ProjectReference>` path.
+  - `tests/Rig.TUnit.Architecture.Tests/Infrastructure/AssemblyLoader.cs` — seed name `"Rig.TUnit.Databases.NoSql.EventStore"` → `"Rig.TUnit.Databases.NoSql.KurrentDb"`.
+  - `.dotnet-ai-kit/features/004-provider-consistency-remediation/data-model.md` — E3.a EventStore row rename label to "KurrentDb (was EventStore)".
+  - `planning/provider-consistency-remediation/Rig.TUnit-Session-Handoff.md` line 86 — rename the checklist entry.
+
+  Deliberately NOT touching: `.dotnet-ai-kit/features/003-*` and `planning/ecosystem-expansion/*` — those are historical artefacts from 003 and renaming them in-place rewrites history.
+
+  Verify `dotnet build Rig.TUnit.slnx` clean after the sweep. CS0246 / CS0234 (type/namespace not found) during intermediate states is expected; must be zero at the end of T002d.
+- [x] T003 [depends: T002d] Run `dotnet test` against the unit + contract + architecture test projects (excluding `*.Tests.Integration` which require live Docker daemons — those belong to `/dotnet-ai-kit:verify`). Confirm the 219-test Phase-A baseline plus any Phase B–F additions all remain green under Testcontainers 4.11.x and the KurrentDb rename. If any test regresses, root-cause and fix before Phase 1 continues. Record the concrete pre-Phase-1 green count in the PR description so Phase-6 T164 can verify "strictly greater".
+- [x] T003a [P] [depends: T003] **003 hard-cutover residue cleanup.** Delete three orphan directories left behind by feature 003's hard-cutover (they contain only `obj/` build artefacts, are not in `Rig.TUnit.slnx`, and violate 003 spec US2 Scenario 1 which stated these MUST NOT exist): `src/Rig.TUnit.SqlServer/`, `src/Rig.TUnit.ServiceBus/`, `tests/Rig.TUnit.Redis.Tests.Integration/`. Use `git rm -rf` so the deletion is tracked. Verify `dotnet build` still clean (slnx already excludes them — the delete is a filesystem hygiene pass, zero code impact).
   Command: `git rm -rf src/Rig.TUnit.SqlServer src/Rig.TUnit.ServiceBus tests/Rig.TUnit.Redis.Tests.Integration`
-- [ ] T004 [P] [depends: T003] Create canonical provider template doc.
+- [x] T004 [P] [depends: T003] Create canonical provider template doc.
   File: `src/Rig.TUnit/Contributing-ProviderTemplate.md`
-- [ ] T004a [P] [depends: T003] Clarify the role of the `src/Rig.TUnit/` convenience meta-package. Currently `Rig.TUnit.csproj` is a bare `Microsoft.NET.Sdk` with ProjectReferences to Core/Mediator/Grpc/WebAPI and no description (unlike `Rig.TUnit.All.csproj` which declares "Meta-only: zero source .cs files"). Add a `<Description>` PropertyGroup matching the pattern — e.g., `<Description>Convenience meta-package bundling Core + Mediator + Grpc + WebAPI — the default entry point for most projects. Use Rig.TUnit.All only when you need every package.</Description>` + `<GenerateDocumentationFile>false</GenerateDocumentationFile>`. Also add a `<!-- Meta-only: zero source .cs files; only ProjectReference entries + docs under this folder (e.g., Contributing-ProviderTemplate.md from T004). -->` comment so contributors know not to drop source here.
+- [x] T004a [P] [depends: T003] Clarify the role of the `src/Rig.TUnit/` convenience meta-package. Currently `Rig.TUnit.csproj` is a bare `Microsoft.NET.Sdk` with ProjectReferences to Core/Mediator/Grpc/WebAPI and no description (unlike `Rig.TUnit.All.csproj` which declares "Meta-only: zero source .cs files"). Add a `<Description>` PropertyGroup matching the pattern — e.g., `<Description>Convenience meta-package bundling Core + Mediator + Grpc + WebAPI — the default entry point for most projects. Use Rig.TUnit.All only when you need every package.</Description>` + `<GenerateDocumentationFile>false</GenerateDocumentationFile>`. Also add a `<!-- Meta-only: zero source .cs files; only ProjectReference entries + docs under this folder (e.g., Contributing-ProviderTemplate.md from T004). -->` comment so contributors know not to drop source here.
   File: `src/Rig.TUnit/Rig.TUnit.csproj`
-- [ ] T005 [P] [depends: T003] RED→GREEN scaffold `ProviderCompletenessTests`. Initial skip list = every provider known to have gaps (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Jwt, OAuth, Mtls, Policies, Metrics). Non-skipped providers (SqlServer, Sqlite, ServiceBus, Redis caching, Memory caching, Logging, Tracing, Seq) MUST pass. **Reuse `AssemblyLoader` from `tests/Rig.TUnit.Architecture.Tests/Infrastructure/`** (already knows every Rig.TUnit.* assembly including the 4 new ones — verified 2026-04-18). Do NOT duplicate the fixture-base inheritance check already covered by `CodeOrganizationTests.AllFixtures_ExtendFixtureBase`; this rule only enforces the four canonical types (Fixture, Options, RigBuilder, `Use{Provider}` extension).
+- [x] T005 [P] [depends: T003] RED→GREEN scaffold `ProviderCompletenessTests`. Initial skip list = every provider known to have gaps (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Jwt, OAuth, Mtls, Policies, Metrics). Non-skipped providers (SqlServer, Sqlite, ServiceBus, Redis caching, Memory caching, Logging, Tracing, Seq) MUST pass. **Reuse `AssemblyLoader` from `tests/Rig.TUnit.Architecture.Tests/Infrastructure/`** (already knows every Rig.TUnit.* assembly including the 4 new ones — verified 2026-04-18). Do NOT duplicate the fixture-base inheritance check already covered by `CodeOrganizationTests.AllFixtures_ExtendFixtureBase`; this rule only enforces the four canonical types (Fixture, Options, RigBuilder, `Use{Provider}` extension).
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs`
-- [ ] T006 [P] [depends: T003] RED→GREEN scaffold `TestFileOrganizationTests` (applies uniformly to `*Contract.cs` per C-003). Initial skip list = every file known to carry inline infrastructure (listed in plan Phase 2).
+- [x] T006 [P] [depends: T003] RED→GREEN scaffold `TestFileOrganizationTests` (applies uniformly to `*Contract.cs` per C-003). Initial skip list = every file known to carry inline infrastructure (listed in plan Phase 2).
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs`
-- [ ] T007 [P] [depends: T003] RED→GREEN scaffold `ReadmeCompletenessTests`. Verified 2026-04-18: **20 of 32 leaf provider packages lack README**; 12 already have one. Initial skip list = the 20 missing (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics, Docker). Non-skipped (MUST pass from Phase 1) = the 12 with existing READMEs: Caching.Memory, Caching.Redis, Databases.NoSql.Redis, Databases.Sql.SqlServer, Databases.Sql.Sqlite, Messaging.ServiceBus, Observability.Logging, Observability.Logging.Analyzers, Observability.Seq, Observability.Tracing, Security.Jwt, Security.OAuth.
+- [x] T007 [P] [depends: T003] RED→GREEN scaffold `ReadmeCompletenessTests`. Verified 2026-04-18: **20 of 32 leaf provider packages lack README**; 12 already have one. Initial skip list = the 20 missing (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics, Docker). Non-skipped (MUST pass from Phase 1) = the 12 with existing READMEs: Caching.Memory, Caching.Redis, Databases.NoSql.Redis, Databases.Sql.SqlServer, Databases.Sql.Sqlite, Messaging.ServiceBus, Observability.Logging, Observability.Logging.Analyzers, Observability.Seq, Observability.Tracing, Security.Jwt, Security.OAuth.
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
-- [ ] T008 [depends: T003a, T004a, T005, T006, T007] Run full `dotnet test` + `dotnet build`. Confirm new rules execute, skips documented, build still green, orphan dirs removed cleanly, `Rig.TUnit.csproj` description lands without warning.
-- [ ] T009 [P] [depends: T008] Commit Phase 1: `test(004): Phase 1 — enforcement scaffolding (RED for all gaps)`.
-- [ ] T010 [P] [depends: T008] Update `planning/provider-consistency-remediation/Rig.TUnit-Provider-Gap-Matrix.md`: note Phase 1 complete; architecture tests now visibly enforce the matrix.
+- [x] T008 [depends: T003a, T004a, T005, T006, T007] Run full `dotnet test` + `dotnet build`. Confirm new rules execute, skips documented, build still green, orphan dirs removed cleanly, `Rig.TUnit.csproj` description lands without warning, EventStore package builds clean on `Testcontainers.KurrentDb` / `KurrentDB.Client`.
+- [ ] T009 [P] [depends: T008] Commit Phase 1: `test(004): Phase 1 — enforcement scaffolding (RED for all gaps) + KurrentDB migration`.
+- [x] T010 [P] [depends: T008] Update `planning/provider-consistency-remediation/Rig.TUnit-Provider-Gap-Matrix.md`: note Phase 1 complete; architecture tests now visibly enforce the matrix.
 
 ---
 
@@ -442,14 +482,15 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ## Reserved range (T177–T218) — contingency / follow-up tasks
 
-T174–T176 are now used by Phase 3.0 (Postgresql remediation added post-analysis). Remaining reserved slots (42):
+T174–T176 are now used by Phase 3.0 (Postgresql remediation added post-analysis). T002b/T002c consume the Kurrent migration — they sit inside Phase 1 and do not take reserved slots. Remaining reserved slots (42):
 
 - Pomelo 10 bump if PR #2019 merges mid-feature (T177)
 - FluentDocker fallback activation if Testcontainers compose regresses (T178)
-- Additional quirk tests surfaced by provider research (T179-T189)
+- Additional quirk tests surfaced by provider research (T179-T189) — **includes KurrentDB projection/subscription quirks if Phase 3a.v exposes them**
 - Coverage-gap fills if a package lands under 90/85 (T190-T199)
 - `Testcontainers.CosmosDb` pin removal from `Directory.Packages.props` after T140 if unreferenced (T200)
 - CI fixups / flaky quarantine (T201-T218)
+- Rename `Rig.TUnit.Databases.NoSql.EventStore` → `Rig.TUnit.Databases.NoSql.KurrentDb` as a future breaking-change PR once downstream callers have settled (reserved — NOT in 004 scope to preserve the public API surface)
 
 ---
 
@@ -464,8 +505,8 @@ T174–T176 are now used by Phase 3.0 (Postgresql remediation added post-analysi
 | Phase 5 | 3 surfaces `[P]` (T142, T146, T149) | Different packages |
 | Phase 6 | 3 main threads `[P]` | READMEs, meta-package, CI matrix |
 
-**Total tasks**: 178 numbered (T001–T173 + T174–T176 Postgresql remediation + T003a orphan-dir cleanup + T004a Rig.TUnit meta-package clarification) + 42 reserved (T177–T218) = 220 slots.
-**Parallel opportunities**: ~65 tasks marked `[P]` (T003a, T004a, T174 join the parallel sets).
+**Total tasks**: 180 numbered (T001–T173 + T174–T176 Postgresql remediation + T003a orphan-dir cleanup + T004a Rig.TUnit meta-package clarification + T002b/T002c Kurrent migration) + 42 reserved (T177–T218) = 222 slots.
+**Parallel opportunities**: ~65 tasks marked `[P]` (T003a, T004a, T174 join the parallel sets; T002b/T002c are serial inside Phase 1 since they touch the same EventStore package).
 **Sequential-critical**: Phase 1 → Phase 2 → Phase 3 (3.0 Postgresql + 3a-3g) → Phase 4 → Phase 5/6 (5 and 6 overlap).
 
 ---

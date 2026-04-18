@@ -58,7 +58,7 @@ public static class AssemblyLoader
             "Rig.TUnit.Databases.NoSql.Mongo",
             "Rig.TUnit.Databases.NoSql.Dynamo",
             "Rig.TUnit.Databases.NoSql.Cassandra",
-            "Rig.TUnit.Databases.NoSql.EventStore",
+            "Rig.TUnit.Databases.NoSql.KurrentDb",
             "Rig.TUnit.Databases.NoSql.ElasticSearch",
             "Rig.TUnit.Messaging",
             "Rig.TUnit.Messaging.ServiceBus",

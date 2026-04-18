@@ -24,8 +24,7 @@ public sealed class KafkaFixture : MessagingFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new KafkaBuilder()
-            .WithImage($"confluentinc/cp-kafka:{_options.ImageTag}")
+        _container = new KafkaBuilder($"confluentinc/cp-kafka:{_options.ImageTag}")
             .Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));
         await _container.StartAsync(cts.Token).ConfigureAwait(false);

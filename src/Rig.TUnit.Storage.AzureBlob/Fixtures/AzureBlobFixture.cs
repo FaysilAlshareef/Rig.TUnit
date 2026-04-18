@@ -29,8 +29,7 @@ public sealed class AzureBlobFixture : StorageFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new AzuriteBuilder()
-            .WithImage($"mcr.microsoft.com/azure-storage/azurite:{_options.ImageTag}")
+        _container = new AzuriteBuilder($"mcr.microsoft.com/azure-storage/azurite:{_options.ImageTag}")
             .Build();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));
         await _container.StartAsync(cts.Token).ConfigureAwait(false);

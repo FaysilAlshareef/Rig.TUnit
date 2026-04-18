@@ -18,8 +18,7 @@ public sealed class MinIOFixture : StorageFixtureBase
     public override async Task InitializeAsync()
     {
         if (_container is not null) return;
-        _container = new MinioBuilder()
-            .WithImage("minio/minio:latest")
+        _container = new MinioBuilder("minio/minio:latest")
             .WithUsername("minioadmin")
             .WithPassword("minioadmin")
             .Build();

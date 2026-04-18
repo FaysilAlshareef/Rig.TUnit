@@ -16,7 +16,7 @@ Feature **004-provider-consistency-remediation** — fills the uniformity gaps l
 Feature 003 (ecosystem expansion) landed the base-package layer and most provider packages, but provider surface area is **inconsistent**:
 
 - SqlServer, Sqlite, ServiceBus, Redis (cache) ship full `Fixture + Options + Builder + Extensions + Helpers`.
-- Cassandra, Dynamo, ElasticSearch, EventStore, Nats, Sqs ship **only a fixture**.
+- Cassandra, Dynamo, ElasticSearch, **KurrentDb (renamed from EventStore in Phase 1 T002c per the upstream Kurrent rebrand — uses `Testcontainers.KurrentDb 4.11.0` + `KurrentDB.Client 1.3.1`)**, Nats, Sqs ship **only a fixture**.
 - Mtls, Policies, Metrics ship **only a single class**.
 - Five packages promised by 003 (`Cosmos`, `MySql`, `Oracle`, `AppInsights`, `Docker`) **were never created**.
 - Test files mix tests with inline infrastructure.

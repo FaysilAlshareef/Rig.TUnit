@@ -83,7 +83,7 @@ Each gets `Fixtures/` (already there), `Options/{Provider}FixtureOptions.cs` (if
 - [ ] `Rig.TUnit.Databases.NoSql.Cassandra` — add options + builder + extensions + `KeyspacePerTestHelper`.
 - [ ] `Rig.TUnit.Databases.NoSql.Dynamo` — add options + builder + extensions + `GsiVerifier` (LocalStack).
 - [ ] `Rig.TUnit.Databases.NoSql.ElasticSearch` — add options + builder + extensions + `IndexRefreshHelper` + `DslAssert`.
-- [ ] `Rig.TUnit.Databases.NoSql.EventStore` — add options + builder + extensions + `StreamAssert` + `ProjectionAssert`.
+- [ ] `Rig.TUnit.Databases.NoSql.KurrentDb` — add options + builder + extensions + `StreamAssert` + `ProjectionAssert`. (Package was renamed from `Rig.TUnit.Databases.NoSql.EventStore` in Phase 1 T002c per the upstream Kurrent rebrand — `Testcontainers.KurrentDb 4.11.0` + `KurrentDB.Client 1.3.1`, namespace `.KurrentDb`, class `KurrentDbFixture`, image `kurrentplatform/kurrentdb:25.1`.)
 - [ ] Integration tests for every provider pass `NoSqlRigContract`.
 
 ### Messaging

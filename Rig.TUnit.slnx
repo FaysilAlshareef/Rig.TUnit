@@ -49,7 +49,7 @@
     <Project Path="src/Rig.TUnit.Microservices.Saga/Rig.TUnit.Microservices.Saga.csproj" />
     <Project Path="src/Rig.TUnit.Microservices.Contracts/Rig.TUnit.Microservices.Contracts.csproj" />
     <Project Path="src/Rig.TUnit.Databases.NoSql.Cassandra/Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
-    <Project Path="src/Rig.TUnit.Databases.NoSql.EventStore/Rig.TUnit.Databases.NoSql.EventStore.csproj" />
+    <Project Path="src/Rig.TUnit.Databases.NoSql.KurrentDb/Rig.TUnit.Databases.NoSql.KurrentDb.csproj" />
     <Project Path="src/Rig.TUnit.Databases.NoSql.ElasticSearch/Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
     <Project Path="src/Rig.TUnit.Databases.NoSql.Dynamo/Rig.TUnit.Databases.NoSql.Dynamo.csproj" />
     <Project Path="src/Rig.TUnit.Messaging.Nats/Rig.TUnit.Messaging.Nats.csproj" />
@@ -114,7 +114,7 @@
     <Project Path="tests/Rig.TUnit.Microservices.Saga.Tests.Integration/Rig.TUnit.Microservices.Saga.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.Contracts.Tests.Integration/Rig.TUnit.Microservices.Contracts.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Integration/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Integration.csproj" />
-    <Project Path="tests/Rig.TUnit.Databases.NoSql.EventStore.Tests.Integration/Rig.TUnit.Databases.NoSql.EventStore.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Integration/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Integration/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.Nats.Tests.Integration/Rig.TUnit.Messaging.Nats.Tests.Integration.csproj" />

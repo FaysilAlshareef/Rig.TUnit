@@ -47,7 +47,8 @@ Rig.TUnit.Databases
 │  └─ Rig.TUnit.Databases.Sql.Oracle        [NEW PACKAGE — Phase 4]
 └─ Rig.TUnit.Databases.NoSql                [UNCHANGED base]
    ├─ Redis (KV, reuses Caching.Redis)      [UNCHANGED]
-   ├─ Mongo / Cassandra / Dynamo / ElasticSearch / EventStore  [MODIFIED — Phase 3]
+   ├─ Mongo / Cassandra / Dynamo / ElasticSearch  [MODIFIED — Phase 3]
+   ├─ KurrentDb (was EventStore)            [RENAMED — Phase 1 (T002b–T002d) + MODIFIED in Phase 3a.v]
    └─ Rig.TUnit.Databases.NoSql.Cosmos      [NEW PACKAGE — Phase 4]
 
 Rig.TUnit.Messaging                         [UNCHANGED base]
@@ -114,11 +115,21 @@ Numbered 1–6 to match the library design doc's phased delivery. Each phase has
 
 **Goal:** Make the gaps machine-visible before any provider is touched. All three rules land RED for every gap; they turn GREEN as each provider is completed.
 
-**Commit 1 (prep):** bump every `Testcontainers.*` pin in `Directory.Packages.props` from `4.6.0` → `4.11.x` (C-001). Run full `dotnet test`. If any 003 test regresses, root-cause and fix before proceeding.
+**Commit 1 (prep):** bump every `Testcontainers.*` pin in `Directory.Packages.props` from `4.6.0` → `4.11.0` (C-001), enable `CentralPackageFloatingVersionsEnabled` (required for the new wildcard pins — NU1011 fails restore otherwise), add `MySqlConnector 2.4.*` + `coverlet.collector 6.0.*` + `coverlet.msbuild 6.0.*`, wildcard `Pomelo.EntityFrameworkCore.MySql 9.0.*`. `Testcontainers.EventStoreDb` has no 4.11 release (latest is 4.9.0) and its Builder type is marked `[Obsolete]` per the KurrentDb rebrand — it is REMOVED in the same commit (see Commit 2). The 18 existing fixtures using `new XxxBuilder()` must be updated to pass the image into the constructor (`new XxxBuilder("image:tag")`) — the parameterless ctor is obsolete in 4.11 and breaks the `TreatWarningsAsErrors=true` build with CS0618. Run `dotnet test` on unit + contract + architecture projects only (integration tests require Docker daemons and belong to `/dotnet-ai-kit:verify`). If any 003-era test regresses, root-cause and fix before proceeding.
 
-**Commit 2 (docs):** add `src/Rig.TUnit/Contributing-ProviderTemplate.md` — canonical copy-paste template for a hypothetical `Rig.TUnit.{Family}.Example` provider.
+**Commit 2 (KurrentDb rename):** Align with the upstream rebrand (https://www.kurrent.io/blog/kurrent-re-brand-faq). This is a deliberate breaking change — the feature is labelled Provider **Consistency** Remediation and keeping a stale `EventStore` name while every dependency reads "Kurrent" violates that intent.
 
-**Commit 3 (architecture tests land RED):**
+- `Directory.Packages.props`: `Testcontainers.EventStoreDb` → `Testcontainers.KurrentDb 4.11.0`; `EventStore.Client.Grpc.Streams` → `KurrentDB.Client 1.3.1`.
+- Rename `src/Rig.TUnit.Databases.NoSql.EventStore/` → `src/Rig.TUnit.Databases.NoSql.KurrentDb/` (preserve history with `git mv`).
+- Rename the test project, the fixture class (`EventStoreFixture` → `KurrentDbFixture`), and the contract + shared-fixture test files.
+- Update `Rig.TUnit.slnx`, `src/Rig.TUnit.All/Rig.TUnit.All.csproj`, and `tests/Rig.TUnit.Architecture.Tests/Infrastructure/AssemblyLoader.cs` seed list.
+- Container image: `eventstore/eventstore:24.10.0-bookworm-slim` → `kurrentplatform/kurrentdb:25.1`.
+- Connection string scheme becomes `kurrentdb://…?tls=false` — consumed directly by `KurrentDB.Client`.
+- Release notes MUST call out the rename under a "Provider rename (breaking)" heading.
+
+**Commit 3 (docs):** add `src/Rig.TUnit/Contributing-ProviderTemplate.md` — canonical copy-paste template for a hypothetical `Rig.TUnit.{Family}.Example` provider.
+
+**Commit 4 (architecture tests land RED):**
 - `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs`
 - `tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs` (applies uniformly, including `*Contract.cs` per C-003)
 - `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`

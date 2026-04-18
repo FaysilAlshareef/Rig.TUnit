@@ -27,6 +27,12 @@ Feature 003 (ecosystem expansion) landed the **Base + Provider** pattern with 59
 - `Rig.TUnit.Security` **already exists** with `Contracts/ISecurityRig.cs`, `Fixtures/SecurityFixtureBase.cs`, `Builder/SecurityRigBuilder.cs` — the planning gap matrix is stale on this row. This feature enhances and wires providers to the existing base; it does NOT recreate it.
 - `Rig.TUnit.Docker/Fixtures/ContainerFixture.cs` **already exists** — this package is partial (fixture-only), not absent. This feature completes the template.
 - `Directory.Packages.props` already pins `Pomelo.EntityFrameworkCore.MySql 9.0.0`, `Oracle.EntityFrameworkCore 10.0.0`, `Microsoft.Azure.Cosmos 3.44.0`, `Microsoft.ApplicationInsights 2.23.0`. `Testcontainers.*` is pinned at 4.6.0 and MUST be bumped to `4.11.x` across every `Testcontainers.*` pin as the first commit of Phase 1 (see Clarification C-001).
+- **`Testcontainers.EventStoreDb` is obsolete from 4.9 onward** — Event Store rebranded to **KurrentDB** on 2026-11-20 (https://www.kurrent.io/blog/kurrent-re-brand-faq) and upstream Testcontainers follows. Phase 1 now includes a full alignment with the upstream rename:
+  - Dependency swap: `Testcontainers.EventStoreDb 4.9.0` → `Testcontainers.KurrentDb 4.11.0`; `EventStore.Client.Grpc.Streams 23.3.8` → `KurrentDB.Client 1.3.1`.
+  - **Rig.TUnit package rename** (breaking — intentional for consistency with the upstream rebrand, since this feature is labelled Provider **Consistency** Remediation): `src/Rig.TUnit.Databases.NoSql.EventStore/` → `src/Rig.TUnit.Databases.NoSql.KurrentDb/`; `tests/…EventStore.Tests.Integration/` → `tests/…KurrentDb.Tests.Integration/`; class `EventStoreFixture` → `KurrentDbFixture`; namespace suffix `.EventStore` → `.KurrentDb`.
+  - Image: `eventstore/eventstore:24.10.0-bookworm-slim` → `kurrentplatform/kurrentdb:25.1` (KurrentDb 4.11 default).
+  - Tracked by tasks T002b (Directory.Packages.props swap), T002c (rename + fixture rewrite), T002d (slnx / All / AssemblyLoader cross-refs). Release notes for 004 MUST call out the breaking rename under a "Provider rename" heading.
+- **Testcontainers 4.11 tightened the Builder API** — every `new XxxBuilder()` parameterless constructor is now `[Obsolete]` and requires the image argument at construction (`new XxxBuilder("image:tag")`). With `TreatWarningsAsErrors=true` at the repo root this manifests as CS0618 build failures across 18 existing fixtures. Repair is bundled into T002 alongside the version bump.
 
 ---
 
@@ -246,6 +252,12 @@ As a CI maintainer, I need the MySql / Oracle / Cosmos emulator containers in th
 - **FR-024**: Every new production class MUST ship in the same commit as its failing test (RED). Commit log MUST show RED → GREEN → REFACTOR order.
 - **FR-025**: Per-package merge gate: line coverage ≥ 90%, branch coverage ≥ 85%, contract suite 100% green, parallel-isolation smoke passes. (Identical to 003.)
 - **FR-026**: Zero regressions — final green test count MUST be strictly greater than the 003 baseline (219 tests).
+
+**KurrentDB rename (Phase 1)**
+
+- **FR-027**: Testcontainers 4.9+ marks the whole `EventStoreDb` module `[Obsolete]`; Phase 1 MUST swap `Testcontainers.EventStoreDb 4.9.0` for `Testcontainers.KurrentDb 4.11.0` and `EventStore.Client.Grpc.Streams 23.3.8` for `KurrentDB.Client 1.3.1` in `Directory.Packages.props` with the matching `PackageReference` swap in the provider's csproj.
+- **FR-028**: The Rig.TUnit package MUST be renamed alongside the upstream rebrand: `src/Rig.TUnit.Databases.NoSql.EventStore/` → `src/Rig.TUnit.Databases.NoSql.KurrentDb/`; namespace `.EventStore` → `.KurrentDb`; class `EventStoreFixture` → `KurrentDbFixture`; test project + file names updated in lockstep; `Rig.TUnit.slnx` + `Rig.TUnit.All.csproj` + `AssemblyLoader.cs` seed list updated. Release notes MUST announce the breaking rename.
+- **FR-029**: The new fixture MUST use image `kurrentplatform/kurrentdb:25.1` (KurrentDb 4.11 default) via `new KurrentDbBuilder("kurrentplatform/kurrentdb:25.1")` and expose `ConnectionString` returning the container's `kurrentdb://…?tls=false` URI (unchanged caller semantics — `KurrentDB.Client` consumes the scheme directly).
 
 ### Key Entities
 

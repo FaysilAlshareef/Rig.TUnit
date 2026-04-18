@@ -1,8 +1,10 @@
 # Rig.TUnit — Provider Gap Matrix (evidence)
 
-Source-of-truth snapshot verified by file inventory of `src/` on 2026-04-18. This is the raw evidence that drives `Rig.TUnit-Library-Design.md` §4. Update when a provider is completed.
+Source-of-truth snapshot verified by file inventory of `src/` on 2026-04-18 (revised 2026-04-18 — KurrentDB rename added at Phase 1 T002b–T002d per research §R15 + spec FR-027..FR-029). This is the raw evidence that drives `Rig.TUnit-Library-Design.md` §4. Update when a provider is completed.
 
 Legend: ✓ = present, — = missing, N/A = not applicable for this family.
+
+**Phase 1 status (2026-04-18, Phase 1 closed):** three architecture rules landed under `tests/Rig.TUnit.Architecture.Tests/Rules/` — `ProviderCompletenessTests`, `TestFileOrganizationTests`, `ReadmeCompletenessTests`. Every row in this matrix is now machine-visible: the `SkipUntilFixed` lists in the three rule files mirror the `—` cells below. The rules turn GREEN progressively as Phase 3/4 closes each cell. Phase 1 exit gate: `dotnet build Rig.TUnit.slnx` clean (119 projects, 0 warnings); 166 tests GREEN across unit + contract + architecture projects (160 pre-Phase-1 + 6 new architecture assertions). KurrentDb rename (T002b–T002d) reflected throughout.
 
 ---
 
@@ -29,7 +31,7 @@ Base (`Rig.TUnit.Databases.Sql`): `ISqlRig`, `SqlFixtureBase`, `SqlRigBuilder<TS
 | Cassandra | ✓ | — | — | — | `KeyspacePerTest` — | — |
 | Dynamo | ✓ | — | — | — | `GsiVerifier` — | — |
 | ElasticSearch | ✓ | — | — | — | `IndexRefreshHelper` + `DslAssert` — | — |
-| EventStore | ✓ | — | — | — | `StreamAssert` + `ProjectionAssert` — | — |
+| KurrentDb (was EventStore, renamed Phase 1 T002c) | ✓ (rewritten on `KurrentDbBuilder`/`KurrentDB.Client`) | — | — | — | `StreamAssert` + `ProjectionAssert` — | — |
 | **Cosmos** (new) | — | — | — | — | `RuChargeCapture` + `PartitionKeyDistributionChecker` — | — |
 
 Base (`Rig.TUnit.Databases.NoSql`): `INoSqlRig`, `DocumentFixtureBase`, `NoSqlRigBuilder<TSelf>`, `JsonDocumentAssert`, `ChangeFeedCapture` — all ✓.

@@ -55,7 +55,7 @@ Create, with full R2 shape + contract-suite compliance:
 
 ### R4 — Fill provider gaps (no new deletions)
 For every existing provider listed in design doc §4.1–4.8, add the missing pieces per the family gap table. Explicit list:
-- **Databases.NoSql:** Mongo + Cassandra + Dynamo + ElasticSearch + EventStore → add Builder + Extensions + provider helper (keyspace/GSI/index-refresh/stream-assert per 003 §4.4).
+- **Databases.NoSql:** Mongo + Cassandra + Dynamo + ElasticSearch + **KurrentDb (renamed from EventStore in Phase 1 T002c per the upstream Kurrent rebrand — now consumes `Testcontainers.KurrentDb 4.11.0` + `KurrentDB.Client 1.3.1` and ships as `Rig.TUnit.Databases.NoSql.KurrentDb`)** → add Builder + Extensions + provider helper (keyspace/GSI/index-refresh/stream-assert per 003 §4.4).
 - **Messaging:** Kafka + RabbitMq + Nats + Sqs → add Builder + Extensions + `{Provider}Listener : ListenerBase` + `{Provider}EventSender : EventSenderBase`.
 - **Caching:** Hybrid + Fusion → full template (Builder + Extensions + Options).
 - **Storage:** AzureBlob + S3 + MinIO + FileSystem → add Builder + Extensions + `{Provider}SasBuilder` (FileSystem gets a path-sandbox helper instead).

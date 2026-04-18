@@ -356,7 +356,7 @@ Contract suite: `MessagingRigContract`.
 
 Contract suite: `CacheRigContract`.
 
-#### 3c.i Memory
+#### 3c.i Memory *(TDD template)*
 - [x] T056 [P] RED→GREEN `UseMemoryCache` extension (no options; parameterless).
   File: `src/Rig.TUnit.Caching.Memory/Builder/MemoryCacheRigBuilderExtensions.cs`
 - [x] T057 [depends: T056] Add README + verify `MemoryCacheContractTests` passes. (README already shipped from 003 — 538 chars. No additional work needed. Memory stays in ProviderCompletenessTests.SkipUntilFixed as "by-design" — in-process caches have no FixtureOptions by design. Marked complete 2026-04-18.)

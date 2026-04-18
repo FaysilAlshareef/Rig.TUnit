@@ -43,7 +43,6 @@ public sealed class ReadmeCompletenessTests
     [
         ("Rig.TUnit.Caching.Fusion",              "T064"),
         ("Rig.TUnit.Caching.Hybrid",              "T060"),
-        ("Rig.TUnit.Databases.NoSql.ElasticSearch", "T037"),
         ("Rig.TUnit.Databases.NoSql.KurrentDb",   "T041 (renamed from EventStore in T002c)"),
         ("Rig.TUnit.Docker",                      "T137"),
         ("Rig.TUnit.Messaging.Kafka",             "T044"),

@@ -45,5 +45,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Storage.FileSystem\Rig.TUnit.Storage.FileSystem.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Security.Jwt\Rig.TUnit.Security.Jwt.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Security.OAuth\Rig.TUnit.Security.OAuth.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Security.Mtls\Rig.TUnit.Security.Mtls.csproj" />
   </ItemGroup>
 </Project>

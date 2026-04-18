@@ -140,5 +140,6 @@
     <Project Path="tests/Rig.TUnit.Storage.FileSystem.Tests.Unit/Rig.TUnit.Storage.FileSystem.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Jwt.Tests.Unit/Rig.TUnit.Security.Jwt.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.OAuth.Tests.Unit/Rig.TUnit.Security.OAuth.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Security.Mtls.Tests.Integration/Rig.TUnit.Security.Mtls.Tests.Integration.csproj" />
   </Folder>
 </Solution>

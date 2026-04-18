@@ -87,3 +87,22 @@
 - T176 modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Postgresql moved from SkipUntilFixed into RequiredProviders (5 required now)
 - T176 modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — Postgresql removed from SkipUntilFixed (19 remaining)
 - verified: 16/16 architecture tests GREEN.
+
+## T176a — Retroactive Postgres TDD backfill (covers commit 2b149b2)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit.csproj` (NEW — with `NoWarn=EF1001` scoped to this test project)
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresRigBuilderExtensionsTests.cs` (6 tests covering null-guards, fluent chain, configure invocation)
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresDbContextOptionsExtensionsTests.cs` (9 tests covering both generic + non-generic overloads — null/empty guards + Npgsql extension routing)
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/UsePostgresFluentTests.cs` (2 integration tests: DbContext round-trip + RigBuilder integration — live Postgres container)
+- created: `tests/Rig.TUnit.Benchmarks/PostgresUseBenchmarks.cs` (3 allocation benchmarks for the Postgres wiring path)
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added Postgres ProjectReference
+- modified: `Rig.TUnit.slnx` — registered new Postgres Tests.Unit project
+
+**Verification:**
+- Unit: 15/15 GREEN (no Docker required)
+- Integration: 2/2 GREEN (UsePostgresFluentTests — Docker-backed round-trip)
+- Benchmark baseline (1-iter smoke): UsePostgres_FluentChain 50 ns / 160 B; UsePostgres_DbContextOptions_Generic 8225 ns / 10650 B; UsePostgres_DbContextOptions_NonGeneric 7668 ns / 10442 B
+- `dotnet build Rig.TUnit.slnx` — 119+1 projects, 0 warnings, 0 errors

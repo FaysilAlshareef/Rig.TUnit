@@ -121,5 +121,6 @@
     <Project Path="tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Rig.TUnit.Messaging.Sqs.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.MinIO.Tests.Integration/Rig.TUnit.Storage.MinIO.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.FileSystem.Tests.Integration/Rig.TUnit.Storage.FileSystem.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit.csproj" />
   </Folder>
 </Solution>

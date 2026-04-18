@@ -106,3 +106,17 @@
 - Integration: 2/2 GREEN (UsePostgresFluentTests — Docker-backed round-trip)
 - Benchmark baseline (1-iter smoke): UsePostgres_FluentChain 50 ns / 160 B; UsePostgres_DbContextOptions_Generic 8225 ns / 10650 B; UsePostgres_DbContextOptions_NonGeneric 7668 ns / 10442 B
 - `dotnet build Rig.TUnit.slnx` — 119+1 projects, 0 warnings, 0 errors
+
+## T022/T023/T024/T025 — Mongo GREEN (canonical shape)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilder.cs` (sealed CRTP subclass of NoSqlRigBuilder<MongoRigBuilder>)
+- created: `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilderExtensions.cs` (static UseMongo extension)
+- created: `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/BsonDiff.cs` (pure-function structural diff)
+- created: `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/CollectionPerTestHelper.cs` (async-disposable collection isolation)
+- created: `src/Rig.TUnit.Databases.NoSql.Mongo/README.md` (> 100 chars)
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Mongo promoted to RequiredProviders (6 required now)
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — Mongo removed from skip list
+- verified: 18 unit tests GREEN, 5 integration tests GREEN (Docker), 16 architecture tests GREEN

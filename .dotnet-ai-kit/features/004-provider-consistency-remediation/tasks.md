@@ -213,7 +213,7 @@ Contract suite: `NoSqlRigContract` — runs 13+ tests per provider (per 003 base
 
 #### 3a.i Mongo — CANONICAL TDD TEMPLATE (copy for other providers)
 
-- [ ] T022-RED [P] **Write failing tests FIRST**. Create the Tests.Unit project if missing, write all four test categories, run, confirm RED:
+- [x] T022-RED [P] **Write failing tests FIRST**. Create the Tests.Unit project if missing, write all four test categories, run, confirm RED:
   1. **Unit (new project)** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit.csproj` with `TUnit`, `NSubstitute`, `ProjectReference` to `Rig.TUnit.Databases.NoSql.Mongo`. Register in `Rig.TUnit.slnx`.
   2. **Unit test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/MongoRigBuilderTests.cs`: asserts `MongoRigBuilder` is sealed, inherits `NoSqlRigBuilder<MongoRigBuilder>`, exposes `ConnectionString` from source; ctor rejects null root/source.
   3. **Unit test** — `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/UseMongoExtensionsTests.cs`: asserts `UseMongo` rejects null args; returns same `RigBuilder` (fluent); `configure` invoked exactly once.
@@ -226,22 +226,22 @@ Contract suite: `NoSqlRigContract` — runs 13+ tests per provider (per 003 base
   Verify RED: `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` — MUST fail with CS0246 (MongoRigBuilder / UseMongo / BsonDiff / CollectionPerTestHelper not found). Paste failure output in commit body.
   Commit: `test(004): T022 — RED for MongoRigBuilder + UseMongo + BsonDiff + CollectionPerTestHelper (unit + integration + benchmark)`.
 
-- [ ] T022-GREEN [depends: T022-RED] **Minimum src to flip the unit tests GREEN**. Write:
+- [x] T022-GREEN [depends: T022-RED] **Minimum src to flip the unit tests GREEN**. Write:
   - `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilder.cs` — sealed CRTP subclass of `NoSqlRigBuilder<MongoRigBuilder>` with `ConnectionString` passthrough.
   - `src/Rig.TUnit.Databases.NoSql.Mongo/Builder/MongoRigBuilderExtensions.cs` — `static class` with `public static RigBuilder UseMongo(this RigBuilder, IRigConnectionSource, Action<MongoRigBuilder>)`.
 
   Run `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` — all unit tests GREEN. Run `dotnet build Rig.TUnit.slnx` — 0 warnings. Commit: `feat(004): T022 — GREEN MongoRigBuilder + UseMongo`.
 
-- [ ] T023-GREEN [depends: T022-GREEN] **Minimum src for Helpers** (unit tests for BsonDiff are already landed in T022-RED; CollectionPerTestHelper integration test is too). Write:
+- [x] T023-GREEN [depends: T022-GREEN] **Minimum src for Helpers** (unit tests for BsonDiff are already landed in T022-RED; CollectionPerTestHelper integration test is too). Write:
   - `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/BsonDiff.cs`
   - `src/Rig.TUnit.Databases.NoSql.Mongo/Helpers/CollectionPerTestHelper.cs`
 
   Run: `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/` (BsonDiffTests pass) + `dotnet test --project tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Integration/ --filter "FullyQualifiedName~CollectionPerTestHelper"` (Docker up). Commit: `feat(004): T023 — GREEN BsonDiff + CollectionPerTestHelper`.
 
-- [ ] T024 [depends: T023-GREEN] Add `README.md` (> 100 chars — `dotnet add` snippet + runnable `[Test]` + Dependencies section). Run `ReadmeCompletenessTests` after removing Mongo from its skip list — confirm GREEN. Run benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*Mongo*"` and paste output in commit body.
+- [x] T024 [depends: T023-GREEN] Add `README.md` (> 100 chars — `dotnet add` snippet + runnable `[Test]` + Dependencies section). Run `ReadmeCompletenessTests` after removing Mongo from its skip list — confirm GREEN. Run benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*Mongo*"` and paste output in commit body.
   Files: `src/Rig.TUnit.Databases.NoSql.Mongo/README.md`, `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`.
 
-- [ ] T025 [depends: T024] **Promote Mongo to `RequiredProviders`** in `ProviderCompletenessTests.cs`. Remove from `SkipUntilFixed`. Run the full architecture test suite and all Mongo unit + integration tests — confirm every rule GREEN. Coverage gate: line ≥ 90 %, branch ≥ 85 % on `Rig.TUnit.Databases.NoSql.Mongo.dll` via coverlet. Commit: `feat(004): T025 — Mongo reaches canonical shape; ProviderCompletenessTests GREEN`.
+- [x] T025 [depends: T024] **Promote Mongo to `RequiredProviders`** in `ProviderCompletenessTests.cs`. Remove from `SkipUntilFixed`. Run the full architecture test suite and all Mongo unit + integration tests — confirm every rule GREEN. Coverage gate: line ≥ 90 %, branch ≥ 85 % on `Rig.TUnit.Databases.NoSql.Mongo.dll` via coverlet. Commit: `feat(004): T025 — Mongo reaches canonical shape; ProviderCompletenessTests GREEN`.
 
 #### 3a.ii Cassandra *(follows the T022–T025 TDD template — every sub-task splits into RED then GREEN with the 4 test categories)*
 - [ ] T026-RED [P] Write failing tests: new `Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/` project with `CassandraFixtureOptionsTests` (SectionName const exists + `[Required]` triggers `ValidateDataAnnotations`) + `CassandraRigBuilderTests` (sealed, CRTP, ctor null-guards) + `UseCassandraExtensionsTests` (fluent + null-guards) + `KeyspacePerTestHelperTests` (pure: `BuildSafeKeyspace` rejects injection-like inputs, accepts a-z0-9_). Integration: `KeyspacePerTestLiveTests.cs` in `*.Tests.Integration/` creates + drops a keyspace on live Cassandra container. Benchmark: `CassandraKeyspaceBenchmarks.cs` in `Rig.TUnit.Benchmarks/`. Verify RED.

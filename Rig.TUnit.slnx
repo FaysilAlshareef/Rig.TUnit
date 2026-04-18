@@ -125,5 +125,6 @@
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit.csproj" />
   </Folder>
 </Solution>

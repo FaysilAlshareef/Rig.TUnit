@@ -9,6 +9,7 @@
     <PackageReference Include="BenchmarkDotNet" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="AWSSDK.DynamoDBv2" />
+    <PackageReference Include="Elastic.Clients.Elasticsearch" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
@@ -18,5 +19,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Mongo\Rig.TUnit.Databases.NoSql.Mongo.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Cassandra\Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Dynamo\Rig.TUnit.Databases.NoSql.Dynamo.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
   </ItemGroup>
 </Project>

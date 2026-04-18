@@ -57,6 +57,7 @@
     <Project Path="src/Rig.TUnit.Storage.MinIO/Rig.TUnit.Storage.MinIO.csproj" />
     <Project Path="src/Rig.TUnit.Storage.FileSystem/Rig.TUnit.Storage.FileSystem.csproj" />
     <Project Path="src/Rig.TUnit.Microservices/Rig.TUnit.Microservices.csproj" />
+    <Project Path="src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj" />
     <Project Path="src/Rig.TUnit.All/Rig.TUnit.All.csproj" />
     <Project Path="src/Rig.TUnit/Rig.TUnit.csproj" />
   </Folder>
@@ -143,5 +144,7 @@
     <Project Path="tests/Rig.TUnit.Security.Mtls.Tests.Integration/Rig.TUnit.Security.Mtls.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Policies.Tests.Unit/Rig.TUnit.Security.Policies.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Metrics.Tests.Unit/Rig.TUnit.Observability.Metrics.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.MySql.Tests.Unit/Rig.TUnit.Databases.Sql.MySql.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.Sql.MySql.Tests.Integration/Rig.TUnit.Databases.Sql.MySql.Tests.Integration.csproj" />
   </Folder>
 </Solution>

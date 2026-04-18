@@ -48,5 +48,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Security.Mtls\Rig.TUnit.Security.Mtls.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Security.Policies\Rig.TUnit.Security.Policies.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Metrics\Rig.TUnit.Observability.Metrics.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.MySql\Rig.TUnit.Databases.Sql.MySql.csproj" />
   </ItemGroup>
 </Project>

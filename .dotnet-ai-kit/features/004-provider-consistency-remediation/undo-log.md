@@ -156,3 +156,43 @@ Counts: Postgres unit 18 → **32 tests** (+14), Mongo unit 23 → **35 tests** 
 Coverage (merged unit + full-integration):
 - Postgres: **92.6 % line** (PASS ≥ 90) / 75.0 % branch — PostgresFixture line 100 % from unit
 - Mongo: **94.7 % line / 87.5 % branch** — BOTH GATES PASS. MongoFixture line 100 % from unit.
+
+## T026 — Cassandra RED (commit d08cabd)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit.csproj` (NEW — TUnit + NSubstitute + CassandraCSharpDriver + Microsoft.Extensions.DependencyInjection)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/CassandraRigBuilderTests.cs` (4 metadata + null-guard tests)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/UseCassandraExtensionsTests.cs` (6 tests — null-guards + fluent + configure-invocation)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/CassandraFixtureOptionsTests.cs` (3 tests — SectionName, defaults, every-property override)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/CassandraFixtureOptionsValidationTests.cs` (4 tests — default passes + Range bounds + Required ImageTag)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/CassandraRigBuilderConnectionStringTests.cs` (2 tests — getter exercise)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/CassandraFixtureTests.cs` (9 tests — every ctor variant + pre-init InvalidOperation + dispose-before-init safe)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/KeyspacePerTestHelperTests.cs` (11 tests — accepts + rejects injection / space / uppercase / leading-digit / empty / default isolation; ≤48 chars; distinct isolation → distinct names)
+- created: `tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Integration/KeyspacePerTestLiveTests.cs` (4 live-container tests — CREATE/DROP keyspace round-trip, distinct keyspaces, idempotent dispose)
+- created: `tests/Rig.TUnit.Benchmarks/CassandraKeyspaceBenchmarks.cs` (2 allocation benchmarks — short + long isolation key)
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added Cassandra ProjectReference
+- modified: `Rig.TUnit.slnx` — registered new Cassandra Tests.Unit project
+
+**Verification (RED):** `dotnet build tests/Rig.TUnit.Databases.NoSql.Cassandra.Tests.Unit/` — 7 × CS0234 (Options / Builder / Helpers namespaces missing) as expected.
+
+## T026/T027/T028/T029 — Cassandra GREEN (commit bf13be2)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Databases.NoSql.Cassandra/Options/CassandraFixtureOptions.cs` (SectionName + [Required] ImageTag + [Range(1,600)] StartupTimeoutSeconds)
+- created: `src/Rig.TUnit.Databases.NoSql.Cassandra/Builder/CassandraRigBuilder.cs` (sealed CRTP)
+- created: `src/Rig.TUnit.Databases.NoSql.Cassandra/Builder/CassandraRigBuilderExtensions.cs` (UseCassandra extension)
+- created: `src/Rig.TUnit.Databases.NoSql.Cassandra/Helpers/KeyspacePerTestHelper.cs` (pure BuildSafeKeyspace CQL whitelist + CreateAsync/DisposeAsync DDL)
+- created: `src/Rig.TUnit.Databases.NoSql.Cassandra/README.md` (855 chars — install + example + deps)
+- modified: `src/Rig.TUnit.Databases.NoSql.Cassandra/Fixtures/CassandraFixture.cs` — added ctor variants (parameterless / IOptions / direct options), Session accessor with pre-init throw, options-driven image tag + timeout, proper Session→Cluster→Container shutdown order
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — Cassandra promoted to RequiredProviders (7 required now)
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — Cassandra removed from skip list (18 remaining)
+
+**Verification (GREEN):**
+- `dotnet build Rig.TUnit.slnx` — 119+1 projects, 0 warnings, 0 errors
+- Unit: 39/39 GREEN (Cassandra.Tests.Unit, 1.8 s)
+- Integration: 17/17 GREEN (live Cassandra:5 container, 25.9 s — CassandraContract + ParallelIsolation + 4 × KeyspacePerTestLiveTests)
+- Architecture: 16/16 GREEN (ProviderCompletenessTests + ReadmeCompletenessTests enforce Cassandra's canonical shape)

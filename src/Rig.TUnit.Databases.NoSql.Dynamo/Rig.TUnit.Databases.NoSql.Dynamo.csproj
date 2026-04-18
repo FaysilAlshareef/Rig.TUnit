@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+    <PackageReference Include="Testcontainers.LocalStack" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql\Rig.TUnit.Databases.NoSql.csproj" />
+  </ItemGroup>
+</Project>

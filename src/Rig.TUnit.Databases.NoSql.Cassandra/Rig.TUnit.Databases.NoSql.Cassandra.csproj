@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+    <PackageReference Include="Testcontainers.Cassandra" />
+    <PackageReference Include="CassandraCSharpDriver" />
+    <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql\Rig.TUnit.Databases.NoSql.csproj" />
+  </ItemGroup>
+</Project>

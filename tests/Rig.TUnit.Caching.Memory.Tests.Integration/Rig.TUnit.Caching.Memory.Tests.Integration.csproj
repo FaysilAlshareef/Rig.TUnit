@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Memory\Rig.TUnit.Caching.Memory.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Tests.Contract\Rig.TUnit.Caching.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

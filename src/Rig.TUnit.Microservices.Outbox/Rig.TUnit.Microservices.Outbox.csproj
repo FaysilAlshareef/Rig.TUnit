@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CS1573;CS1734</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Databases\Rig.TUnit.Databases.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging\Rig.TUnit.Messaging.csproj" />
+  </ItemGroup>
+</Project>

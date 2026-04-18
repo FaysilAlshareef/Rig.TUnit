@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Meta-package: Core + Mediator + Grpc + Outbox + Tracing + Jwt + Seq — the opinionated microservice testing kit.</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Outbox\Rig.TUnit.Microservices.Outbox.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Inbox\Rig.TUnit.Microservices.Inbox.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.EventSourcing\Rig.TUnit.Microservices.EventSourcing.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Snapshots\Rig.TUnit.Microservices.Snapshots.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Saga\Rig.TUnit.Microservices.Saga.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Contracts\Rig.TUnit.Microservices.Contracts.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Tracing\Rig.TUnit.Observability.Tracing.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security.Jwt\Rig.TUnit.Security.Jwt.csproj" />
+  </ItemGroup>
+</Project>

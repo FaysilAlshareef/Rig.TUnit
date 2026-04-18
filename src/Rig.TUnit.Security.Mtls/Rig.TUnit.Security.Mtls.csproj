@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Security\Rig.TUnit.Security.csproj" />
+  </ItemGroup>
+</Project>

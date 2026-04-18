@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseAspNetCore>true</UseAspNetCore>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Security\Rig.TUnit.Security.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,6 @@
+using Rig.TUnit.Databases.Contracts;
 using Rig.TUnit.Databases.Sql.Contracts;
 using Rig.TUnit.Databases.Tests.Contract;
-using Rig.TUnit.Databases.Contracts;
 
 namespace Rig.TUnit.Databases.Sql.Tests.Contract;
 

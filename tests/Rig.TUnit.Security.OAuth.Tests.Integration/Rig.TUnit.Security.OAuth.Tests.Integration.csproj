@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Security.OAuth\Rig.TUnit.Security.OAuth.csproj" />
+  </ItemGroup>
+</Project>

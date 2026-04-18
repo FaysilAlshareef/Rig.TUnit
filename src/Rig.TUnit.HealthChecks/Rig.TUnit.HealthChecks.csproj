@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -11,6 +11,7 @@
     <PackageReference Include="AWSSDK.DynamoDBv2" />
     <PackageReference Include="Elastic.Clients.Elasticsearch" />
     <PackageReference Include="KurrentDB.Client" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
@@ -22,5 +23,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Dynamo\Rig.TUnit.Databases.NoSql.Dynamo.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.KurrentDb\Rig.TUnit.Databases.NoSql.KurrentDb.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.ServiceBus\Rig.TUnit.Messaging.ServiceBus.csproj" />
   </ItemGroup>
 </Project>

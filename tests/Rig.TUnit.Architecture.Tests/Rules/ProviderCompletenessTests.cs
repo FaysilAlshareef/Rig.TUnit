@@ -57,7 +57,7 @@ public sealed class ProviderCompletenessTests
         ("Rig.TUnit.Messaging.RabbitMq",              "T045-T047"),
         ("Rig.TUnit.Messaging.Nats",                  "T048-T051"),
         ("Rig.TUnit.Messaging.Sqs",                   "T052-T055"),
-        ("Rig.TUnit.Caching.Memory",                  "T056-T057"),
+        ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
         ("Rig.TUnit.Caching.Hybrid",                  "T058-T060"),
         ("Rig.TUnit.Caching.Fusion",                  "T061-T064"),
         ("Rig.TUnit.Storage.AzureBlob",               "T065-T067"),

@@ -43,5 +43,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Storage.S3\Rig.TUnit.Storage.S3.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Storage.MinIO\Rig.TUnit.Storage.MinIO.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Storage.FileSystem\Rig.TUnit.Storage.FileSystem.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Security.Jwt\Rig.TUnit.Security.Jwt.csproj" />
   </ItemGroup>
 </Project>

@@ -138,5 +138,6 @@
     <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Unit/Rig.TUnit.Storage.S3.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.MinIO.Tests.Unit/Rig.TUnit.Storage.MinIO.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.FileSystem.Tests.Unit/Rig.TUnit.Storage.FileSystem.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Security.Jwt.Tests.Unit/Rig.TUnit.Security.Jwt.Tests.Unit.csproj" />
   </Folder>
 </Solution>

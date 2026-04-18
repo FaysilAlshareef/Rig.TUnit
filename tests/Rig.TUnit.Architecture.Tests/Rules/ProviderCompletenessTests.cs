@@ -21,7 +21,7 @@ public sealed class ProviderCompletenessTests
 {
     private sealed record ProviderEntry(
         string AssemblyName,
-        string FixtureName,
+        string? FixtureName,
         string OptionsName,
         string BuilderName,
         string UseMethodName);
@@ -53,6 +53,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Storage.S3",               "S3Fixture",        "S3FixtureOptions",        "S3RigBuilder",         "UseS3"),
         new("Rig.TUnit.Storage.MinIO",            "MinIOFixture",     "MinIOFixtureOptions",     "MinIORigBuilder",      "UseMinIO"),
         new("Rig.TUnit.Storage.FileSystem",       "FileSystemFixture","FileSystemFixtureOptions","FileSystemRigBuilder", "UseFileSystem"),
+        new("Rig.TUnit.Security.Jwt",             null,               "JwtBuilderOptions",       "JwtRigBuilder",        "UseJwt"),
     ];
 
     /// <summary>
@@ -64,7 +65,6 @@ public sealed class ProviderCompletenessTests
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
-        ("Rig.TUnit.Security.Jwt",                    "T079-T080"),
         ("Rig.TUnit.Security.OAuth",                  "T081-T082"),
         ("Rig.TUnit.Security.Mtls",                   "T083-T086"),
         ("Rig.TUnit.Security.Policies",               "T087-T090"),
@@ -99,7 +99,7 @@ public sealed class ProviderCompletenessTests
 
             var types = assembly.GetExportedTypes();
 
-            if (!types.Any(t => t is { IsClass: true, IsAbstract: false } && t.Name == p.FixtureName))
+            if (p.FixtureName is not null && !types.Any(t => t is { IsClass: true, IsAbstract: false } && t.Name == p.FixtureName))
             {
                 offenders.Add($"{p.AssemblyName}: missing concrete class {p.FixtureName}");
             }
@@ -165,6 +165,17 @@ public sealed class ProviderCompletenessTests
         await Assert.That(overlap)
             .IsEmpty()
             .Because("A provider cannot be both required and skipped — move it from SkipUntilFixed into RequiredProviders");
+    }
+
+    [Test]
+    public async Task Security_ProvidersWithoutContainer_NeedNoFixture()
+    {
+        // Providers that ship without a container-backed Fixture (e.g., Jwt — pure token-signing,
+        // no broker/server) declare FixtureName: null in RequiredProviders. This test documents
+        // the intent so future contributors know nulls are not a mistake.
+        var nullFixtureEntries = RequiredProviders.Where(p => p.FixtureName is null).ToArray();
+        await Assert.That(nullFixtureEntries.Length).IsGreaterThanOrEqualTo(1)
+            .Because("At least one provider (Jwt) intentionally ships without a container-backed Fixture.");
     }
 
     private static bool IsStaticClass(Type t) => t is { IsClass: true, IsAbstract: true, IsSealed: true };

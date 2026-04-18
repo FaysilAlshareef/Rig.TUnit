@@ -142,5 +142,6 @@
     <Project Path="tests/Rig.TUnit.Security.OAuth.Tests.Unit/Rig.TUnit.Security.OAuth.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Mtls.Tests.Integration/Rig.TUnit.Security.Mtls.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Policies.Tests.Unit/Rig.TUnit.Security.Policies.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Observability.Metrics.Tests.Unit/Rig.TUnit.Observability.Metrics.Tests.Unit.csproj" />
   </Folder>
 </Solution>

@@ -163,7 +163,7 @@ Providers grouped by family. **Within each family, a provider is "done" when**: 
 | Order | Family | Providers | Per-provider adds |
 |---|---|---|---|
 | 3a | Databases.Sql | Postgresql | `PostgresRigBuilderExtensions` (`UsePostgres` fluent) + `PostgresBuilderExtensions` (`UsePostgresInMemory` EF quickstart per design §4.1) + README. `PostgresRigBuilder` already present. |
-| 3b | Databases.NoSql | Mongo, Cassandra, Dynamo, ElasticSearch, EventStore | Builder + Extensions + Options (where missing) + family-specific helper per design §4.4 |
+| 3b | Databases.NoSql | Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb (renamed from EventStore in Phase 1 T002c) | Builder + Extensions + Options (where missing) + family-specific helper per design §4.4 |
 | 3c | Messaging | Kafka, RabbitMq, Nats, Sqs | Builder + Extensions + Options (Nats/Sqs) + `{Provider}Listener : ListenerBase` + `{Provider}EventSender : EventSenderBase` |
 | 3d | Caching | Memory, Hybrid, Fusion | Memory: `UseMemoryCache` ext only. Hybrid/Fusion: Options + Builder + Extensions + fail-safe/eager-refresh helpers |
 | 3e | Storage | AzureBlob, S3, MinIO, FileSystem | Options (MinIO/FileSystem) + Builder + Extensions + `{Provider}SasBuilder` (FS gets `PathSandboxHelper` instead) |

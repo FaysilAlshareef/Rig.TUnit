@@ -75,7 +75,7 @@ Marker legend:
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs`
 - [x] T007 [P] [depends: T003] RED→GREEN scaffold `ReadmeCompletenessTests`. Verified 2026-04-18: **20 of 32 leaf provider packages lack README**; 12 already have one. Initial skip list = the 20 missing (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics, Docker). Non-skipped (MUST pass from Phase 1) = the 12 with existing READMEs: Caching.Memory, Caching.Redis, Databases.NoSql.Redis, Databases.Sql.SqlServer, Databases.Sql.Sqlite, Messaging.ServiceBus, Observability.Logging, Observability.Logging.Analyzers, Observability.Seq, Observability.Tracing, Security.Jwt, Security.OAuth.
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
-- [x] T008 [depends: T003a, T004a, T005, T006, T007] Run full `dotnet test` + `dotnet build`. Confirm new rules execute, skips documented, build still green, orphan dirs removed cleanly, `Rig.TUnit.csproj` description lands without warning, EventStore package builds clean on `Testcontainers.KurrentDb` / `KurrentDB.Client`.
+- [x] T008 [depends: T003a, T004a, T005, T006, T007] Run full `dotnet test` + `dotnet build`. Confirm new rules execute, skips documented, build still green, orphan dirs removed cleanly, `Rig.TUnit.csproj` description lands without warning, `Rig.TUnit.Databases.NoSql.KurrentDb` package builds clean on `Testcontainers.KurrentDb` / `KurrentDB.Client`.
 - [ ] T009 [P] [depends: T008] Commit Phase 1: `test(004): Phase 1 — enforcement scaffolding (RED for all gaps) + KurrentDB migration`.
 - [x] T010 [P] [depends: T008] Update `planning/provider-consistency-remediation/Rig.TUnit-Provider-Gap-Matrix.md`: note Phase 1 complete; architecture tests now visibly enforce the matrix.
 
@@ -176,14 +176,14 @@ Contract suite: `NoSqlRigContract` — runs 13+ tests per provider (per 003 base
   Files: `src/Rig.TUnit.Databases.NoSql.ElasticSearch/Helpers/IndexRefreshHelper.cs`, `Assertions/DslAssert.cs`
 - [ ] T037 [depends: T036] Add README + `ElasticSearchContractTests`. Remove from skip list.
 
-#### 3a.v EventStore
-- [ ] T038 [P] RED→GREEN `EventStoreFixtureOptions`.
-  File: `src/Rig.TUnit.Databases.NoSql.EventStore/Options/EventStoreFixtureOptions.cs`
-- [ ] T039 [depends: T038] RED→GREEN `EventStoreRigBuilder` + `UseEventStore` extension.
-  Files: `src/Rig.TUnit.Databases.NoSql.EventStore/Builder/EventStoreRigBuilder.cs`, `EventStoreRigBuilderExtensions.cs`
-- [ ] T040 [depends: T039] RED→GREEN `StreamAssert` + `ProjectionAssert`.
-  Files: `src/Rig.TUnit.Databases.NoSql.EventStore/Assertions/StreamAssert.cs`, `ProjectionAssert.cs`
-- [ ] T041 [depends: T040] Add README + `EventStoreContractTests`. Remove from skip list.
+#### 3a.v KurrentDb (was EventStore — package renamed in Phase 1 T002c)
+- [ ] T038 [P] RED→GREEN `KurrentDbFixtureOptions`.
+  File: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Options/KurrentDbFixtureOptions.cs`
+- [ ] T039 [depends: T038] RED→GREEN `KurrentDbRigBuilder` + `UseKurrentDb` extension.
+  Files: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Builder/KurrentDbRigBuilder.cs`, `KurrentDbRigBuilderExtensions.cs`
+- [ ] T040 [depends: T039] RED→GREEN `StreamAssert` + `ProjectionAssert` — built against `KurrentDB.Client 1.3.x`.
+  Files: `src/Rig.TUnit.Databases.NoSql.KurrentDb/Assertions/StreamAssert.cs`, `ProjectionAssert.cs`
+- [ ] T041 [depends: T040] Add README (cite upstream rebrand + image `kurrentplatform/kurrentdb:25.1`) + `KurrentDbContractTests`. Remove `Rig.TUnit.Databases.NoSql.KurrentDb` from `ProviderCompletenessTests` + `ReadmeCompletenessTests` skip lists.
 
 ### 3b Messaging
 
@@ -490,7 +490,7 @@ T174–T176 are now used by Phase 3.0 (Postgresql remediation added post-analysi
 - Coverage-gap fills if a package lands under 90/85 (T190-T199)
 - `Testcontainers.CosmosDb` pin removal from `Directory.Packages.props` after T140 if unreferenced (T200)
 - CI fixups / flaky quarantine (T201-T218)
-- Rename `Rig.TUnit.Databases.NoSql.EventStore` → `Rig.TUnit.Databases.NoSql.KurrentDb` as a future breaking-change PR once downstream callers have settled (reserved — NOT in 004 scope to preserve the public API surface)
+- ~~Rename `Rig.TUnit.Databases.NoSql.EventStore` → `Rig.TUnit.Databases.NoSql.KurrentDb`~~ (no longer reserved — completed in Phase 1 T002b/T002c/T002d; breaking change announced in release notes)
 
 ---
 
@@ -506,7 +506,7 @@ T174–T176 are now used by Phase 3.0 (Postgresql remediation added post-analysi
 | Phase 6 | 3 main threads `[P]` | READMEs, meta-package, CI matrix |
 
 **Total tasks**: 180 numbered (T001–T173 + T174–T176 Postgresql remediation + T003a orphan-dir cleanup + T004a Rig.TUnit meta-package clarification + T002b/T002c Kurrent migration) + 42 reserved (T177–T218) = 222 slots.
-**Parallel opportunities**: ~65 tasks marked `[P]` (T003a, T004a, T174 join the parallel sets; T002b/T002c are serial inside Phase 1 since they touch the same EventStore package).
+**Parallel opportunities**: ~65 tasks marked `[P]` (T003a, T004a, T174 join the parallel sets; T002b/T002c/T002d are serial inside Phase 1 since they touch the same Rig.TUnit.Databases.NoSql.KurrentDb package).
 **Sequential-critical**: Phase 1 → Phase 2 → Phase 3 (3.0 Postgresql + 3a-3g) → Phase 4 → Phase 5/6 (5 and 6 overlap).
 
 ---

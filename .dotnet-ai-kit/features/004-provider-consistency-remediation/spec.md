@@ -13,7 +13,7 @@ Feature 003 (ecosystem expansion) landed the **Base + Provider** pattern with 59
 
 - SqlServer, Sqlite, ServiceBus, Redis caching ship full `Fixture + Options + Builder + Extensions + Helpers + README`.
 - Postgresql has `Fixture + Options + Builder` but is **missing `PostgresRigBuilderExtensions` and `PostgresBuilderExtensions`** (EF quickstart) and has no README — per library design §4.1.
-- Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics ship **only a fixture** (sometimes + options).
+- Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb (renamed from EventStore in Phase 1 T002c), Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics ship **only a fixture** (sometimes + options).
 - `Rig.TUnit.Docker` has only a `ContainerFixture`; four packages promised by 003 (`Cosmos`, `MySql`, `Oracle`, `AppInsights`) never shipped.
 - Test files mix tests with inline infrastructure (ActivitySource setup, Polly pipelines, JWKS helpers, outbox seed builders) — contradicts the `TestInfrastructure/` pattern already used by `Rig.TUnit.Grpc.Tests.Unit`, `Rig.TUnit.Core.Tests.Unit`.
 - **20 of 32 leaf provider packages** ship without a README (verified 2026-04-18) — plus the 4 new packages to create in Phase 4, bringing the total Phase-6 README backlog to **~24 provider READMEs**. Providers that DO have a README today: Caching.Memory, Caching.Redis, Databases.NoSql.Redis, Databases.Sql.SqlServer, Databases.Sql.Sqlite, Messaging.ServiceBus, Observability.Logging, Observability.Logging.Analyzers, Observability.Seq, Observability.Tracing, Security.Jwt, Security.OAuth. (Planning docs' "57 of 59" figure is stale — superseded by this count.)
@@ -94,7 +94,7 @@ As a developer writing integration tests, I need every existing provider to expo
 
 **Acceptance Scenarios (Databases.NoSql):**
 
-1. **Given** the 5 NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, EventStore), **When** Phase 3 closes, **Then** each MUST ship `{Provider}FixtureOptions` (with `SectionName` + `[Required]` + `ValidateOnStart()`), `{Provider}RigBuilder : NoSqlRigBuilder<{Provider}RigBuilder>`, a public `Use{Provider}` extension on `RigBuilder`, and a provider-specific helper per 003 §4.4 (`CollectionPerTestHelper` + `BsonDiff` for Mongo, `KeyspacePerTestHelper` for Cassandra, `GsiVerifier` for Dynamo via LocalStack, `IndexRefreshHelper` + `DslAssert` for ElasticSearch, `StreamAssert` + `ProjectionAssert` for EventStore).
+1. **Given** the 5 NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb — renamed from EventStore in Phase 1 T002c), **When** Phase 3 closes, **Then** each MUST ship `{Provider}FixtureOptions` (with `SectionName` + `[Required]` + `ValidateOnStart()`), `{Provider}RigBuilder : NoSqlRigBuilder<{Provider}RigBuilder>`, a public `Use{Provider}` extension on `RigBuilder`, and a provider-specific helper per 003 §4.4 (`CollectionPerTestHelper` + `BsonDiff` for Mongo, `KeyspacePerTestHelper` for Cassandra, `GsiVerifier` for Dynamo via LocalStack, `IndexRefreshHelper` + `DslAssert` for ElasticSearch, `StreamAssert` + `ProjectionAssert` for KurrentDb — built against `KurrentDB.Client 1.3.x`).
 2. **Given** the integration test project for each NoSql provider, **When** it inherits `NoSqlRigContract`, **Then** all contract tests MUST pass end-to-end against the real container.
 
 **Acceptance Scenarios (Messaging):**

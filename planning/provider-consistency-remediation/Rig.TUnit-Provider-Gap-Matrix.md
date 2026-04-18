@@ -11,7 +11,7 @@ Legend: ✓ = present, — = missing, N/A = not applicable for this family.
 | Provider | Fixture | Options | Builder | BuilderExt | EF Ext | Helpers | README |
 |---|---|---|---|---|---|---|---|
 | SqlServer | ✓ | ✓ | ✓ | ✓ | ✓ | via base | ✓ |
-| Postgresql | ✓ | ✓ | ✓ | — | — | via base | — |
+| Postgresql | ✓ | ✓ | ✓ | **→ in scope (tasks T174–T176)** | **→ in scope (tasks T174–T176)** | via base | **→ in scope (tasks T174–T176)** |
 | Sqlite | ✓ | ✓ | ✓ | ✓ | ✓ | via base | — |
 | **MySql** (new) | — | — | — | — | — | — | — |
 | **Oracle** (new) | — | — | — | — | — | — | — |

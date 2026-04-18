@@ -54,6 +54,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Storage.MinIO",            "MinIOFixture",     "MinIOFixtureOptions",     "MinIORigBuilder",      "UseMinIO"),
         new("Rig.TUnit.Storage.FileSystem",       "FileSystemFixture","FileSystemFixtureOptions","FileSystemRigBuilder", "UseFileSystem"),
         new("Rig.TUnit.Security.Jwt",             null,               "JwtBuilderOptions",       "JwtRigBuilder",        "UseJwt"),
+        new("Rig.TUnit.Security.OAuth",           "MockOAuthServer",  "MockOAuthServerOptions",  "OAuthRigBuilder",      "UseOAuthServer"),
     ];
 
     /// <summary>
@@ -65,7 +66,6 @@ public sealed class ProviderCompletenessTests
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
-        ("Rig.TUnit.Security.OAuth",                  "T081-T082"),
         ("Rig.TUnit.Security.Mtls",                   "T083-T086"),
         ("Rig.TUnit.Security.Policies",               "T087-T090"),
         ("Rig.TUnit.Observability.Metrics",           "T091-T095"),

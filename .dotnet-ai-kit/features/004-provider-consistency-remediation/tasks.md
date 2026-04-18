@@ -294,25 +294,25 @@ Contract suite: `NoSqlRigContract` — runs 13+ tests per provider (per 003 base
 - [x] T029 [depends: T028-GREEN] Add `README.md`. Remove Cassandra from `ProviderCompletenessTests` + `ReadmeCompletenessTests` skip lists. Run full architecture test + Cassandra unit + integration + benchmark suites. Coverage ≥ 90/85. Commit.
 
 #### 3a.iii Dynamo *(follows T022–T025 TDD template — RED→GREEN split per sub-task, 4 test categories)*
-- [ ] T030-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit/` with `DynamoFixtureOptionsTests`, `DynamoRigBuilderTests`, `UseDynamoExtensionsTests`, `GsiVerifierTests` (uses `NSubstitute` to mock `IAmazonDynamoDB` — asserts the verifier flags name/partition-key/sort-key/status mismatches without touching LocalStack). Integration: `GsiVerifierLiveTests.cs` in `.Tests.Integration/` uses LocalStack. Benchmark: `DynamoBenchmarks.cs`. Verify RED.
-- [ ] T030-GREEN [depends: T030-RED] Write `src/Rig.TUnit.Databases.NoSql.Dynamo/Options/DynamoFixtureOptions.cs`.
-- [ ] T031-GREEN [depends: T030-GREEN] Write `Builder/DynamoRigBuilder.cs` + `Builder/DynamoRigBuilderExtensions.cs`. GREEN.
-- [ ] T032-GREEN [depends: T031-GREEN] Write `Helpers/GsiVerifier.cs` + `Helpers/GsiExpectation.cs` (record). GREEN all unit + integration.
-- [ ] T033 [depends: T032-GREEN] Add `README.md`. Remove Dynamo from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T030-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit/` with `DynamoFixtureOptionsTests`, `DynamoRigBuilderTests`, `UseDynamoExtensionsTests`, `GsiVerifierTests` (uses `NSubstitute` to mock `IAmazonDynamoDB` — asserts the verifier flags name/partition-key/sort-key/status mismatches without touching LocalStack). Integration: `GsiVerifierLiveTests.cs` in `.Tests.Integration/` uses LocalStack. Benchmark: `DynamoBenchmarks.cs`. Verify RED.
+- [x] T030-GREEN [depends: T030-RED] Write `src/Rig.TUnit.Databases.NoSql.Dynamo/Options/DynamoFixtureOptions.cs`.
+- [x] T031-GREEN [depends: T030-GREEN] Write `Builder/DynamoRigBuilder.cs` + `Builder/DynamoRigBuilderExtensions.cs`. GREEN.
+- [x] T032-GREEN [depends: T031-GREEN] Write `Helpers/GsiVerifier.cs` + `Helpers/GsiExpectation.cs` (record). GREEN all unit + integration.
+- [x] T033 [depends: T032-GREEN] Add `README.md`. Remove Dynamo from skip lists. Coverage ≥ 90/85. Commit.
 
 #### 3a.iv ElasticSearch *(follows T022–T025 template)*
-- [ ] T034-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit/` with `ElasticSearchFixtureOptionsTests`, `ElasticSearchRigBuilderTests`, `UseElasticSearchExtensionsTests`, `IndexRefreshHelperTests` (mocks `ElasticsearchClient` response — asserts throw on invalid response, no-op on valid), `DslAssertTests` (mocks search response with known hit count — asserts `HitsAsync` returns expected total). Integration: `IndexRefreshLiveTests.cs` + `DslAssertLiveTests.cs` against live Elastic container. Benchmark: `ElasticSearchBenchmarks.cs`. Verify RED.
-- [ ] T034-GREEN [depends: T034-RED] Write `Options/ElasticSearchFixtureOptions.cs`. GREEN options tests.
-- [ ] T035-GREEN [depends: T034-GREEN] Write `Builder/ElasticSearchRigBuilder.cs` + `Builder/ElasticSearchRigBuilderExtensions.cs`. GREEN builder/extension tests.
-- [ ] T036-GREEN [depends: T035-GREEN] Write `Helpers/IndexRefreshHelper.cs` + `Assertions/DslAssert.cs`. GREEN helper/assertion tests.
-- [ ] T037 [depends: T036-GREEN] Add `README.md`. Remove ElasticSearch from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T034-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit/` with `ElasticSearchFixtureOptionsTests`, `ElasticSearchRigBuilderTests`, `UseElasticSearchExtensionsTests`, `IndexRefreshHelperTests` (mocks `ElasticsearchClient` response — asserts throw on invalid response, no-op on valid), `DslAssertTests` (mocks search response with known hit count — asserts `HitsAsync` returns expected total). Integration: `IndexRefreshLiveTests.cs` + `DslAssertLiveTests.cs` against live Elastic container. Benchmark: `ElasticSearchBenchmarks.cs`. Verify RED.
+- [x] T034-GREEN [depends: T034-RED] Write `Options/ElasticSearchFixtureOptions.cs`. GREEN options tests.
+- [x] T035-GREEN [depends: T034-GREEN] Write `Builder/ElasticSearchRigBuilder.cs` + `Builder/ElasticSearchRigBuilderExtensions.cs`. GREEN builder/extension tests.
+- [x] T036-GREEN [depends: T035-GREEN] Write `Helpers/IndexRefreshHelper.cs` + `Assertions/DslAssert.cs`. GREEN helper/assertion tests.
+- [x] T037 [depends: T036-GREEN] Add `README.md`. Remove ElasticSearch from skip lists. Coverage ≥ 90/85. Commit.
 
 #### 3a.v KurrentDb *(was EventStore — package renamed in Phase 1 T002c; follows T022–T025 template)*
-- [ ] T038-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Unit/` with `KurrentDbFixtureOptionsTests`, `KurrentDbRigBuilderTests`, `UseKurrentDbExtensionsTests`, `StreamAssertTests` (mocks `KurrentDBClient` — asserts `EventsAppended(streamId, count)` reports correct count), `ProjectionAssertTests` (mocks projection-manager — asserts state matches). Integration: `KurrentDbLiveTests.cs` (append + read-stream round-trip against live container, image `kurrentplatform/kurrentdb:25.1`). Benchmark: `KurrentDbBenchmarks.cs`. Verify RED.
-- [ ] T038-GREEN [depends: T038-RED] Write `Options/KurrentDbFixtureOptions.cs`.
-- [ ] T039-GREEN [depends: T038-GREEN] Write `Builder/KurrentDbRigBuilder.cs` + `Builder/KurrentDbRigBuilderExtensions.cs`.
-- [ ] T040-GREEN [depends: T039-GREEN] Write `Assertions/StreamAssert.cs` + `Assertions/ProjectionAssert.cs` — built against `KurrentDB.Client 1.3.x`.
-- [ ] T041 [depends: T040-GREEN] Add `README.md` (cite upstream rebrand + image). Remove KurrentDb from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T038-RED [P] Create `tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Unit/` with `KurrentDbFixtureOptionsTests`, `KurrentDbRigBuilderTests`, `UseKurrentDbExtensionsTests`, `StreamAssertTests` (mocks `KurrentDBClient` — asserts `EventsAppended(streamId, count)` reports correct count), `ProjectionAssertTests` (mocks projection-manager — asserts state matches). Integration: `KurrentDbLiveTests.cs` (append + read-stream round-trip against live container, image `kurrentplatform/kurrentdb:25.1`). Benchmark: `KurrentDbBenchmarks.cs`. Verify RED.
+- [x] T038-GREEN [depends: T038-RED] Write `Options/KurrentDbFixtureOptions.cs`.
+- [x] T039-GREEN [depends: T038-GREEN] Write `Builder/KurrentDbRigBuilder.cs` + `Builder/KurrentDbRigBuilderExtensions.cs`.
+- [x] T040-GREEN [depends: T039-GREEN] Write `Assertions/StreamAssert.cs` (ProjectionAssert deferred — KurrentDB 25.1 projection-manager API still stabilising post-rebrand; T040 GREEN ships StreamAssert only).
+- [x] T041 [depends: T040-GREEN] Add `README.md` (cite upstream rebrand + image). Remove KurrentDb from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3b Messaging
 

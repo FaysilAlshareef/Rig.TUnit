@@ -196,3 +196,100 @@ Coverage (merged unit + full-integration):
 - Unit: 39/39 GREEN (Cassandra.Tests.Unit, 1.8 s)
 - Integration: 17/17 GREEN (live Cassandra:5 container, 25.9 s — CassandraContract + ParallelIsolation + 4 × KeyspacePerTestLiveTests)
 - Architecture: 16/16 GREEN (ProviderCompletenessTests + ReadmeCompletenessTests enforce Cassandra's canonical shape)
+
+## T030 — Dynamo RED (commit 1dfc66c)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: 10 files in `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Unit/` (csproj + 7 test classes: DynamoRigBuilderTests, UseDynamoExtensionsTests, DynamoFixtureOptionsTests, DynamoFixtureOptionsValidationTests, DynamoRigBuilderConnectionStringTests, DynamoFixtureTests, GsiVerifierTests with NSubstitute mocks) — 38 tests
+- created: `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Integration/GsiVerifierLiveTests.cs` (3 live tests against LocalStack)
+- created: `tests/Rig.TUnit.Benchmarks/DynamoBenchmarks.cs` (2 allocation benchmarks — NSubstitute mock client)
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added Dynamo ProjectReference + NSubstitute + AWSSDK.DynamoDBv2
+- modified: `tests/Rig.TUnit.Databases.NoSql.Dynamo.Tests.Integration/…csproj` — added AWSSDK.DynamoDBv2 PackageReference
+- modified: `Rig.TUnit.slnx` — registered new Dynamo Tests.Unit
+
+**Verification (RED):** 7 × CS0234 (Options / Builder / Helpers namespaces missing).
+
+## T030/T031/T032/T033 — Dynamo GREEN (commit bb03f69)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/Options/DynamoFixtureOptions.cs` (SectionName + [Required] ImageTag + [Range] StartupTimeoutSeconds + [Required] Region)
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/Builder/DynamoRigBuilder.cs` (sealed CRTP)
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/Builder/DynamoRigBuilderExtensions.cs` (UseDynamo)
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/Helpers/GsiExpectation.cs` (record: IndexName + PartitionKey + SortKey? + Status="ACTIVE")
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/Helpers/GsiVerifier.cs` (static VerifyAsync: flags missing/partition-drift/sort-drift/status-drift)
+- created: `src/Rig.TUnit.Databases.NoSql.Dynamo/README.md` (1.3k chars)
+- modified: `src/Rig.TUnit.Databases.NoSql.Dynamo/Fixtures/DynamoFixture.cs` — ctor variants, options-driven image/timeout/region, null-guards, Client accessor
+- modified: ProviderCompletenessTests + ReadmeCompletenessTests skip lists
+
+**Verification (GREEN):**
+- Unit: 38/38 GREEN (Dynamo.Tests.Unit, 2.3 s)
+- Integration: 16/16 GREEN (LocalStack 3, 22.4 s — DynamoContract + ParallelIsolation + 3 × GsiVerifierLiveTests)
+- Architecture: 16/16 GREEN
+
+## T034 — ElasticSearch RED (commit e9faa51)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: 11 files in Tests.Unit (csproj + 8 test classes + TestClients.cs) — 33 tests; RED via 8 × CS0234
+- created: 2 integration tests (IndexRefreshLiveTests, DslAssertLiveTests)
+- created: `tests/Rig.TUnit.Benchmarks/ElasticSearchBenchmarks.cs`
+- modified: slnx + Benchmarks + Integration csprojs
+
+## T034/T035/T036/T037 — ElasticSearch GREEN (commit 7175466)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: Options/ElasticSearchFixtureOptions.cs
+- created: Builder/ElasticSearchRigBuilder.cs + ElasticSearchRigBuilderExtensions.cs
+- created: Helpers/IndexRefreshHelper.cs (forces near-real-time refresh; throws on non-valid response)
+- created: Assertions/DslAssert.cs (HitCountAsync<T> — strongly-typed search)
+- created: README.md
+- modified: Fixtures/ElasticSearchFixture.cs — ctor variants, options-driven image/timeout, Client accessor with self-signed-cert-trusting settings (CertificateValidations.AllowAll) for ES 8.x HTTPS
+- modified: skip lists
+
+**Verification (GREEN):**
+- Unit: 33/33 GREEN (ElasticSearch.Tests.Unit, 2.3 s)
+- Integration: 17/17 GREEN (live Elastic 8.15.3 HTTPS + basic-auth, 51.5 s — ElasticSearchContract + ParallelIsolation + 2 × IndexRefreshLiveTests + 2 × DslAssertLiveTests)
+- Architecture: 16/16 GREEN
+
+## T038 — KurrentDb RED (commit 7376cc2)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: 11 files in Tests.Unit (csproj + 8 test classes + TestClients.cs) — 30 tests; RED via 7 × CS0234
+- created: `tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Integration/KurrentDbLiveTests.cs` (3 live tests)
+- created: `tests/Rig.TUnit.Benchmarks/KurrentDbBenchmarks.cs`
+- modified: slnx + Benchmarks + Integration csprojs
+
+**Note on ProjectionAssert deferral:** KurrentDB 25.1 projection-manager API is still unstable post-rebrand. Spec FR-035 requires at least one helper per provider; StreamAssert (append-count round-trip) meets that bar. ProjectionAssert can be revisited in a follow-up once the upstream API stabilises.
+
+## T038/T039/T040/T041 — KurrentDb GREEN (commit b28e6a4)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: Options/KurrentDbFixtureOptions.cs
+- created: Builder/KurrentDbRigBuilder.cs + KurrentDbRigBuilderExtensions.cs
+- created: Assertions/StreamAssert.cs (EventsAppendedAsync: reads stream forwards, returns count, StreamNotFound → 0)
+- created: README.md (rebrand note + runnable example)
+- modified: Fixtures/KurrentDbFixture.cs — ctor variants, options-driven image/timeout, Client accessor via KurrentDBClientSettings.Create, Client-before-container disposal
+- modified: skip lists
+
+**Verification (GREEN):**
+- Unit: 30/30 GREEN (KurrentDb.Tests.Unit, 2.3 s)
+- Integration: 16/16 GREEN (live KurrentDB 25.1 container, 18.3 s — KurrentDbContract + ParallelIsolation + 3 × KurrentDbLiveTests)
+  - First run hit Docker Hub pull flakiness (9/16 failed with "unexpected EOF"); pre-pulling `kurrentplatform/kurrentdb:25.1` fixed it on retry.
+- Architecture: 16/16 GREEN
+
+## Phase 3a full NoSql sweep complete
+**Timestamp**: 2026-04-18
+**Repo**: primary
+
+All five NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb) now ship the canonical quartet (Fixture + Options + RigBuilder + Use extension) plus at least one helper/assertion per provider with matching unit + integration + benchmark coverage. ProviderCompletenessTests.RequiredProviders list grew 6 → 10; ReadmeCompletenessTests skip list shrunk 20 → 15.

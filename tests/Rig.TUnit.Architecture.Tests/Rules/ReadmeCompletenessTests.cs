@@ -45,10 +45,6 @@ public sealed class ReadmeCompletenessTests
         ("Rig.TUnit.Observability.Metrics",       "T095"),
         ("Rig.TUnit.Security.Mtls",               "T086"),
         ("Rig.TUnit.Security.Policies",           "T090"),
-        ("Rig.TUnit.Storage.AzureBlob",           "T067"),
-        ("Rig.TUnit.Storage.FileSystem",          "T078"),
-        ("Rig.TUnit.Storage.MinIO",               "T074"),
-        ("Rig.TUnit.Storage.S3",                  "T070"),
     ];
 
     [Test]

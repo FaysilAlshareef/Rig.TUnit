@@ -2,6 +2,8 @@
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="System.IO.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rig.TUnit.Storage\Rig.TUnit.Storage.csproj" />

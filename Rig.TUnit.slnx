@@ -134,5 +134,9 @@
     <Project Path="tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/Rig.TUnit.Messaging.Sqs.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Hybrid.Tests.Unit/Rig.TUnit.Caching.Hybrid.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Fusion.Tests.Unit/Rig.TUnit.Caching.Fusion.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.AzureBlob.Tests.Unit/Rig.TUnit.Storage.AzureBlob.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Unit/Rig.TUnit.Storage.S3.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.MinIO.Tests.Unit/Rig.TUnit.Storage.MinIO.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.FileSystem.Tests.Unit/Rig.TUnit.Storage.FileSystem.Tests.Unit.csproj" />
   </Folder>
 </Solution>

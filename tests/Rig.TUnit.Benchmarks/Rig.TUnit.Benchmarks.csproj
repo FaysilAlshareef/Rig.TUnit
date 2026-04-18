@@ -17,6 +17,10 @@
     <PackageReference Include="NATS.Client.Core" />
     <PackageReference Include="AWSSDK.SQS" />
     <PackageReference Include="ZiggyCreatures.FusionCache" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="Minio" />
+    <PackageReference Include="System.IO.Abstractions" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
@@ -35,5 +39,9 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Sqs\Rig.TUnit.Messaging.Sqs.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Hybrid\Rig.TUnit.Caching.Hybrid.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Fusion\Rig.TUnit.Caching.Fusion.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Storage.AzureBlob\Rig.TUnit.Storage.AzureBlob.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Storage.S3\Rig.TUnit.Storage.S3.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Storage.MinIO\Rig.TUnit.Storage.MinIO.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Storage.FileSystem\Rig.TUnit.Storage.FileSystem.csproj" />
   </ItemGroup>
 </Project>

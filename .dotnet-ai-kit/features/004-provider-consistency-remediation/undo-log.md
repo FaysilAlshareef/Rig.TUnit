@@ -456,3 +456,63 @@ ProviderCompletenessTests.RequiredProviders: 14 → 15 · ReadmeCompletenessTest
 
 ProviderCompletenessTests.RequiredProviders: 15 → 16 · ReadmeCompletenessTests.SkipUntilFixed: 9 → 8.
 **Phase 3c (Caching) complete** — Memory (by-design) + Hybrid + Fusion all ship canonical shape. Next up: Phase 3d (Storage — AzureBlob/S3/MinIO/FileSystem).
+
+## T065–T078 — Phase 3d Storage GREEN (AzureBlob + S3 + MinIO + FileSystem, strict TDD, parallel)
+**Timestamp**: 2026-04-19
+**Repo**: primary
+**Status**: OK
+
+**Parallelism report**: 4 providers fully independent (distinct src trees, test trees, namespaces); 4 shared-file edits serialized into single batched updates: ProviderCompletenessTests (add 4 → RequiredProviders, remove 4 from SkipUntilFixed), ReadmeCompletenessTests (remove 4 entries), Rig.TUnit.Benchmarks.csproj (add 4 PackageRefs + 4 ProjectRefs), Rig.TUnit.slnx (add 4 Tests.Unit projects).
+
+**RED sequence** (all executed before any src touched):
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — 4 providers moved from SkipUntilFixed → RequiredProviders (20 required now).
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — 4 Storage entries removed from SkipUntilFixed (4 remaining).
+- created: 4 × `tests/Rig.TUnit.Storage.{Provider}.Tests.Unit/` (csproj + 6 test classes each = 24 files, 134 tests covering RigBuilder + UseExt + FixtureOptions + ConnectionString + Fixture ctors + SasBuilder or PathSandboxHelper).
+- created: 4 × `tests/…Tests.Integration/Use{Provider}FluentTests.cs` (fluent wiring + round-trip).
+- created: 4 × `tests/Rig.TUnit.Benchmarks/{Provider}Benchmarks.cs` ([Config(InProcessEmitBenchmarkConfig)]).
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added `Azure.Storage.Blobs`, `AWSSDK.S3`, `Minio`, `System.IO.Abstractions` PackageRefs + 4 Storage ProjectRefs.
+- modified: `Rig.TUnit.slnx` — registered 4 new Tests.Unit projects.
+
+**RED evidence**: `dotnet build` produced ~15 × CS0234 across 4 Tests.Unit projects (Builder/Helpers/Options namespaces missing) + 2 × arch test failures (`RequiredProviders_ExposeCanonicalTypes` listing 12 missing types, `EveryLeafProvider_ShipsReadme` listing 4 missing READMEs).
+
+**GREEN sequence**:
+
+*AzureBlob (T065/T066/T067)*:
+- created: `src/Rig.TUnit.Storage.AzureBlob/Builder/AzureBlobRigBuilder.cs` (sealed CRTP of `StorageRigBuilder<AzureBlobRigBuilder>`)
+- created: `src/Rig.TUnit.Storage.AzureBlob/Builder/AzureBlobRigBuilderExtensions.cs` (`UseAzureBlob`)
+- created: `src/Rig.TUnit.Storage.AzureBlob/Helpers/AzureBlobSasBuilder.cs` (pure `BuildQueryString` emitting `sv=…&sr=b&sp=…&se=…&spr=https&rscd=inline`)
+- created: `src/Rig.TUnit.Storage.AzureBlob/README.md`
+
+*S3 (T068/T069/T070)*:
+- created: `src/Rig.TUnit.Storage.S3/Builder/S3RigBuilder.cs` + `S3RigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Storage.S3/Helpers/S3SasBuilder.cs` (record `S3PresignRequest(BucketName, Key, Verb, Expires)`)
+- created: `src/Rig.TUnit.Storage.S3/README.md`
+
+*MinIO (T071/T072/T073/T074)*:
+- created: `src/Rig.TUnit.Storage.MinIO/Options/MinIOFixtureOptions.cs`
+- created: `src/Rig.TUnit.Storage.MinIO/Builder/MinIORigBuilder.cs` + `MinIORigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Storage.MinIO/Helpers/MinIOSasBuilder.cs` (record `MinIOPresignRequest` + 7-day expiry enforcement matching AWS SigV4)
+- modified: `src/Rig.TUnit.Storage.MinIO/Fixtures/MinIOFixture.cs` — added ctor variants + options-driven image/timeout/credentials
+- modified: `src/Rig.TUnit.Storage.MinIO/Rig.TUnit.Storage.MinIO.csproj` — added `Microsoft.Extensions.Options{,.DataAnnotations}`
+- created: `src/Rig.TUnit.Storage.MinIO/README.md`
+
+*FileSystem (T075/T076/T077/T078)*:
+- created: `src/Rig.TUnit.Storage.FileSystem/Options/FileSystemFixtureOptions.cs` (RootPathPrefix + CleanupOnDispose)
+- created: `src/Rig.TUnit.Storage.FileSystem/Builder/FileSystemRigBuilder.cs` + `FileSystemRigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Storage.FileSystem/Helpers/PathSandboxHelper.cs` — pure `Resolve(root, relative)` that canonicalizes + blocks `../` escapes with `UnauthorizedAccessException`; `IsInside(root, candidate)` predicate
+- modified: `src/Rig.TUnit.Storage.FileSystem/Fixtures/FileSystemFixture.cs` — ctor variants + options-driven prefix + cleanup toggle
+- modified: `src/Rig.TUnit.Storage.FileSystem/Rig.TUnit.Storage.FileSystem.csproj` — added Options packages
+- created: `src/Rig.TUnit.Storage.FileSystem/README.md`
+
+*Test-file hygiene fix*: 3 × `{Provider}SasBuilderTests.cs` originally embedded an inline `TestClock` helper. `TestFileOrganizationTests.EveryTestFile_HasSingleTopLevelType` flagged these as violations → extracted to dedicated `TestClock.cs` per Tests.Unit project (AzureBlob, S3, MinIO).
+
+**Verification (fresh)**:
+- Full solution build: 129 projects, 0 warnings, 0 errors (Debug + Release).
+- Unit: AzureBlob 33 · S3 33 · MinIO 34 · FileSystem 34 = **134/134 GREEN** (no Docker).
+- Integration: AzureBlob 11 (Azurite) · S3 11 (LocalStack 3) · MinIO 8 (minio/minio) · FileSystem 12 (in-process) = **42/42 GREEN**.
+- Architecture: 16/16 GREEN.
+- Benchmarks: AzureBlob 3 · S3 3 · MinIO 3 · FileSystem 4 = **13/13 executed** via InProcessEmitToolchain.
+
+ProviderCompletenessTests.RequiredProviders: 16 → **20** (AzureBlob/S3/MinIO/FileSystem added).
+ReadmeCompletenessTests.SkipUntilFixed: 8 → **4** (4 Storage leaves removed).
+**Phase 3d (Storage) complete** — next up: Phase 3e (Security — Jwt/OAuth/Mtls/Policies).

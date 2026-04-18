@@ -383,29 +383,30 @@ Contract suite: `StorageRigContract`.
 **TDD GATE APPLIES**: same 4-test cadence (Unit / Integration / Contract / Benchmark) + RED→GREEN pairs per task. Every provider gets a `Rig.TUnit.Storage.{Provider}.Tests.Unit/` project and a `{Provider}StorageBenchmarks.cs` entry in `Rig.TUnit.Benchmarks/`.
 
 #### 3d.i AzureBlob *(TDD template)*
-- [ ] T065-RED [P] Unit tests (RigBuilder, UseAzureBlob, `AzureBlobSasBuilderTests` mocking the SAS token math). Integration live (Azurite) + benchmark. Verify RED.
-- [ ] T065-GREEN [depends: T065-RED] Write `Builder/AzureBlobRigBuilder.cs` + `AzureBlobRigBuilderExtensions.cs`.
-- [ ] T066-GREEN [depends: T065-GREEN] Write `Helpers/AzureBlobSasBuilder.cs`.
-- [ ] T067 [depends: T066-GREEN] Add README. Remove AzureBlob from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T065-RED [P] Strict TDD flip-first. Moved AzureBlob → RequiredProviders + removed from Readme skip list → arch tests RED (2 failures). Created Tests.Unit csproj + 6 test classes (33 tests: RigBuilder sealed/CRTP/null-guards, UseAzureBlob null-guards/fluent/configure, FixtureOptions SectionName/defaults/overrides/validation, RigBuilderConnectionString getter exercise, Fixture ctor variants + Client/ConnectionString pre-init throws, AzureBlobSasBuilder pure-function guard tests). Integration: `tests/…Integration/UseAzureBlobFluentTests.cs`. Benchmark: `tests/Rig.TUnit.Benchmarks/AzureBlobBenchmarks.cs`. RED evidence: CS0234 (Builder + Helpers missing).
+- [x] T065-GREEN [depends: T065-RED] Wrote `Builder/AzureBlobRigBuilder.cs` (sealed CRTP of `StorageRigBuilder<AzureBlobRigBuilder>`) + `Builder/AzureBlobRigBuilderExtensions.cs` (`UseAzureBlob` fluent null-guards).
+- [x] T066-GREEN [depends: T065-GREEN] Wrote `Helpers/AzureBlobSasBuilder.cs` — pure `BuildQueryString(container, blob, permissions, expiry, clock)` that emits SAS-style `sv/sr/sp/se/spr/rscd` parameters with null-guards and positive-expiry enforcement.
+- [x] T067 [depends: T066-GREEN] Added README. Unit 33/33 · Integration 11/11 (Azurite) · Architecture 16/16 · Benchmark 3/3.
 
 #### 3d.ii S3 *(TDD template; LocalStack-backed)*
-- [ ] T068-RED [P] Unit tests (RigBuilder, UseS3, `S3SasBuilderTests`). Integration live (LocalStack) + benchmark. Verify RED.
-- [ ] T068-GREEN [depends: T068-RED] Write `Builder/S3RigBuilder.cs` + `S3RigBuilderExtensions.cs`.
-- [ ] T069-GREEN [depends: T068-GREEN] Write `Helpers/S3SasBuilder.cs`.
-- [ ] T070 [depends: T069-GREEN] Add README. Remove S3 from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T068-RED [P] Strict TDD flip-first. Tests.Unit csproj + 6 test classes (33 tests). Integration: `UseS3FluentTests.cs` + existing Contract/Quirks. Benchmark: `S3Benchmarks.cs`. RED evidence: CS0234.
+- [x] T068-GREEN [depends: T068-RED] Wrote `Builder/S3RigBuilder.cs` + `Builder/S3RigBuilderExtensions.cs` (`UseS3`).
+- [x] T069-GREEN [depends: T068-GREEN] Wrote `Helpers/S3SasBuilder.cs` (pure `BuildPresignRequest(bucket, key, verb, expiry, clock)` → `S3PresignRequest` record that matches the AWSSDK's `GetPreSignedUrlRequest` shape).
+- [x] T070 [depends: T069-GREEN] Added README. Unit 33/33 · Integration 11/11 (LocalStack) · Architecture 16/16 · Benchmark 3/3.
 
 #### 3d.iii MinIO *(TDD template)*
-- [ ] T071-RED [P] Unit tests (Options, RigBuilder, UseMinIO, `MinIOSasBuilderTests`). Integration live + benchmark. Verify RED.
-- [ ] T071-GREEN [depends: T071-RED] Write `Options/MinIOFixtureOptions.cs`.
-- [ ] T072-GREEN [depends: T071-GREEN] Write `Builder/MinIORigBuilder.cs` + `MinIORigBuilderExtensions.cs`.
-- [ ] T073-GREEN [depends: T072-GREEN] Write `Helpers/MinIOSasBuilder.cs`.
-- [ ] T074 [depends: T073-GREEN] Add README. Remove MinIO from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T071-RED [P] Strict TDD flip-first. Tests.Unit csproj + 6 test classes (34 tests: includes 7 `MinIOSasBuilderTests` covering the 7-day max-expiry enforcement). Integration: `UseMinIOFluentTests.cs` round-trip using `MakeBucketArgs` / `PutObjectArgs` / `GetObjectArgs` / `RemoveBucketArgs`. Benchmark: `MinIOBenchmarks.cs`. RED evidence: CS0234 (Options/Builder/Helpers missing).
+- [x] T071-GREEN [depends: T071-RED] Wrote `Options/MinIOFixtureOptions.cs` (SectionName="RigTUnit:MinIO"; ImageTag + StartupTimeoutSeconds + Username + Password with `[Required]`/`[Range]`). Added `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences.
+- [x] T072-GREEN [depends: T071-GREEN] Wrote `Builder/MinIORigBuilder.cs` + `Builder/MinIORigBuilderExtensions.cs`. Rewrote `Fixtures/MinIOFixture.cs` with ctor variants (parameterless / IOptions / direct) + null-guards + options-driven image/timeout/credentials.
+- [x] T073-GREEN [depends: T072-GREEN] Wrote `Helpers/MinIOSasBuilder.cs` (pure `BuildPresignRequest` → `MinIOPresignRequest` record; enforces MinIO's 7-day max expiry).
+- [x] T074 [depends: T073-GREEN] Added README. Unit 34/34 · Integration 8/8 (MinIO container) · Architecture 16/16 · Benchmark 3/3.
 
 #### 3d.iv FileSystem *(no container — pure filesystem sandbox; TDD template)*
-- [ ] T075-RED [P] Unit tests (Options, RigBuilder, UseFileSystem, `PathSandboxHelperTests` — pure: asserts path traversal prevented, dispose deletes sandbox). Integration = full filesystem operations (no Docker) + benchmark. Verify RED.
-- [ ] T075-GREEN [depends: T075-RED] Write `Options/FileSystemFixtureOptions.cs`.
-- [ ] T076-GREEN [depends: T075-GREEN] Write `Builder/FileSystemRigBuilder.cs` + `FileSystemRigBuilderExtensions.cs`.
-- [ ] T077-GREEN [depends: T076-GREEN] Write `Helpers/PathSandboxHelper.cs` (sandboxed temp-dir isolation — N/A for SAS).
+- [x] T075-RED [P] Strict TDD flip-first. Tests.Unit csproj + 6 test classes (34 tests: includes 9 `PathSandboxHelperTests` covering path-traversal prevention + absolute-path escape blocking + IsInside predicate). Integration: `UseFileSystemFluentTests.cs` (no Docker — in-process). Benchmark: `FileSystemBenchmarks.cs`. RED evidence: CS0234.
+- [x] T075-GREEN [depends: T075-RED] Wrote `Options/FileSystemFixtureOptions.cs` (SectionName="RigTUnit:FileSystem"; RootPathPrefix + CleanupOnDispose).
+- [x] T076-GREEN [depends: T075-GREEN] Wrote `Builder/FileSystemRigBuilder.cs` + `Builder/FileSystemRigBuilderExtensions.cs`. Rewrote `Fixtures/FileSystemFixture.cs` with ctor variants + null-guards + options-driven prefix + cleanup toggle.
+- [x] T077-GREEN [depends: T076-GREEN] Wrote `Helpers/PathSandboxHelper.cs` — pure `Resolve(root, relative)` that canonicalizes + blocks `../` escapes via `UnauthorizedAccessException`, plus `IsInside(root, candidate)` predicate.
+- [x] T078 [depends: T077-GREEN] Added README. Unit 34/34 · Integration 12/12 (in-process) · Architecture 16/16 · Benchmark 4/4.
 - [ ] T078 [depends: T077-GREEN] Add README. Remove FileSystem from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3e Security

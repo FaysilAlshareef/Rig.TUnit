@@ -49,6 +49,10 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Caching.Redis",            "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
         new("Rig.TUnit.Caching.Hybrid",           "HybridCacheFixture","HybridCacheFixtureOptions","HybridCacheRigBuilder","UseHybridCache"),
         new("Rig.TUnit.Caching.Fusion",           "FusionCacheFixture","FusionCacheFixtureOptions","FusionCacheRigBuilder","UseFusionCache"),
+        new("Rig.TUnit.Storage.AzureBlob",        "AzureBlobFixture", "AzureBlobFixtureOptions", "AzureBlobRigBuilder",  "UseAzureBlob"),
+        new("Rig.TUnit.Storage.S3",               "S3Fixture",        "S3FixtureOptions",        "S3RigBuilder",         "UseS3"),
+        new("Rig.TUnit.Storage.MinIO",            "MinIOFixture",     "MinIOFixtureOptions",     "MinIORigBuilder",      "UseMinIO"),
+        new("Rig.TUnit.Storage.FileSystem",       "FileSystemFixture","FileSystemFixtureOptions","FileSystemRigBuilder", "UseFileSystem"),
     ];
 
     /// <summary>
@@ -60,10 +64,6 @@ public sealed class ProviderCompletenessTests
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
-        ("Rig.TUnit.Storage.AzureBlob",               "T065-T067"),
-        ("Rig.TUnit.Storage.S3",                      "T068-T070"),
-        ("Rig.TUnit.Storage.MinIO",                   "T071-T074"),
-        ("Rig.TUnit.Storage.FileSystem",              "T075-T078"),
         ("Rig.TUnit.Security.Jwt",                    "T079-T080"),
         ("Rig.TUnit.Security.OAuth",                  "T081-T082"),
         ("Rig.TUnit.Security.Mtls",                   "T083-T086"),

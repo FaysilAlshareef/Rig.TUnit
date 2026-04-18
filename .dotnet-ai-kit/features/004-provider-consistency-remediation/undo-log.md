@@ -140,3 +140,19 @@
 - Postgres: 77.8 % → **83.3 % line** / 41.7 % branch
 
 Mongo line gate met. Postgres line gate 6.7 % short; residual gap is PostgresFixture async state-machine lines — closure deferred to Phase 3 exit T097. Branch gate deliberately permissive this pass; MTP appears to count async continuation branches as uncovered until every fault-handler path executes, which inflates the denominator.
+
+## T025a pass-2 — Fixture + Options full coverage
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK — Mongo PASSES both gates; Postgres PASSES line gate
+
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/PostgresFixtureTests.cs` (9 tests — parameterless ctor, IOptions + direct-options variants with null-guards, pre-init ConnectionString throws, DisposeAsync-before-init safe, DatabaseName stability)
+- created: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/PostgresFixtureOptionsValidationTests.cs` (5 tests — SectionName const, defaults, overrides propagation, data-annotations valid + Range bounds)
+- created: `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/MongoFixtureTests.cs` (9 tests — constructor variants + pre-init Database/ConnectionString throws + DisposeAsync-before-init + DatabaseName stability)
+- created: `tests/Rig.TUnit.Databases.NoSql.Mongo.Tests.Unit/MongoFixtureOptionsValidationTests.cs` (3 tests — defaults valid, Range upper + lower bounds)
+
+Counts: Postgres unit 18 → **32 tests** (+14), Mongo unit 23 → **35 tests** (+12). All GREEN.
+
+Coverage (merged unit + full-integration):
+- Postgres: **92.6 % line** (PASS ≥ 90) / 75.0 % branch — PostgresFixture line 100 % from unit
+- Mongo: **94.7 % line / 87.5 % branch** — BOTH GATES PASS. MongoFixture line 100 % from unit.

@@ -326,31 +326,31 @@ Contract suite: `MessagingRigContract`.
 - Coverage ≥ 90 %/85 %.
 
 #### 3b.i Kafka
-- [ ] T042-RED [P] Write unit tests (KafkaRigBuilderTests, UseKafkaExtensionsTests) + integration stubs (KafkaListenerLiveTests, KafkaEventSenderLiveTests) + benchmark (KafkaMessagingBenchmarks.cs). Verify RED.
-- [ ] T042-GREEN [depends: T042-RED] Write `KafkaRigBuilder.cs` + `KafkaRigBuilderExtensions.cs`. GREEN.
+- [x] T042-RED [P] Write unit tests (KafkaRigBuilderTests, UseKafkaExtensionsTests, KafkaFixtureOptionsTests, KafkaFixtureOptionsValidationTests, KafkaRigBuilderConnectionStringTests, KafkaFixtureTests, KafkaListenerTests, KafkaEventSenderTests) + integration stub (KafkaListenerLiveTests) + benchmark (KafkaMessagingBenchmarks.cs). RED verified via 5 × CS0234 (Builder/Helpers namespaces missing).
+- [x] T042-GREEN [depends: T042-RED] Wrote `KafkaRigBuilder.cs` + `KafkaRigBuilderExtensions.cs`.
   Files: `src/Rig.TUnit.Messaging.Kafka/Builder/KafkaRigBuilder.cs`, `KafkaRigBuilderExtensions.cs`
-- [ ] T043-GREEN [depends: T042-GREEN] Write `Helpers/KafkaListener.cs` + `Helpers/KafkaEventSender.cs`. GREEN listener/sender tests.
-- [ ] T044 [depends: T043-GREEN] Add `README.md`. Remove Kafka from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T043-GREEN [depends: T042-GREEN] Wrote `Helpers/KafkaListener.cs` + `Helpers/KafkaEventSender.cs`. All 41 unit tests GREEN.
+- [x] T044 [depends: T043-GREEN] Added `README.md`. Kafka promoted from SkipUntilFixed to RequiredProviders in `ProviderCompletenessTests`; removed from `ReadmeCompletenessTests` skip list. Integration: 21/21 GREEN (incl. KafkaListenerLiveTests round-trip). Benchmark: 4/4 executed.
 
 #### 3b.ii RabbitMq *(TDD template)*
-- [ ] T045-RED [P] Unit tests (RabbitMqRigBuilderTests, UseRabbitMqExtensionsTests, RabbitMqListenerTests, RabbitMqEventSenderTests) + integration live tests + `RabbitMqMessagingBenchmarks.cs`. Verify RED.
-- [ ] T045-GREEN [depends: T045-RED] Write `RabbitMqRigBuilder.cs` + `RabbitMqRigBuilderExtensions.cs`. GREEN.
-- [ ] T046-GREEN [depends: T045-GREEN] Write `RabbitMqListener.cs` + `RabbitMqEventSender.cs`. GREEN.
-- [ ] T047 [depends: T046-GREEN] Add `README.md`. Remove RabbitMq from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T045-RED [P] Unit tests (RabbitMqRigBuilderTests, UseRabbitMqExtensionsTests, RabbitMqFixtureOptionsTests, RabbitMqRigBuilderConnectionStringTests, RabbitMqFixtureTests, RabbitMqListenerTests, RabbitMqEventSenderTests) + integration live test + `RabbitMqMessagingBenchmarks.cs`. RED verified via CS0234 (Builder/Helpers namespaces missing).
+- [x] T045-GREEN [depends: T045-RED] Wrote `RabbitMqRigBuilder.cs` + `RabbitMqRigBuilderExtensions.cs`. GREEN.
+- [x] T046-GREEN [depends: T045-GREEN] Wrote `RabbitMqListener.cs` + `RabbitMqEventSender.cs` using RabbitMQ.Client 7.x async APIs. 38 unit tests GREEN.
+- [x] T047 [depends: T046-GREEN] Added `README.md`. Flipped skip lists. Integration: 21/21 GREEN (incl. RabbitMqListenerLiveTests round-trip). Benchmark: 4/4 executed.
 
 #### 3b.iii Nats *(TDD template)*
-- [ ] T048-RED [P] Unit tests for Options + RigBuilder + Use extension + Listener + Sender. Integration live + benchmark. Verify RED.
-- [ ] T048-GREEN [depends: T048-RED] Write `Options/NatsFixtureOptions.cs`.
-- [ ] T049-GREEN [depends: T048-GREEN] Write `NatsRigBuilder.cs` + `NatsRigBuilderExtensions.cs`.
-- [ ] T050-GREEN [depends: T049-GREEN] Write `NatsListener.cs` + `NatsEventSender.cs`.
-- [ ] T051 [depends: T050-GREEN] Add README. Remove Nats from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T048-RED [P] Unit tests for Options + RigBuilder + Use extension + Fixture + Listener + Sender. Integration live stub + benchmark. RED verified.
+- [x] T048-GREEN [depends: T048-RED] Wrote `Options/NatsFixtureOptions.cs` (+ `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences).
+- [x] T049-GREEN [depends: T048-GREEN] Wrote `NatsRigBuilder.cs` + `NatsRigBuilderExtensions.cs`. Rewrote `NatsFixture` to accept Options (ctor variants + options-driven image/timeout).
+- [x] T050-GREEN [depends: T049-GREEN] Wrote `NatsListener.cs` (wraps `NatsMessageRecord` — the NATS v2 `NatsMsg<T>` is a struct, can't satisfy `ListenerBase<T> where T : class`) + `NatsEventSender.cs`.
+- [x] T051 [depends: T050-GREEN] Added README. Flipped skip lists. 38 unit tests GREEN. Integration: 17/17 GREEN (incl. NatsListenerLiveTests round-trip). Benchmark: 4/4 executed.
 
 #### 3b.iv Sqs *(LocalStack-backed; TDD template)*
-- [ ] T052-RED [P] Unit tests for Options + RigBuilder + Use + Listener + Sender. Integration live (LocalStack) + benchmark. Verify RED.
-- [ ] T052-GREEN [depends: T052-RED] Write `Options/SqsFixtureOptions.cs`.
-- [ ] T053-GREEN [depends: T052-GREEN] Write `SqsRigBuilder.cs` + `SqsRigBuilderExtensions.cs` (LocalStack-backed).
-- [ ] T054-GREEN [depends: T053-GREEN] Write `SqsListener.cs` + `SqsEventSender.cs`.
-- [ ] T055 [depends: T054-GREEN] Add README. Remove Sqs from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T052-RED [P] Unit tests for Options + RigBuilder + Use + Fixture + Listener + Sender (using NSubstitute IAmazonSQS). Integration live stub + benchmark. RED verified.
+- [x] T052-GREEN [depends: T052-RED] Wrote `Options/SqsFixtureOptions.cs` (ImageTag + StartupTimeout + Region + AccessKey + SecretAccessKey, all `[Required]`/`[Range]`).
+- [x] T053-GREEN [depends: T052-GREEN] Wrote `SqsRigBuilder.cs` + `SqsRigBuilderExtensions.cs`. Rewrote `SqsFixture` to accept Options (ctor variants + options-driven image/timeout/region/credentials).
+- [x] T054-GREEN [depends: T053-GREEN] Wrote `SqsListener.cs` (long-poll + DeleteMessage on receive) + `SqsEventSender.cs`.
+- [x] T055 [depends: T054-GREEN] Added README. Flipped skip lists. 36 unit tests GREEN. Integration: 17/17 GREEN (LocalStack 3; incl. SqsListenerLiveTests round-trip). Benchmark: 4/4 executed.
 
 ### 3c Caching
 

@@ -293,3 +293,85 @@ Coverage (merged unit + full-integration):
 **Repo**: primary
 
 All five NoSql providers (Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb) now ship the canonical quartet (Fixture + Options + RigBuilder + Use extension) plus at least one helper/assertion per provider with matching unit + integration + benchmark coverage. ProviderCompletenessTests.RequiredProviders list grew 6 → 10; ReadmeCompletenessTests skip list shrunk 20 → 15.
+
+## T042/T043/T044 — Kafka GREEN (Phase 3b.i)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Messaging.Kafka/Builder/KafkaRigBuilder.cs` (sealed CRTP, `Source.ConnectionString` passthrough)
+- created: `src/Rig.TUnit.Messaging.Kafka/Builder/KafkaRigBuilderExtensions.cs` (`UseKafka` fluent extension with null-guards)
+- created: `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs` (lazy Consumer, capture loop → Record, async dispose)
+- created: `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaEventSender.cs` (lazy Producer, headers via `BuildHeaders`)
+- created: `src/Rig.TUnit.Messaging.Kafka/README.md` (install + example + deps)
+- created: Tests.Unit csproj + 8 test files (41 tests — RigBuilder, Use extension, FixtureOptions, validation, ConnectionString getter, Fixture ctor variants, Listener guards, EventSender guards)
+- created: `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/KafkaListenerLiveTests.cs` (round-trip against live Kafka container)
+- created: `tests/Rig.TUnit.Benchmarks/KafkaMessagingBenchmarks.cs` (4 benchmarks + `[Config(InProcessEmitBenchmarkConfig)]`)
+
+## T045/T046/T047 — RabbitMq GREEN (Phase 3b.ii)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Messaging.RabbitMq/Builder/RabbitMqRigBuilder.cs`
+- created: `src/Rig.TUnit.Messaging.RabbitMq/Builder/RabbitMqRigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Messaging.RabbitMq/Helpers/RabbitMqListener.cs` (RabbitMQ.Client 7 async APIs — `CreateConnectionAsync` / `AsyncEventingBasicConsumer`)
+- created: `src/Rig.TUnit.Messaging.RabbitMq/Helpers/RabbitMqEventSender.cs` (lazy IConnection + IChannel; `BasicPublishAsync` with byte-array header values)
+- created: `src/Rig.TUnit.Messaging.RabbitMq/README.md`
+- created: Tests.Unit csproj + 7 test files (38 tests)
+- created: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/RabbitMqListenerLiveTests.cs`
+- created: `tests/Rig.TUnit.Benchmarks/RabbitMqMessagingBenchmarks.cs`
+
+## T048/T049/T050/T051 — Nats GREEN (Phase 3b.iii)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Messaging.Nats/Options/NatsFixtureOptions.cs` (SectionName, ImageTag, StartupTimeoutSeconds)
+- created: `src/Rig.TUnit.Messaging.Nats/Builder/NatsRigBuilder.cs`
+- created: `src/Rig.TUnit.Messaging.Nats/Builder/NatsRigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Messaging.Nats/Helpers/NatsListener.cs` (wraps into `NatsMessageRecord` — NatsMsg<T> is a struct and can't satisfy `where T : class`)
+- created: `src/Rig.TUnit.Messaging.Nats/Helpers/NatsEventSender.cs` (lazy NatsConnection, `PublishAsync<string>` + headers)
+- created: `src/Rig.TUnit.Messaging.Nats/README.md`
+- modified: `src/Rig.TUnit.Messaging.Nats/Rig.TUnit.Messaging.Nats.csproj` — added `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences
+- modified: `src/Rig.TUnit.Messaging.Nats/Fixtures/NatsFixture.cs` — added ctor variants (parameterless / IOptions / direct-options) + null-guards + options-driven image/timeout
+- created: Tests.Unit csproj + 7 test files (38 tests)
+- created: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/NatsListenerLiveTests.cs`
+- created: `tests/Rig.TUnit.Benchmarks/NatsMessagingBenchmarks.cs`
+
+## T052/T053/T054/T055 — Sqs GREEN (Phase 3b.iv)
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- created: `src/Rig.TUnit.Messaging.Sqs/Options/SqsFixtureOptions.cs` (ImageTag + StartupTimeoutSeconds + Region + AccessKeyId + SecretAccessKey)
+- created: `src/Rig.TUnit.Messaging.Sqs/Builder/SqsRigBuilder.cs`
+- created: `src/Rig.TUnit.Messaging.Sqs/Builder/SqsRigBuilderExtensions.cs`
+- created: `src/Rig.TUnit.Messaging.Sqs/Helpers/SqsListener.cs` (long-poll loop + DeleteMessage on receive)
+- created: `src/Rig.TUnit.Messaging.Sqs/Helpers/SqsEventSender.cs` (MessageAttribute-based headers)
+- created: `src/Rig.TUnit.Messaging.Sqs/README.md`
+- modified: `src/Rig.TUnit.Messaging.Sqs/Rig.TUnit.Messaging.Sqs.csproj` — added `Microsoft.Extensions.Options{,.DataAnnotations}` PackageReferences
+- modified: `src/Rig.TUnit.Messaging.Sqs/Fixtures/SqsFixture.cs` — added ctor variants + options-driven config
+- created: Tests.Unit csproj + 7 test files (36 tests; NSubstitute IAmazonSQS for guard tests)
+- created: `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/SqsListenerLiveTests.cs`
+- created: `tests/Rig.TUnit.Benchmarks/SqsMessagingBenchmarks.cs`
+
+## Phase 3b architecture flip + benchmark toolchain
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` — moved all 4 messaging providers (Kafka, RabbitMq, Nats, Sqs) from `SkipUntilFixed` → `RequiredProviders`. Count now 14 required (was 10 after Phase 3a).
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` — removed all 4 messaging entries from `SkipUntilFixed` (14 → 10 entries).
+- modified: `Rig.TUnit.slnx` — registered 4 Tests.Unit projects.
+- modified: `tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj` — added `Confluent.Kafka`, `RabbitMQ.Client`, `NATS.Client.Core`, `AWSSDK.SQS` PackageReferences + 4 ProjectReferences.
+- created: `tests/Rig.TUnit.Benchmarks/InProcessEmitBenchmarkConfig.cs` — `ManualConfig` using `InProcessEmitToolchain` + `Job.Dry` (avoids BDN's 2-minute external build timeout on our 100+ project transitive graph).
+
+**Verification:**
+- Full solution build: 123 projects, 0 warnings, 0 errors (Debug + Release).
+- Unit tests: Kafka 41/41 · RabbitMq 38/38 · Nats 38/38 · Sqs 36/36 = **153/153 GREEN** (no Docker).
+- Integration tests (Docker up): Nats 17/17 · RabbitMq 21/21 · Sqs 17/17 (LocalStack) · Kafka 21/21 = **76/76 GREEN**.
+- Architecture tests: 16/16 GREEN — `ProviderCompletenessTests.RequiredProviders_ExposeCanonicalTypes` now enforces canonical quartet for all 4 new messaging providers.
+- Benchmarks: 19/19 executed (4 Kafka, 4 RabbitMq, 4 Nats, 4 Sqs, 3 ServiceBus) via InProcessEmitToolchain in 1-iter Dry mode — MemoryDiagnoser reports for Options + Listener + Sender construction.
+
+**Phase 3b exit gate MET.** ProviderCompletenessTests.RequiredProviders grew 10 → 14 (Kafka/RabbitMq/Nats/Sqs added). ReadmeCompletenessTests skip list shrunk 14 → 10 (4 messaging leaves removed).

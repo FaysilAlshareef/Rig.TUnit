@@ -12,6 +12,10 @@
     <PackageReference Include="Elastic.Clients.Elasticsearch" />
     <PackageReference Include="KurrentDB.Client" />
     <PackageReference Include="Azure.Messaging.ServiceBus" />
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="RabbitMQ.Client" />
+    <PackageReference Include="NATS.Client.Core" />
+    <PackageReference Include="AWSSDK.SQS" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
@@ -24,5 +28,9 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.KurrentDb\Rig.TUnit.Databases.NoSql.KurrentDb.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.ServiceBus\Rig.TUnit.Messaging.ServiceBus.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Kafka\Rig.TUnit.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.RabbitMq\Rig.TUnit.Messaging.RabbitMq.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Nats\Rig.TUnit.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Sqs\Rig.TUnit.Messaging.Sqs.csproj" />
   </ItemGroup>
 </Project>

@@ -128,5 +128,9 @@
     <Project Path="tests/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit/Rig.TUnit.Databases.NoSql.ElasticSearch.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Unit/Rig.TUnit.Databases.NoSql.KurrentDb.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.ServiceBus.Tests.Unit/Rig.TUnit.Messaging.ServiceBus.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Kafka.Tests.Unit/Rig.TUnit.Messaging.Kafka.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.RabbitMq.Tests.Unit/Rig.TUnit.Messaging.RabbitMq.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Nats.Tests.Unit/Rig.TUnit.Messaging.Nats.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/Rig.TUnit.Messaging.Sqs.Tests.Unit.csproj" />
   </Folder>
 </Solution>

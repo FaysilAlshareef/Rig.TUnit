@@ -3,6 +3,8 @@
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.LocalStack" />
     <PackageReference Include="AWSSDK.SQS" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rig.TUnit.Messaging\Rig.TUnit.Messaging.csproj" />

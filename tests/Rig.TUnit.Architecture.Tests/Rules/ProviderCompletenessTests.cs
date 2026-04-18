@@ -42,6 +42,10 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Databases.NoSql.ElasticSearch","ElasticSearchFixture","ElasticSearchFixtureOptions","ElasticSearchRigBuilder","UseElasticSearch"),
         new("Rig.TUnit.Databases.NoSql.KurrentDb","KurrentDbFixture",  "KurrentDbFixtureOptions",  "KurrentDbRigBuilder",  "UseKurrentDb"),
         new("Rig.TUnit.Messaging.ServiceBus",     "ServiceBusFixture", "ServiceBusFixtureOptions", "ServiceBusRigBuilder", "UseServiceBus"),
+        new("Rig.TUnit.Messaging.Kafka",          "KafkaFixture",      "KafkaFixtureOptions",      "KafkaRigBuilder",      "UseKafka"),
+        new("Rig.TUnit.Messaging.RabbitMq",       "RabbitMqFixture",   "RabbitMqFixtureOptions",   "RabbitMqRigBuilder",   "UseRabbitMq"),
+        new("Rig.TUnit.Messaging.Nats",           "NatsFixture",       "NatsFixtureOptions",       "NatsRigBuilder",       "UseNats"),
+        new("Rig.TUnit.Messaging.Sqs",            "SqsFixture",        "SqsFixtureOptions",        "SqsRigBuilder",        "UseSqs"),
         new("Rig.TUnit.Caching.Redis",            "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
     ];
 
@@ -53,10 +57,6 @@ public sealed class ProviderCompletenessTests
     /// </summary>
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
-        ("Rig.TUnit.Messaging.Kafka",                 "T042-T044"),
-        ("Rig.TUnit.Messaging.RabbitMq",              "T045-T047"),
-        ("Rig.TUnit.Messaging.Nats",                  "T048-T051"),
-        ("Rig.TUnit.Messaging.Sqs",                   "T052-T055"),
         ("Rig.TUnit.Caching.Memory",                  "by-design — in-process cache, no FixtureOptions/container (T056/T057 confirmed no gap)"),
         ("Rig.TUnit.Caching.Hybrid",                  "T058-T060"),
         ("Rig.TUnit.Caching.Fusion",                  "T061-T064"),

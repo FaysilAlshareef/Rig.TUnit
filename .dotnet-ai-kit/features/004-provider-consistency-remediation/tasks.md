@@ -158,7 +158,7 @@ Phase 3.0 Postgres (commit `2b149b2`) shipped `PostgresRigBuilderExtensions.UseP
 - [x] T007 [P] [depends: T003] RED→GREEN scaffold `ReadmeCompletenessTests`. Verified 2026-04-18: **20 of 32 leaf provider packages lack README**; 12 already have one. Initial skip list = the 20 missing (Postgresql, Mongo, Cassandra, Dynamo, ElasticSearch, EventStore, Kafka, RabbitMq, Nats, Sqs, Hybrid, Fusion, AzureBlob, S3, MinIO, FileSystem, Mtls, Policies, Metrics, Docker). Non-skipped (MUST pass from Phase 1) = the 12 with existing READMEs: Caching.Memory, Caching.Redis, Databases.NoSql.Redis, Databases.Sql.SqlServer, Databases.Sql.Sqlite, Messaging.ServiceBus, Observability.Logging, Observability.Logging.Analyzers, Observability.Seq, Observability.Tracing, Security.Jwt, Security.OAuth.
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
 - [x] T008 [depends: T003a, T004a, T005, T006, T007] Run full `dotnet test` + `dotnet build`. Confirm new rules execute, skips documented, build still green, orphan dirs removed cleanly, `Rig.TUnit.csproj` description lands without warning, `Rig.TUnit.Databases.NoSql.KurrentDb` package builds clean on `Testcontainers.KurrentDb` / `KurrentDB.Client`.
-- [ ] T009 [P] [depends: T008] Commit Phase 1: `test(004): Phase 1 — enforcement scaffolding (RED for all gaps) + KurrentDB migration`.
+- [x] T009 [P] [depends: T008] Commit Phase 1: `test(004): Phase 1 — enforcement scaffolding (RED for all gaps) + KurrentDB migration`.
 - [x] T010 [P] [depends: T008] Update `planning/provider-consistency-remediation/Rig.TUnit-Provider-Gap-Matrix.md`: note Phase 1 complete; architecture tests now visibly enforce the matrix.
 
 ---
@@ -197,7 +197,7 @@ Phase 3.0 Postgres (commit `2b149b2`) shipped `PostgresRigBuilderExtensions.UseP
 - [x] T019 [depends: T011-T018] Remove all `[Category("SkipUntilFixed")]` markers from `TestFileOrganizationTests`. Rule fully enforced.
   File: `tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs`
 - [x] T020 [depends: T019] Run full `dotnet test`. Confirm `TestFileOrganizationTests` GREEN + no regression on 219 baseline.
-- [ ] T021 [P] [depends: T020] Commit Phase 2: `refactor(004): Phase 2 — test-file hygiene (TestFileOrganizationTests enforced)`.
+- [x] T021 [P] [depends: T020] Commit Phase 2: `refactor(004): Phase 2 — test-file hygiene (TestFileOrganizationTests enforced)`.
 
 ---
 
@@ -416,44 +416,44 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 **TDD GATE APPLIES**: same 4-test cadence per task. **Spec-rule reconciliation** (added 2026-04-18): FR-008 mandates RigBuilder + Use extension for Security providers; it does NOT mandate a `{Provider}Fixture` for Jwt/OAuth (these are in-process — no container). `ProviderCompletenessTests` must be relaxed for Security: when the provider has no container, `Fixture` check is waived (`FixtureName` is nullable in the `ProviderEntry` record). T079 updates the rule ahead of moving Jwt/OAuth into `RequiredProviders`. Mtls + Policies add `{Provider}Fixture` per T084/T088.
 
 #### 3e.i Jwt *(TDD template; in-process — no Fixture)*
-- [ ] T079-RED [P] Create `tests/Rig.TUnit.Security.Jwt.Tests.Unit/` with `JwtRigBuilderTests` (sealed, `: SecurityRigBuilder<JwtRigBuilder>`, ctor null-guards), `UseJwtExtensionsTests` (fluent + null-guards). Update `ProviderCompletenessTests` to make `FixtureName` nullable in `ProviderEntry` — add test `Security_ProvidersWithoutContainer_NeedNoFixture`. Benchmark: `JwtBenchmarks.cs` (token-sign/verify allocation). No new integration test — `JwtBuilder` (token builder) is already exercised in `Rig.TUnit.Security.Jwt.Tests.Integration/`. Verify RED.
-- [ ] T079-GREEN [depends: T079-RED] Write `src/Rig.TUnit.Security.Jwt/Builder/JwtRigBuilder.cs` + `JwtRigBuilderExtensions.cs`. Update `ProviderCompletenessTests.ProviderEntry.FixtureName` to `string?` + implementation to skip Fixture check when null. Do NOT rename existing `JwtBuilder` (token builder). GREEN.
-- [ ] T080 [depends: T079-GREEN] Add README. Promote Jwt in `ProviderCompletenessTests.RequiredProviders` with `FixtureName: null`. Coverage ≥ 90/85. Commit.
+- [x] T079-RED [P] Create `tests/Rig.TUnit.Security.Jwt.Tests.Unit/` with `JwtRigBuilderTests` (sealed, `: SecurityRigBuilder<JwtRigBuilder>`, ctor null-guards), `UseJwtExtensionsTests` (fluent + null-guards). Update `ProviderCompletenessTests` to make `FixtureName` nullable in `ProviderEntry` — add test `Security_ProvidersWithoutContainer_NeedNoFixture`. Benchmark: `JwtBenchmarks.cs` (token-sign/verify allocation). No new integration test — `JwtBuilder` (token builder) is already exercised in `Rig.TUnit.Security.Jwt.Tests.Integration/`. Verify RED.
+- [x] T079-GREEN [depends: T079-RED] Write `src/Rig.TUnit.Security.Jwt/Builder/JwtRigBuilder.cs` + `JwtRigBuilderExtensions.cs`. Update `ProviderCompletenessTests.ProviderEntry.FixtureName` to `string?` + implementation to skip Fixture check when null. Do NOT rename existing `JwtBuilder` (token builder). GREEN.
+- [x] T080 [depends: T079-GREEN] Add README. Promote Jwt in `ProviderCompletenessTests.RequiredProviders` with `FixtureName: null`. Coverage ≥ 90/85. Commit.
 
 #### 3e.ii OAuth *(TDD template; in-process — wraps existing `MockOAuthServer` as its fixture surrogate)*
-- [ ] T081-RED [P] Create `tests/Rig.TUnit.Security.OAuth.Tests.Unit/` with `OAuthRigBuilderTests` + `UseOAuthServerExtensionsTests`. Benchmark: `OAuthBenchmarks.cs` (JWKS resolution). Verify RED.
-- [ ] T081-GREEN [depends: T081-RED] Write `OAuthRigBuilder : SecurityRigBuilder<OAuthRigBuilder>` + `UseOAuthServer` extension wrapping the existing `MockOAuthServer`. GREEN.
-- [ ] T082 [depends: T081-GREEN] Add README. Promote OAuth in `RequiredProviders` (Fixture: `MockOAuthServer` — already present as the wrapper). Coverage ≥ 90/85. Commit.
+- [x] T081-RED [P] Create `tests/Rig.TUnit.Security.OAuth.Tests.Unit/` with `OAuthRigBuilderTests` + `UseOAuthServerExtensionsTests`. Benchmark: `OAuthBenchmarks.cs` (JWKS resolution). Verify RED.
+- [x] T081-GREEN [depends: T081-RED] Write `OAuthRigBuilder : SecurityRigBuilder<OAuthRigBuilder>` + `UseOAuthServer` extension wrapping the existing `MockOAuthServer`. GREEN.
+- [x] T082 [depends: T081-GREEN] Add README. Promote OAuth in `RequiredProviders` (Fixture: `MockOAuthServer` — already present as the wrapper). Coverage ≥ 90/85. Commit.
 
 #### 3e.iii Mtls *(TDD template; ADDS a new `MtlsFixture`)*
-- [ ] T083-RED [P] Create `tests/Rig.TUnit.Security.Mtls.Tests.Unit/` with `MtlsFixtureOptionsTests`, `MtlsFixtureTests` (generates CA + leaf cert on initialize, assertions on cert chain/expiry — pure X509 math, no container), `MtlsRigBuilderTests`, `UseMtlsExtensionsTests`. Integration: `MtlsFixtureLiveTests.cs` (cert round-trip via Kestrel mTLS endpoint). Benchmark: `MtlsBenchmarks.cs`. Verify RED.
-- [ ] T083-GREEN [depends: T083-RED] Write `Options/MtlsFixtureOptions.cs`.
-- [ ] T084-GREEN [depends: T083-GREEN] Write `Fixtures/MtlsFixture.cs : SecurityFixtureBase` — generates CA + leaf cert on initialize.
-- [ ] T085-GREEN [depends: T084-GREEN] Write `Builder/MtlsRigBuilder.cs` + `MtlsRigBuilderExtensions.cs`. Keep existing `MtlsCertificateBuilder` as helper.
-- [ ] T086 [depends: T085-GREEN] Add README. Remove Mtls from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T083-RED [P] Create `tests/Rig.TUnit.Security.Mtls.Tests.Unit/` with `MtlsFixtureOptionsTests`, `MtlsFixtureTests` (generates CA + leaf cert on initialize, assertions on cert chain/expiry — pure X509 math, no container), `MtlsRigBuilderTests`, `UseMtlsExtensionsTests`. Integration: `MtlsFixtureLiveTests.cs` (cert round-trip via Kestrel mTLS endpoint). Benchmark: `MtlsBenchmarks.cs`. Verify RED.
+- [x] T083-GREEN [depends: T083-RED] Write `Options/MtlsFixtureOptions.cs`.
+- [x] T084-GREEN [depends: T083-GREEN] Write `Fixtures/MtlsFixture.cs : SecurityFixtureBase` — generates CA + leaf cert on initialize.
+- [x] T085-GREEN [depends: T084-GREEN] Write `Builder/MtlsRigBuilder.cs` + `MtlsRigBuilderExtensions.cs`. Keep existing `MtlsCertificateBuilder` as helper.
+- [x] T086 [depends: T085-GREEN] Add README. Remove Mtls from skip lists. Coverage ≥ 90/85. Commit.
 
 #### 3e.iv Policies *(TDD template; ADDS a new `PolicyFixture`)*
-- [ ] T087-RED [P] Create `tests/Rig.TUnit.Security.Policies.Tests.Unit/` with `PolicyFixtureOptionsTests`, `PolicyFixtureTests` (registers in-memory `IAuthorizationService` — tests assert a known-good/known-bad policy decision), `PolicyRigBuilderTests`, `UsePoliciesExtensionsTests`. Benchmark: `PolicyBenchmarks.cs`. Verify RED.
-- [ ] T087-GREEN [depends: T087-RED] Write `Options/PolicyFixtureOptions.cs`.
-- [ ] T088-GREEN [depends: T087-GREEN] Write `Fixtures/PolicyFixture.cs : SecurityFixtureBase` (registers in-memory `IAuthorizationService`).
-- [ ] T089-GREEN [depends: T088-GREEN] Write `Builder/PolicyRigBuilder.cs` + `UsePolicies` extension. Keep `PolicyAssert` untouched.
-- [ ] T090 [depends: T089-GREEN] Add README. Remove Policies from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T087-RED [P] Create `tests/Rig.TUnit.Security.Policies.Tests.Unit/` with `PolicyFixtureOptionsTests`, `PolicyFixtureTests` (registers in-memory `IAuthorizationService` — tests assert a known-good/known-bad policy decision), `PolicyRigBuilderTests`, `UsePoliciesExtensionsTests`. Benchmark: `PolicyBenchmarks.cs`. Verify RED.
+- [x] T087-GREEN [depends: T087-RED] Write `Options/PolicyFixtureOptions.cs`.
+- [x] T088-GREEN [depends: T087-GREEN] Write `Fixtures/PolicyFixture.cs : SecurityFixtureBase` (registers in-memory `IAuthorizationService`).
+- [x] T089-GREEN [depends: T088-GREEN] Write `Builder/PolicyRigBuilder.cs` + `UsePolicies` extension. Keep `PolicyAssert` untouched.
+- [x] T090 [depends: T089-GREEN] Add README. Remove Policies from skip lists. Coverage ≥ 90/85. Commit.
 
 ### 3f Observability.Metrics
 
 **TDD GATE APPLIES**: same 4-test cadence per task.
 
-- [ ] T091-RED [P] Create `tests/Rig.TUnit.Observability.Metrics.Tests.Unit/` with `MetricsFixtureOptionsTests`, `MetricsFixtureTests` (pure — tests `MeterListener` captures a known counter emission), `MetricsRigBuilderTests`, `UseMetricsCaptureExtensionsTests`, `TagCardinalityGuardTests` (pure: asserts throws when N distinct tag values exceeded). Integration: `MetricsFixtureLiveTests.cs` (end-to-end via a dummy `Meter` + `MeterListener`). Benchmark: `MetricsBenchmarks.cs`. Verify RED.
-- [ ] T091-GREEN [depends: T091-RED] Write `Options/MetricsFixtureOptions.cs`.
-- [ ] T092-GREEN [depends: T091-GREEN] Write `Fixtures/MetricsFixture.cs : TelemetryFixtureBase` wrapping `System.Diagnostics.Metrics.MeterListener`.
-- [ ] T093-GREEN [depends: T092-GREEN] Write `Builder/MetricsRigBuilder.cs` + `MetricsRigBuilderExtensions.cs`.
-- [ ] T094-GREEN [depends: T093-GREEN] Write `Helpers/TagCardinalityGuard.cs` (default N=100).
-- [ ] T095 [depends: T094-GREEN] Add README. Remove Metrics from skip lists. Coverage ≥ 90/85. Commit.
+- [x] T091-RED [P] Create `tests/Rig.TUnit.Observability.Metrics.Tests.Unit/` with `MetricsFixtureOptionsTests`, `MetricsFixtureTests` (pure — tests `MeterListener` captures a known counter emission), `MetricsRigBuilderTests`, `UseMetricsCaptureExtensionsTests`, `TagCardinalityGuardTests` (pure: asserts throws when N distinct tag values exceeded). Integration: `MetricsFixtureLiveTests.cs` (end-to-end via a dummy `Meter` + `MeterListener`). Benchmark: `MetricsBenchmarks.cs`. Verify RED.
+- [x] T091-GREEN [depends: T091-RED] Write `Options/MetricsFixtureOptions.cs`.
+- [x] T092-GREEN [depends: T091-GREEN] Write `Fixtures/MetricsFixture.cs : TelemetryFixtureBase` wrapping `System.Diagnostics.Metrics.MeterListener`.
+- [x] T093-GREEN [depends: T092-GREEN] Write `Builder/MetricsRigBuilder.cs` + `MetricsRigBuilderExtensions.cs`.
+- [x] T094-GREEN [depends: T093-GREEN] Write `Helpers/TagCardinalityGuard.cs` (default N=100).
+- [x] T095 [depends: T094-GREEN] Add README. Remove Metrics from skip lists. Coverage ≥ 90/85. Commit.
 
 ### Phase 3 gate
 
-- [ ] T096 [depends: T025, T029, T033, T037, T041, T044, T047, T051, T055, T057, T060, T064, T067, T070, T074, T078, T080, T082, T086, T090, T095, T176] Run full `dotnet test`. Confirm every family's contract suite passes for every provider (including Postgresql via T176). Confirm `ProviderCompletenessTests` fully GREEN for Phase-3 providers.
-- [ ] T097 [depends: T096] Verify coverage gate: line ≥ 90% + branch ≥ 85% per modified package. Command:
+- [x] T096 [depends: T025, T029, T033, T037, T041, T044, T047, T051, T055, T057, T060, T064, T067, T070, T074, T078, T080, T082, T086, T090, T095, T176] Run full `dotnet test`. Confirm every family's contract suite passes for every provider (including Postgresql via T176). Confirm `ProviderCompletenessTests` fully GREEN for Phase-3 providers.
+- [~] T097 [depends: T096] Verify coverage gate: line ≥ 90% + branch ≥ 85% per modified package. Command:
   ```bash
   dotnet test --collect:"XPlat Code Coverage" \
     -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
@@ -462,8 +462,8 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
   dotnet test /p:CollectCoverage=true /p:Threshold=85 /p:ThresholdType=branch /p:ThresholdStat=minimum
   ```
   Requires `coverlet.collector` + `coverlet.msbuild` pins from T002; ensure each `Rig.TUnit.*.Tests.*.csproj` has both as `PackageReference` (no `<Version>`). Until T160 wires CI enforcement, run the commands manually at this gate and record results in the PR description.
-- [ ] T098 [depends: T097] Update `Rig.TUnit-Provider-Gap-Matrix.md`: mark every Phase-3 row complete (all cells ✓).
-- [ ] T099 [P] [depends: T098] Commit Phase 3: `feat(004): Phase 3 — close existing-provider gaps (ProviderCompletenessTests GREEN for 20 providers)`.
+- [~] T098 [depends: T097] Update `Rig.TUnit-Provider-Gap-Matrix.md`: mark every Phase-3 row complete (all cells ✓).
+- [x] T099 [P] [depends: T098] Commit Phase 3: `feat(004): Phase 3 — close existing-provider gaps (ProviderCompletenessTests GREEN for 20 providers)`.
 
 ---
 

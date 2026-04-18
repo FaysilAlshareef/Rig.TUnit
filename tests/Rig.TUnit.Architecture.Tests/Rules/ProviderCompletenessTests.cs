@@ -40,6 +40,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Databases.NoSql.Cassandra","CassandraFixture",  "CassandraFixtureOptions",  "CassandraRigBuilder",  "UseCassandra"),
         new("Rig.TUnit.Databases.NoSql.Dynamo",   "DynamoFixture",     "DynamoFixtureOptions",     "DynamoRigBuilder",     "UseDynamo"),
         new("Rig.TUnit.Databases.NoSql.ElasticSearch","ElasticSearchFixture","ElasticSearchFixtureOptions","ElasticSearchRigBuilder","UseElasticSearch"),
+        new("Rig.TUnit.Databases.NoSql.KurrentDb","KurrentDbFixture",  "KurrentDbFixtureOptions",  "KurrentDbRigBuilder",  "UseKurrentDb"),
         new("Rig.TUnit.Messaging.ServiceBus",     "ServiceBusFixture", "ServiceBusFixtureOptions", "ServiceBusRigBuilder", "UseServiceBus"),
         new("Rig.TUnit.Caching.Redis",            "RedisFixture",      "RedisFixtureOptions",      "RedisCacheRigBuilder", "UseRedisCache"),
     ];
@@ -52,7 +53,6 @@ public sealed class ProviderCompletenessTests
     /// </summary>
     private static readonly (string Assembly, string ClosingTask)[] SkipUntilFixed =
     [
-        ("Rig.TUnit.Databases.NoSql.KurrentDb",       "T038-T041 (renamed from EventStore in T002c)"),
         ("Rig.TUnit.Messaging.Kafka",                 "T042-T044"),
         ("Rig.TUnit.Messaging.RabbitMq",              "T045-T047"),
         ("Rig.TUnit.Messaging.Nats",                  "T048-T051"),

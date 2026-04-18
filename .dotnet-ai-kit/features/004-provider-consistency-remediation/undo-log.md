@@ -61,3 +61,17 @@
 - `planning/provider-consistency-remediation/Rig.TUnit-Library-Design.md` (two rows)
 - `planning/provider-consistency-remediation/Rig.TUnit-Provider-Gap-Matrix.md`
 - `planning/provider-consistency-remediation/Rig.TUnit-Session-Handoff.md`
+
+## Phase 2 — T016/T019/T020 critical path
+**Timestamp**: 2026-04-18
+**Repo**: primary
+**Status**: OK
+
+- T016 modified: `tests/Rig.TUnit.Databases.Sql.Tests.Contract/SqlRigContract.cs` (removed `DbContextHelperCrudContract` sibling type)
+- T016 created: `tests/Rig.TUnit.Databases.Sql.Tests.Contract/DbContextHelperCrudContract.cs` (split target)
+- T016 modified: `tests/Rig.TUnit.Parallelism.Tests.Contract/ParallelIsolationContract.cs` (removed `IParallelRig` sibling type + unused `using`)
+- T016 created: `tests/Rig.TUnit.Parallelism.Tests.Contract/IParallelRig.cs` (split target)
+- T019 modified: `tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs` — SkipUntilFixed emptied, rule fully enforced
+- T020 verified: 16/16 architecture tests GREEN; 166 tests across unit+contract+architecture projects still green.
+
+**Deferred (beyond Phase 2 exit-gate scope):** T011/T012/T013/T014/T015/T017/T018 — hygiene extractions of inline setup code (ActivitySource factories, Polly pipelines, JWKS keys, Outbox builders, QuirkTests helpers) from worst-offender test files into per-project `TestInfrastructure/` folders. The rule itself passes — these are quality improvements for a follow-up PR.

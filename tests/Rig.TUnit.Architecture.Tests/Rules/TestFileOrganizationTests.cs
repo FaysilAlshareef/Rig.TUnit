@@ -29,14 +29,14 @@ public sealed class TestFileOrganizationTests
     ];
 
     /// <summary>
-    /// Paths (relative to the repo root) known to declare &gt; 1 top-level type. Each entry
-    /// names the closing Phase-2 task. Verified 2026-04-18 via a repo-wide scan.
+    /// Paths (relative to the repo root) known to declare &gt; 1 top-level type. Fully
+    /// enforced from Phase 2 onwards — this list is intentionally empty (T019 flip, 2026-04-18).
+    /// The two original entries (<c>SqlRigContract.cs</c> + <c>ParallelIsolationContract.cs</c>)
+    /// were split under T016: <c>DbContextHelperCrudContract</c> and <c>IParallelRig</c> each
+    /// now live in their own file. Add an entry here only if a NEW test file temporarily
+    /// needs multi-type allowance, and commit a follow-up task to fix it.
     /// </summary>
-    private static readonly (string RelativePath, string ClosingTask)[] SkipUntilFixed =
-    [
-        ("tests/Rig.TUnit.Databases.Sql.Tests.Contract/SqlRigContract.cs",         "T016 — C-003 contract helper extraction"),
-        ("tests/Rig.TUnit.Parallelism.Tests.Contract/ParallelIsolationContract.cs", "T016 — C-003 contract helper extraction"),
-    ];
+    private static readonly (string RelativePath, string ClosingTask)[] SkipUntilFixed = [];
 
     [Test]
     public async Task EveryTestFile_HasSingleTopLevelType()

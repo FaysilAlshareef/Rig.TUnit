@@ -1,5 +1,3 @@
-using Rig.TUnit.Core;
-
 namespace Rig.TUnit.Parallelism.Tests.Contract;
 
 /// <summary>
@@ -30,10 +28,4 @@ public abstract class ParallelIsolationContract
 
         await Assert.That(distinct).IsEqualTo(parallelism);
     }
-}
-
-/// <summary>Minimal contract every parallel-tested rig exposes.</summary>
-public interface IParallelRig : IAsyncDisposable
-{
-    IsolationKey IsolationKey { get; }
 }

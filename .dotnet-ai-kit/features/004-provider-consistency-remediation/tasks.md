@@ -629,11 +629,11 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ## Pre-PR final gate
 
-- [ ] T168 [depends: T167] Run `dotnet format --verify-no-changes` — clean.
-- [ ] T169 [depends: T168] Run `dotnet build Rig.TUnit.slnx` — zero new warnings under `TreatWarningsAsErrors=true`.
-- [ ] T170 [depends: T169] Run full `dotnet test` across **unit + integration + contract** projects (Docker up). All green. Coverage gates met (line ≥ 90 %, branch ≥ 85 %) per package.
-- [ ] T170a [depends: T170] Run the full Benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks --` (no filter). Record summary output in `PR description` — any regression ≥ 20 % vs Phase-3 baseline MUST be root-caused before merge.
-- [ ] T171 [depends: T170a] Verify commit log shows RED → GREEN order across all production changes. Run:
+- [x] T168 [depends: T167] Run `dotnet format --verify-no-changes` — clean.
+- [x] T169 [depends: T168] Run `dotnet build Rig.TUnit.slnx` — zero new warnings under `TreatWarningsAsErrors=true`.
+- [x] T170 [depends: T169] Run full `dotnet test` across **unit + integration + contract** projects (Docker up). All green. Coverage gates met (line ≥ 90 %, branch ≥ 85 %) per package.
+- [~] T170a [depends: T170] Run the full Benchmark suite: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks --` (no filter). Record summary output in `PR description` — any regression ≥ 20 % vs Phase-3 baseline MUST be root-caused before merge.
+- [x] T171 [depends: T170a] Verify commit log shows RED → GREEN order across all production changes. Run:
   ```bash
   git log master..HEAD --oneline --grep='— RED'  | wc -l   # count of RED commits
   git log master..HEAD --oneline --grep='— GREEN' | wc -l   # count of GREEN commits
@@ -641,7 +641,7 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
   # (a RED may cover multiple test files feeding one GREEN, but every GREEN MUST trace to a preceding RED)
   git log master..HEAD --oneline --grep='T[0-9]\+-GREEN'    # list every GREEN commit — each MUST have a matching TNNN-RED before it
   ```
-- [ ] T171a [depends: T171] `TestCompletenessTests` (T157a) GREEN — every provider has unit + integration + contract + benchmark test file. No exceptions.
+- [x] T171a [depends: T171] `TestCompletenessTests` (T157a) GREEN — every provider has unit + integration + contract + benchmark test file. No exceptions.
 - [ ] T172 [depends: T171a] Open PR against `master`. Title: `feat(004): Provider Consistency Remediation — uniform provider shape + 4 new packages + architecture-test enforcement (unit + integration + contract + benchmark per provider, 90/85 coverage)`.
 - [ ] T173 [depends: T172] Update `.dotnet-ai-kit/features/004-provider-consistency-remediation/spec.md` — change Status from `Draft` to `Shipped` once PR merges.
 

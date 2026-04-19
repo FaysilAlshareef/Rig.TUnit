@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Confluent.Kafka" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.Kafka\Rig.TUnit.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.Tests.Contract\Rig.TUnit.Messaging.Tests.Contract.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Parallelism.Tests.Contract\Rig.TUnit.Parallelism.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

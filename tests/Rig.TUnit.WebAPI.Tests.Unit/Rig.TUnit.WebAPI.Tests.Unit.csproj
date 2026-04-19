@@ -3,7 +3,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TUnit" Version="1.34.5" />
+    <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />

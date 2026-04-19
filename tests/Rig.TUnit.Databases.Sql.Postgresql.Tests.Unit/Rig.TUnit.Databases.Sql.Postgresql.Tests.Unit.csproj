@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- EF1001 warns when tests peek at internal EF provider types (e.g. NpgsqlOptionsExtension).
+         Test code legitimately inspects these to assert routing; the warning would otherwise
+         block the build under TreatWarningsAsErrors. Scoped to this test project only. -->
+    <NoWarn>$(NoWarn);EF1001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Postgresql\Rig.TUnit.Databases.Sql.Postgresql.csproj" />
+  </ItemGroup>
+</Project>

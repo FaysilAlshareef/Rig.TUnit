@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <PackageReference Include="TUnit" Version="1.34.5" />
-    <PackageReference Include="Mediator.SourceGenerator" Version="3.0.2">
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Mediator.SourceGenerator">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
+    <PackageReference Include="Mediator.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />

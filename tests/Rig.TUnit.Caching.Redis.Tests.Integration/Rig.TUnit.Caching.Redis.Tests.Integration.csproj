@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Tests.Contract\Rig.TUnit.Caching.Tests.Contract.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Parallelism.Tests.Contract\Rig.TUnit.Parallelism.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

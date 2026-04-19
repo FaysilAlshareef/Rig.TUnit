@@ -1,0 +1,233 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+
+  # ─── Build + Unit + Arch ────────────────────────────────────────────────────
+  build-unit-arch:
+    name: Build + Unit + Arch
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Rig.TUnit.slnx
+      - name: Build
+        run: dotnet build Rig.TUnit.slnx --no-restore -c Release
+      - name: Test (unit + arch + contract)
+        shell: pwsh
+        run: |
+          # TUnit uses Microsoft.Testing.Platform — --filter is invalid.
+          # Enumerate each non-integration, non-benchmark project individually.
+          $projects = Get-ChildItem tests -Recurse -Filter "*.csproj" |
+              Where-Object { $_.Name -notmatch "Integration|Benchmarks|Contract" }
+          $failed = @()
+          foreach ($p in $projects) {
+              Write-Host "::group::$($p.Name)"
+              dotnet test --project $p.FullName --no-build -c Release
+              if ($LASTEXITCODE -ne 0) { $failed += $p.Name }
+              Write-Host "::endgroup::"
+          }
+          if ($failed.Count -gt 0) {
+              Write-Error "Failed projects: $($failed -join ', ')"
+              exit 1
+          }
+
+  # ─── SQL matrix ─────────────────────────────────────────────────────────────
+  integration-sql:
+    name: Integration — SQL matrix (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [SqlServer, Sqlite, Postgresql, MySql, Oracle]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Pull provider image (warm cache)
+        if: matrix.provider == 'MySql' || matrix.provider == 'Oracle'
+        run: |
+          case "${{ matrix.provider }}" in
+            MySql)  docker pull mysql:8.4 ;;
+            Oracle) docker pull gvenzl/oracle-free:23.5-slim-faststart ;;
+          esac
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── NoSQL matrix ───────────────────────────────────────────────────────────
+  integration-nosql:
+    name: Integration — NoSQL matrix (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb, Redis, Cosmos]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Skip Cosmos on Windows
+        if: matrix.provider == 'Cosmos' && runner.os == 'Windows'
+        run: echo "Cosmos emulator requires Linux containers — skipping."
+      - name: Restore + Build
+        if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
+        run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Caching matrix ─────────────────────────────────────────────────────────
+  integration-caching:
+    name: Integration — Caching (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Memory, Redis, Hybrid, Fusion]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Messaging matrix ───────────────────────────────────────────────────────
+  integration-messaging:
+    name: Integration — Messaging (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Kafka, Nats, RabbitMq, ServiceBus, Sqs]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Microservices matrix ───────────────────────────────────────────────────
+  integration-microservices:
+    name: Integration — Microservices (${{ matrix.component }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [Contracts, EventSourcing, Inbox, Outbox, Saga, Snapshots]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Security matrix ────────────────────────────────────────────────────────
+  integration-security:
+    name: Integration — Security (${{ matrix.area }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        area: [Jwt, Mtls, OAuth, Policies]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Observability matrix ───────────────────────────────────────────────────
+  integration-observability:
+    name: Integration — Observability (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Logging, Metrics, Tracing, Seq, AppInsights]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Storage matrix ─────────────────────────────────────────────────────────
+  integration-storage:
+    name: Integration — Storage (${{ matrix.provider }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [FileSystem, MinIO, S3, AzureBlob]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  # ─── Core / infrastructure matrix ──────────────────────────────────────────
+  integration-core:
+    name: Integration — Core (${{ matrix.area }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release

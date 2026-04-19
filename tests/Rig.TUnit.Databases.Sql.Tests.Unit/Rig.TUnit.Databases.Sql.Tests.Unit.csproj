@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql\Rig.TUnit.Databases.Sql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.Tests.Contract\Rig.TUnit.Databases.Sql.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

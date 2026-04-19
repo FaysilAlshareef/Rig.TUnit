@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.SqlServer\Rig.TUnit.Databases.Sql.SqlServer.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.Tests.Contract\Rig.TUnit.Databases.Sql.Tests.Contract.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Parallelism.Tests.Contract\Rig.TUnit.Parallelism.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Convenience meta-package bundling Core + Mediator + Grpc + WebAPI — the default entry point for most projects. Use Rig.TUnit.All only when you need every package.</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
   <ItemGroup>
+    <!-- Meta-only: zero source .cs files; only ProjectReference entries + docs under this folder (e.g., Contributing-ProviderTemplate.md). -->
     <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
     <ProjectReference Include="..\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
-    <ProjectReference Include="..\Rig.TUnit.SqlServer\Rig.TUnit.SqlServer.csproj" />
-    <ProjectReference Include="..\Rig.TUnit.Redis\Rig.TUnit.Redis.csproj" />
-    <ProjectReference Include="..\Rig.TUnit.ServiceBus\Rig.TUnit.ServiceBus.csproj" />
   </ItemGroup>
 </Project>

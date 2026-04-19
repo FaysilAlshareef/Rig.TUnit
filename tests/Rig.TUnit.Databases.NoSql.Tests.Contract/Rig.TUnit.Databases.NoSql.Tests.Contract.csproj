@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql\Rig.TUnit.Databases.NoSql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Tests.Contract\Rig.TUnit.Databases.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

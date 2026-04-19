@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup><PackageReference Include="TUnit" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Cassandra\Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Tests.Contract\Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

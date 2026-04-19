@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <!-- Roslyn CSharp parser used by TestFileOrganizationTests to count top-level type declarations. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
+    <!-- Rig.TUnit.All transitively references every Rig.TUnit.* provider so architecture rules
+         (ProviderCompletenessTests, ReadmeCompletenessTests, CoverageRuleTests) can reflect over
+         the full ecosystem without enumerating 50+ <ProjectReference> entries here. -->
+    <ProjectReference Include="..\..\src\Rig.TUnit.All\Rig.TUnit.All.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="coverage-whitelist.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

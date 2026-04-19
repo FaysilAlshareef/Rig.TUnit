@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Elastic.Clients.Elasticsearch" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Tests.Contract\Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

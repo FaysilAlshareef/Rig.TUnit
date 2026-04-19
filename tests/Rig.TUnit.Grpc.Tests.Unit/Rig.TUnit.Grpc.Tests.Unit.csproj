@@ -3,16 +3,16 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TUnit" Version="1.34.5" />
-    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
-    <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
-    <PackageReference Include="Mediator.SourceGenerator" Version="3.0.2">
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.Tools" PrivateAssets="All" />
+    <PackageReference Include="Grpc.AspNetCore" />
+    <PackageReference Include="Mediator.SourceGenerator">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.6" />
+    <PackageReference Include="Mediator.Abstractions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />

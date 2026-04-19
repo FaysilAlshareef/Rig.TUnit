@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Tests.Contract\Rig.TUnit.Observability.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Meta-package containing every Rig.TUnit.* package. DISCOURAGED — prefer per-feature or per-stack meta-packages (Rig.TUnit, Rig.TUnit.Microservices).</Description>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Meta-only: zero source .cs files; only ProjectReference entries. -->
+    <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.WebAPI\Rig.TUnit.WebAPI.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases\Rig.TUnit.Databases.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql\Rig.TUnit.Databases.Sql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.SqlServer\Rig.TUnit.Databases.Sql.SqlServer.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.Sqlite\Rig.TUnit.Databases.Sql.Sqlite.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.Postgresql\Rig.TUnit.Databases.Sql.Postgresql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.MySql\Rig.TUnit.Databases.Sql.MySql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.Sql.Oracle\Rig.TUnit.Databases.Sql.Oracle.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql\Rig.TUnit.Databases.NoSql.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Redis\Rig.TUnit.Databases.NoSql.Redis.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Mongo\Rig.TUnit.Databases.NoSql.Mongo.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Cosmos\Rig.TUnit.Databases.NoSql.Cosmos.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Cassandra\Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.KurrentDb\Rig.TUnit.Databases.NoSql.KurrentDb.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Dynamo\Rig.TUnit.Databases.NoSql.Dynamo.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching\Rig.TUnit.Caching.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Memory\Rig.TUnit.Caching.Memory.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Hybrid\Rig.TUnit.Caching.Hybrid.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Caching.Fusion\Rig.TUnit.Caching.Fusion.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging\Rig.TUnit.Messaging.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.ServiceBus\Rig.TUnit.Messaging.ServiceBus.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.Kafka\Rig.TUnit.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.RabbitMq\Rig.TUnit.Messaging.RabbitMq.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.Nats\Rig.TUnit.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Messaging.Sqs\Rig.TUnit.Messaging.Sqs.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability\Rig.TUnit.Observability.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Tracing\Rig.TUnit.Observability.Tracing.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Metrics\Rig.TUnit.Observability.Metrics.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.AppInsights\Rig.TUnit.Observability.AppInsights.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security\Rig.TUnit.Security.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security.Jwt\Rig.TUnit.Security.Jwt.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security.OAuth\Rig.TUnit.Security.OAuth.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security.Mtls\Rig.TUnit.Security.Mtls.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Security.Policies\Rig.TUnit.Security.Policies.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Http\Rig.TUnit.Http.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Resilience\Rig.TUnit.Resilience.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Concurrency\Rig.TUnit.Concurrency.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.HealthChecks\Rig.TUnit.HealthChecks.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Docker\Rig.TUnit.Docker.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Parallelism\Rig.TUnit.Parallelism.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Ci\Rig.TUnit.Ci.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Outbox\Rig.TUnit.Microservices.Outbox.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Inbox\Rig.TUnit.Microservices.Inbox.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.EventSourcing\Rig.TUnit.Microservices.EventSourcing.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Snapshots\Rig.TUnit.Microservices.Snapshots.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Saga\Rig.TUnit.Microservices.Saga.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Microservices.Contracts\Rig.TUnit.Microservices.Contracts.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage\Rig.TUnit.Storage.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage.AzureBlob\Rig.TUnit.Storage.AzureBlob.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage.S3\Rig.TUnit.Storage.S3.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage.MinIO\Rig.TUnit.Storage.MinIO.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage.FileSystem\Rig.TUnit.Storage.FileSystem.csproj" />
+  </ItemGroup>
+</Project>

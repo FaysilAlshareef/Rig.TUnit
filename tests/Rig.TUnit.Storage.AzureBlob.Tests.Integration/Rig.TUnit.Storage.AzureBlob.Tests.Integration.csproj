@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Storage.AzureBlob\Rig.TUnit.Storage.AzureBlob.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Storage.Tests.Contract\Rig.TUnit.Storage.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

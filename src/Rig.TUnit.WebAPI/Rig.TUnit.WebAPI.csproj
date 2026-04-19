@@ -3,8 +3,8 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="TUnit.AspNetCore" Version="1.34.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.6" />
+    <PackageReference Include="TUnit.Core" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />

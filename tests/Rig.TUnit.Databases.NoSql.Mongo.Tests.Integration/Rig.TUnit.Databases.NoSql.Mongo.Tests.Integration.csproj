@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="MongoDB.Driver" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Mongo\Rig.TUnit.Databases.NoSql.Mongo.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Tests.Contract\Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Parallelism.Tests.Contract\Rig.TUnit.Parallelism.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Testcontainers" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.Tests.Contract\Rig.TUnit.Observability.Tests.Contract.csproj" />
+  </ItemGroup>
+</Project>

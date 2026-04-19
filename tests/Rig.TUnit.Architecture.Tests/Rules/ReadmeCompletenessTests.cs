@@ -39,10 +39,7 @@ public sealed class ReadmeCompletenessTests
     /// names the closing task. Verified 2026-04-18: 20 entries — the exact set documented
     /// in <c>spec.md:19</c> + <c>analysis.md</c> finding #8.
     /// </summary>
-    private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
-    [
-        ("Rig.TUnit.Docker",                      "T137"),
-    ];
+    private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed = Array.Empty<(string, string)>();
 
     [Test]
     public async Task EveryLeafProvider_ShipsReadme()

@@ -52,6 +52,7 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Oracle\Rig.TUnit.Databases.Sql.Oracle.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Cosmos\Rig.TUnit.Databases.NoSql.Cosmos.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Observability.AppInsights\Rig.TUnit.Observability.AppInsights.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Docker\Rig.TUnit.Docker.csproj" />
     <PackageReference Include="Microsoft.ApplicationInsights" />
   </ItemGroup>
 </Project>

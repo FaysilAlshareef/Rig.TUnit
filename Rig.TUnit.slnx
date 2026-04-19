@@ -155,5 +155,7 @@
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.AppInsights.Tests.Unit/Rig.TUnit.Observability.AppInsights.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.AppInsights.Tests.Integration/Rig.TUnit.Observability.AppInsights.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Docker.Tests.Unit/Rig.TUnit.Docker.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Docker.Tests.Integration/Rig.TUnit.Docker.Tests.Integration.csproj" />
   </Folder>
 </Solution>

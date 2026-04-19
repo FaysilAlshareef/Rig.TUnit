@@ -60,6 +60,7 @@
     <Project Path="src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj" />
     <Project Path="src/Rig.TUnit.Databases.Sql.Oracle/Rig.TUnit.Databases.Sql.Oracle.csproj" />
     <Project Path="src/Rig.TUnit.Databases.NoSql.Cosmos/Rig.TUnit.Databases.NoSql.Cosmos.csproj" />
+    <Project Path="src/Rig.TUnit.Observability.AppInsights/Rig.TUnit.Observability.AppInsights.csproj" />
     <Project Path="src/Rig.TUnit.All/Rig.TUnit.All.csproj" />
     <Project Path="src/Rig.TUnit/Rig.TUnit.csproj" />
   </Folder>
@@ -152,5 +153,7 @@
     <Project Path="tests/Rig.TUnit.Databases.Sql.Oracle.Tests.Integration/Rig.TUnit.Databases.Sql.Oracle.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Unit/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Observability.AppInsights.Tests.Unit/Rig.TUnit.Observability.AppInsights.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Observability.AppInsights.Tests.Integration/Rig.TUnit.Observability.AppInsights.Tests.Integration.csproj" />
   </Folder>
 </Solution>

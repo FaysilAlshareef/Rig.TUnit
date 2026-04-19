@@ -40,6 +40,7 @@
     <ProjectReference Include="..\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Observability.Metrics\Rig.TUnit.Observability.Metrics.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Observability.AppInsights\Rig.TUnit.Observability.AppInsights.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Security\Rig.TUnit.Security.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Security.Jwt\Rig.TUnit.Security.Jwt.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Security.OAuth\Rig.TUnit.Security.OAuth.csproj" />

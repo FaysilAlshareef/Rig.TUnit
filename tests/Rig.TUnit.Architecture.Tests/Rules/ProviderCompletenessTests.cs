@@ -61,6 +61,7 @@ public sealed class ProviderCompletenessTests
         new("Rig.TUnit.Security.Mtls",            "MtlsFixture",      "MtlsFixtureOptions",      "MtlsRigBuilder",       "UseMtls"),
         new("Rig.TUnit.Security.Policies",        "PolicyFixture",    "PolicyFixtureOptions",    "PolicyRigBuilder",     "UsePolicies"),
         new("Rig.TUnit.Observability.Metrics",    "MetricsFixture",   "MetricsFixtureOptions",   "MetricsRigBuilder",    "UseMetricsCapture"),
+        new("Rig.TUnit.Observability.AppInsights","AppInsightsFixture","AppInsightsFixtureOptions","AppInsightsRigBuilder","UseAppInsights"),
     ];
 
     /// <summary>
@@ -75,7 +76,6 @@ public sealed class ProviderCompletenessTests
         ("Rig.TUnit.Observability.Logging",           "by-design — telemetry-style (no fluent Use extension)"),
         ("Rig.TUnit.Observability.Tracing",           "by-design — telemetry-style"),
         ("Rig.TUnit.Observability.Seq",               "by-design — telemetry-style"),
-        ("Rig.TUnit.Observability.AppInsights",       "T124-T131 (Phase 4)"),
         ("Rig.TUnit.Docker",                          "T132-T137 (Phase 4 — ships DockerFixtureOptions/Builder/Extensions)"),
     ];
 

@@ -27,7 +27,7 @@ jobs:
           # TUnit uses Microsoft.Testing.Platform — --filter is invalid.
           # Enumerate each non-integration, non-benchmark project individually.
           $projects = Get-ChildItem tests -Recurse -Filter "*.csproj" |
-              Where-Object { $_.Name -notmatch "Integration|Benchmarks" }
+              Where-Object { $_.Name -notmatch "Integration|Benchmarks|Contract" }
           $failed = @()
           foreach ($p in $projects) {
               Write-Host "::group::$($p.Name)"

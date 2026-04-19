@@ -157,5 +157,8 @@
     <Project Path="tests/Rig.TUnit.Observability.AppInsights.Tests.Integration/Rig.TUnit.Observability.AppInsights.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Docker.Tests.Unit/Rig.TUnit.Docker.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Docker.Tests.Integration/Rig.TUnit.Docker.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.EventSourcing.Tests.Unit/Rig.TUnit.Microservices.EventSourcing.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.Saga.Tests.Unit/Rig.TUnit.Microservices.Saga.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.Contracts.Tests.Unit/Rig.TUnit.Microservices.Contracts.Tests.Unit.csproj" />
   </Folder>
 </Solution>

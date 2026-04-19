@@ -608,22 +608,22 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ### 6b Meta-package sync
 
-- [ ] T158 [P] Verify `Rig.TUnit.All/Rig.TUnit.All.csproj` transitively references every provider (use `dotnet list package` + diff against `src/` directory listing).
-- [ ] T159 [depends: T158] Verify `Rig.TUnit.Microservices/Rig.TUnit.Microservices.csproj` references `Rig.TUnit.Docker` if its Microservices sub-packages need containers.
+- [x] T158 [P] Verify `Rig.TUnit.All/Rig.TUnit.All.csproj` transitively references every provider (use `dotnet list package` + diff against `src/` directory listing).
+- [x] T159 [depends: T158] Verify `Rig.TUnit.Microservices/Rig.TUnit.Microservices.csproj` references `Rig.TUnit.Docker` if its Microservices sub-packages need containers.
 
 ### 6c CI matrix
 
-- [ ] T160 [P] Update `.github/workflows/ci.yml` — add MySql 8.0 + 8.4, Oracle Free 23, Cosmos vnext-preview matrix rows OR tag the Integration projects `[Category("containers")]` and add a dedicated job.
-- [ ] T161 [depends: T160] Add pull-image caching for MySql / Oracle / Cosmos images.
-- [ ] T162 [depends: T161] Document Windows-runner skip for Cosmos (Linux emulator requires Linux containers) in workflow YAML comments.
+- [x] T160 [P] Update `.github/workflows/ci.yml` — add MySql 8.0 + 8.4, Oracle Free 23, Cosmos vnext-preview matrix rows OR tag the Integration projects `[Category("containers")]` and add a dedicated job.
+- [x] T161 [depends: T160] Add pull-image caching for MySql / Oracle / Cosmos images.
+- [x] T162 [depends: T161] Document Windows-runner skip for Cosmos (Linux emulator requires Linux containers) in workflow YAML comments.
 
 ### Phase 6 gate
 
-- [ ] T163 [depends: T157, T159, T162] Run full solution `dotnet build` under .NET 10 — zero new warnings above 003 baseline.
-- [ ] T164 [depends: T163] Run full `dotnet test`. Final green count MUST be strictly > 219. Record new total.
-- [ ] T165 [depends: T164] Verify every checkbox in `planning/provider-consistency-remediation/Rig.TUnit-Session-Handoff.md` is ticked.
-- [ ] T166 [depends: T165] Update `Rig.TUnit-Provider-Gap-Matrix.md` — every row fully ✓.
-- [ ] T167 [P] [depends: T166] Commit Phase 6: `docs(004): Phase 6 — README polish + CI matrix + final gap-matrix update`.
+- [x] T163 [depends: T157, T159, T162] Run full solution `dotnet build` under .NET 10 — zero new warnings above 003 baseline.
+- [x] T164 [depends: T163] Run full `dotnet test`. Final green count MUST be strictly > 219. Record new total.
+- [~] T165 [depends: T164] Verify every checkbox in `planning/provider-consistency-remediation/Rig.TUnit-Session-Handoff.md` is ticked.
+- [~] T166 [depends: T165] Update `Rig.TUnit-Provider-Gap-Matrix.md` — every row fully ✓.
+- [x] T167 [P] [depends: T166] Commit Phase 6: `docs(004): Phase 6 — README polish + CI matrix + final gap-matrix update`.
 
 ---
 

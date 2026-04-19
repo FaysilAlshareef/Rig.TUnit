@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build-unit-arch:
+    name: Build + Unit + Arch
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Rig.TUnit.slnx
+      - name: Build
+        run: dotnet build Rig.TUnit.slnx --no-restore -c Release
+      - name: Test (unit + arch only — exclude Integration)
+        run: dotnet test Rig.TUnit.slnx --no-build -c Release --filter "FullyQualifiedName!~Tests.Integration"
+
+  integration-sql:
+    name: Integration — SQL matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider:
+          - SqlServer
+          - Sqlite
+          - Postgresql
+          - MySql
+          - Oracle
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Pull provider image (warm cache)
+        if: matrix.provider == 'MySql' || matrix.provider == 'Oracle'
+        run: |
+          case "${{ matrix.provider }}" in
+            MySql)  docker pull mysql:8.4 ;;
+            Oracle) docker pull gvenzl/oracle-free:23.5-slim-faststart ;;
+          esac
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        run: dotnet test tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+
+  integration-nosql:
+    name: Integration — NoSQL matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider:
+          - Mongo
+          - Cassandra
+          - Dynamo
+          - ElasticSearch
+          - KurrentDb
+          - Redis
+          # Cosmos intentionally omitted from Windows runners — Linux-emulator container only runs under Linux.
+          - Cosmos
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Skip Cosmos on Windows
+        if: matrix.provider == 'Cosmos' && runner.os == 'Windows'
+        run: echo "Cosmos emulator requires Linux containers — skipping."
+      - name: Restore + Build
+        if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run integration
+        if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
+        run: dotnet test tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release

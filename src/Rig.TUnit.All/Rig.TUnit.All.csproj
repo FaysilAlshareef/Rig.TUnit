@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql\Rig.TUnit.Databases.NoSql.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Redis\Rig.TUnit.Databases.NoSql.Redis.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Mongo\Rig.TUnit.Databases.NoSql.Mongo.csproj" />
+    <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Cosmos\Rig.TUnit.Databases.NoSql.Cosmos.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.Cassandra\Rig.TUnit.Databases.NoSql.Cassandra.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.KurrentDb\Rig.TUnit.Databases.NoSql.KurrentDb.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Databases.NoSql.ElasticSearch\Rig.TUnit.Databases.NoSql.ElasticSearch.csproj" />

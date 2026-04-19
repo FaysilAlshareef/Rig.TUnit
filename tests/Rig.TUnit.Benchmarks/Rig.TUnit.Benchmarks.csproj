@@ -50,5 +50,6 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Metrics\Rig.TUnit.Observability.Metrics.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.MySql\Rig.TUnit.Databases.Sql.MySql.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Oracle\Rig.TUnit.Databases.Sql.Oracle.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Cosmos\Rig.TUnit.Databases.NoSql.Cosmos.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-namespace Rig.TUnit.Microservices.Contracts.Fixtures;
+namespace Rig.TUnit.Microservices.Contracts.Helpers;
 
 /// <summary>
 /// Provider-side verification helper — given a loaded <see cref="ContractPact"/>
@@ -6,12 +6,12 @@ namespace Rig.TUnit.Microservices.Contracts.Fixtures;
 /// documented interaction. Simulator is a delegate so tests can mock producer
 /// endpoints without spinning up a real web host.
 /// </summary>
-public sealed class ProviderVerificationFixture
+public sealed class ProviderVerificationHarness
 {
     private readonly ContractPact _pact;
     private readonly Func<ContractInteraction, Task<(int Status, string? Body)>> _simulator;
 
-    public ProviderVerificationFixture(
+    public ProviderVerificationHarness(
         ContractPact pact,
         Func<ContractInteraction, Task<(int Status, string? Body)>> simulator)
     {

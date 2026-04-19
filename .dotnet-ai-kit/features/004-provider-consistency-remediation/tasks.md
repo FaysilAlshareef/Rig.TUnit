@@ -560,30 +560,30 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ### 5a EventSourcing
 
-- [ ] T142-RED [P] Create `tests/Rig.TUnit.Microservices.EventSourcing.Tests.Unit/` with `AggregateAssertTests` (fluent `.For(agg).Raised<TEvent>().WithData(pred)` — pure, exhaustive matcher coverage), `EventCatalogueVerifierTests` (discovers event factories via reflection — uses a fake catalogue), `SchemaEvolutionHelperTests` (loads fixture JSON with missing/added/renamed fields — pure). Integration: extend existing Integration project with `AggregateAssertLiveTests.cs`, `EventCatalogueVerifierLiveTests.cs`, `SchemaEvolutionHelperLiveTests.cs` against a real aggregate. Benchmark: `EventSourcingBenchmarks.cs`. Verify RED.
-- [ ] T142-GREEN [depends: T142-RED] Write `src/Rig.TUnit.Microservices.EventSourcing/Assertions/AggregateAssert.cs`.
-- [ ] T143-GREEN [depends: T142-GREEN] Write `Helpers/EventCatalogueVerifier.cs` — walks every event type in the catalogue and confirms producibility.
-- [ ] T144-GREEN [depends: T143-GREEN] Write `Helpers/SchemaEvolutionHelper.cs` — loads legacy-JSON payload, asserts current type deserializes without data loss.
-- [ ] T145 [depends: T144-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
+- [x] T142-RED [P] Create `tests/Rig.TUnit.Microservices.EventSourcing.Tests.Unit/` with `AggregateAssertTests` (fluent `.For(agg).Raised<TEvent>().WithData(pred)` — pure, exhaustive matcher coverage), `EventCatalogueVerifierTests` (discovers event factories via reflection — uses a fake catalogue), `SchemaEvolutionHelperTests` (loads fixture JSON with missing/added/renamed fields — pure). Integration: extend existing Integration project with `AggregateAssertLiveTests.cs`, `EventCatalogueVerifierLiveTests.cs`, `SchemaEvolutionHelperLiveTests.cs` against a real aggregate. Benchmark: `EventSourcingBenchmarks.cs`. Verify RED.
+- [x] T142-GREEN [depends: T142-RED] Write `src/Rig.TUnit.Microservices.EventSourcing/Assertions/AggregateAssert.cs`.
+- [x] T143-GREEN [depends: T142-GREEN] Write `Helpers/EventCatalogueVerifier.cs` — walks every event type in the catalogue and confirms producibility.
+- [x] T144-GREEN [depends: T143-GREEN] Write `Helpers/SchemaEvolutionHelper.cs` — loads legacy-JSON payload, asserts current type deserializes without data loss.
+- [x] T145 [depends: T144-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### 5b Saga
 
-- [ ] T146-RED [P] Create `tests/Rig.TUnit.Microservices.Saga.Tests.Unit/` with `SagaAssertTests` (`.For(history).Step(name).Compensated()` — pure), `SagaTimeoutHelperTests` (uses `FakeTimeProvider` — pure). Integration: extend existing Integration project. Benchmark: `SagaBenchmarks.cs`. Verify RED.
-- [ ] T146-GREEN [depends: T146-RED] Write `Assertions/SagaAssert.cs`.
-- [ ] T147-GREEN [depends: T146-GREEN] Write `Helpers/SagaTimeoutHelper.cs` — advances injected `TimeProvider` until saga timeout fires, asserts correct compensation.
-- [ ] T148 [depends: T147-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
+- [x] T146-RED [P] Create `tests/Rig.TUnit.Microservices.Saga.Tests.Unit/` with `SagaAssertTests` (`.For(history).Step(name).Compensated()` — pure), `SagaTimeoutHelperTests` (uses `FakeTimeProvider` — pure). Integration: extend existing Integration project. Benchmark: `SagaBenchmarks.cs`. Verify RED.
+- [x] T146-GREEN [depends: T146-RED] Write `Assertions/SagaAssert.cs`.
+- [x] T147-GREEN [depends: T146-GREEN] Write `Helpers/SagaTimeoutHelper.cs` — advances injected `TimeProvider` until saga timeout fires, asserts correct compensation.
+- [x] T148 [depends: T147-GREEN] Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### 5c Contracts
 
-- [ ] T149-RED [P] Create `tests/Rig.TUnit.Microservices.Contracts.Tests.Unit/` with `PactBrokerClientStubTests` (file-based reads, C-002 compliant — pure, no HTTP), `ProviderVerificationFixtureTests` (mocks producer endpoints, verifies every interaction). Integration: extend existing project with end-to-end verification using a seeded `TestInfrastructure/Pacts/sample.json`. Benchmark: `ContractsBenchmarks.cs`. Verify RED.
-- [ ] T149-GREEN [depends: T149-RED] Write `Helpers/PactBrokerClientStub.cs` — file-based (reads `TestInfrastructure/Pacts/*.json`). No HTTP, no HAL emulation.
-- [ ] T150-GREEN [depends: T149-GREEN] Write `Fixtures/ProviderVerificationFixture.cs` — loads Pact, stands up producer endpoints, verifies every interaction.
-- [ ] T151 [depends: T150-GREEN] Seed `tests/.../TestInfrastructure/Pacts/sample.json`. Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
+- [x] T149-RED [P] Create `tests/Rig.TUnit.Microservices.Contracts.Tests.Unit/` with `PactBrokerClientStubTests` (file-based reads, C-002 compliant — pure, no HTTP), `ProviderVerificationFixtureTests` (mocks producer endpoints, verifies every interaction). Integration: extend existing project with end-to-end verification using a seeded `TestInfrastructure/Pacts/sample.json`. Benchmark: `ContractsBenchmarks.cs`. Verify RED.
+- [x] T149-GREEN [depends: T149-RED] Write `Helpers/PactBrokerClientStub.cs` — file-based (reads `TestInfrastructure/Pacts/*.json`). No HTTP, no HAL emulation.
+- [x] T150-GREEN [depends: T149-GREEN] Write `Fixtures/ProviderVerificationFixture.cs` — loads Pact, stands up producer endpoints, verifies every interaction.
+- [x] T151 [depends: T150-GREEN] Seed `tests/.../TestInfrastructure/Pacts/sample.json`. Full Integration + benchmark sweep. Add README. Coverage ≥ 90/85.
 
 ### Phase 5 gate
 
-- [ ] T152 [depends: T145, T148, T151] Run full `dotnet test`. Confirm coverage gate met per Microservices package (EventSourcing, Saga, Contracts) using the `coverlet.msbuild` commands from T097.
-- [ ] T153 [P] [depends: T152] Commit Phase 5: `feat(004): Phase 5 — microservices depth (EventSourcing + Saga + Contracts)`.
+- [x] T152 [depends: T145, T148, T151] Run full `dotnet test`. Confirm coverage gate met per Microservices package (EventSourcing, Saga, Contracts) using the `coverlet.msbuild` commands from T097.
+- [x] T153 [P] [depends: T152] Commit Phase 5: `feat(004): Phase 5 — microservices depth (EventSourcing + Saga + Contracts)`.
 
 ---
 
@@ -595,16 +595,16 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ### 6a README coverage
 
-- [ ] T154 [P] Audit every `src/Rig.TUnit.{Family}.{Provider}/` directory for README > 100 chars. Cross-reference with `ReadmeCompletenessTests` skip list.
-- [ ] T155 [P] Write README for every provider directory missing one or too-short. Expected backlog at Phase 6 entry: **~0 provider READMEs** (the 20 missing + 4 new packages = 24 were all landed in Phases 3-5 alongside their Builder/Fixture commits). Phase 6 T155 catches residuals only: any leaf provider missed during Phases 3-5, plus base-package READMEs if `ReadmeCompletenessTests` is extended to cover them (out of scope per FR-003, which scopes to `src/Rig.TUnit.{Family}.{Provider}/`). Run `ReadmeCompletenessTests` to get the precise residual list.
+- [x] T154 [P] Audit every `src/Rig.TUnit.{Family}.{Provider}/` directory for README > 100 chars. Cross-reference with `ReadmeCompletenessTests` skip list.
+- [x] T155 [P] Write README for every provider directory missing one or too-short. Expected backlog at Phase 6 entry: **~0 provider READMEs** (the 20 missing + 4 new packages = 24 were all landed in Phases 3-5 alongside their Builder/Fixture commits). Phase 6 T155 catches residuals only: any leaf provider missed during Phases 3-5, plus base-package READMEs if `ReadmeCompletenessTests` is extended to cover them (out of scope per FR-003, which scopes to `src/Rig.TUnit.{Family}.{Provider}/`). Run `ReadmeCompletenessTests` to get the precise residual list.
   Files: `src/Rig.TUnit.{various}/README.md`
-- [ ] T156 [depends: T155] Remove all `[Category("SkipUntilFixed")]` markers from `ReadmeCompletenessTests`.
-- [ ] T157 [depends: T156] Run full `dotnet test`. Confirm `ReadmeCompletenessTests` fully GREEN.
+- [x] T156 [depends: T155] Remove all `[Category("SkipUntilFixed")]` markers from `ReadmeCompletenessTests`.
+- [x] T157 [depends: T156] Run full `dotnet test`. Confirm `ReadmeCompletenessTests` fully GREEN.
 
 ### 6a-bis TestCompletenessTests (new architecture rule)
 
-- [ ] T157a-RED [depends: T157] Write `tests/Rig.TUnit.Architecture.Tests/Rules/TestCompletenessTests.cs` — rule MUST fail when any `src/Rig.TUnit.{Family}.{Provider}/` folder lacks any of: (a) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Unit/` project, (b) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/` project, (c) matching `{Provider}Contract.cs` inside the Integration project, (d) at least one `{Provider}*Benchmarks.cs` in `tests/Rig.TUnit.Benchmarks/`. Initial skip list empty — every provider must pass. Verify RED (test itself passes — no unit-under-test yet; the failing assertions will drive Phase 6 completion). Commit: `test(004): T157a — RED TestCompletenessTests`.
-- [ ] T157a-GREEN [depends: T157a-RED] Ensure every provider has the 4 artefacts listed above (back-fill any missing Unit project / Benchmark class discovered by the rule). Once all 4 pass per provider, commit: `feat(004): T157a — GREEN TestCompletenessTests (4-test completeness enforced repo-wide)`.
+- [x] T157a-RED [depends: T157] Write `tests/Rig.TUnit.Architecture.Tests/Rules/TestCompletenessTests.cs` — rule MUST fail when any `src/Rig.TUnit.{Family}.{Provider}/` folder lacks any of: (a) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Unit/` project, (b) matching `tests/Rig.TUnit.{Family}.{Provider}.Tests.Integration/` project, (c) matching `{Provider}Contract.cs` inside the Integration project, (d) at least one `{Provider}*Benchmarks.cs` in `tests/Rig.TUnit.Benchmarks/`. Initial skip list empty — every provider must pass. Verify RED (test itself passes — no unit-under-test yet; the failing assertions will drive Phase 6 completion). Commit: `test(004): T157a — RED TestCompletenessTests`.
+- [x] T157a-GREEN [depends: T157a-RED] Ensure every provider has the 4 artefacts listed above (back-fill any missing Unit project / Benchmark class discovered by the rule). Once all 4 pass per provider, commit: `feat(004): T157a — GREEN TestCompletenessTests (4-test completeness enforced repo-wide)`.
 
 ### 6b Meta-package sync
 

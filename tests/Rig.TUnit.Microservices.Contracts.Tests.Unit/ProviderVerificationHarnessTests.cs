@@ -1,9 +1,9 @@
 using Rig.TUnit.Microservices.Contracts;
-using Rig.TUnit.Microservices.Contracts.Fixtures;
+using Rig.TUnit.Microservices.Contracts.Helpers;
 
 namespace Rig.TUnit.Microservices.Contracts.Tests.Unit;
 
-public sealed class ProviderVerificationFixtureTests
+public sealed class ProviderVerificationHarnessTests
 {
     private static ContractPact SamplePact(params ContractInteraction[] interactions)
         => new("c", "p", interactions);
@@ -11,14 +11,14 @@ public sealed class ProviderVerificationFixtureTests
     [Test]
     public async Task Ctor_NullPact_Throws()
     {
-        await Assert.That(() => new ProviderVerificationFixture(null!, _ => Task.FromResult((200, (string?)null))))
+        await Assert.That(() => new ProviderVerificationHarness(null!, _ => Task.FromResult((200, (string?)null))))
             .ThrowsExactly<ArgumentNullException>();
     }
 
     [Test]
     public async Task Ctor_NullSimulator_Throws()
     {
-        await Assert.That(() => new ProviderVerificationFixture(SamplePact(), null!))
+        await Assert.That(() => new ProviderVerificationHarness(SamplePact(), null!))
             .ThrowsExactly<ArgumentNullException>();
     }
 
@@ -26,7 +26,7 @@ public sealed class ProviderVerificationFixtureTests
     public async Task VerifyAllAsync_StatusMatches_Succeeds()
     {
         var pact = SamplePact(new ContractInteraction("list", "GET", "/x", ResponseStatus: 200));
-        var fixture = new ProviderVerificationFixture(pact, _ => Task.FromResult((200, (string?)null)));
+        var fixture = new ProviderVerificationHarness(pact, _ => Task.FromResult((200, (string?)null)));
 
         var report = await fixture.VerifyAllAsync();
 
@@ -38,7 +38,7 @@ public sealed class ProviderVerificationFixtureTests
     public async Task VerifyAllAsync_StatusMismatch_FailsReport()
     {
         var pact = SamplePact(new ContractInteraction("list", "GET", "/x", ResponseStatus: 200));
-        var fixture = new ProviderVerificationFixture(pact, _ => Task.FromResult((500, (string?)null)));
+        var fixture = new ProviderVerificationHarness(pact, _ => Task.FromResult((500, (string?)null)));
 
         var report = await fixture.VerifyAllAsync();
 
@@ -50,7 +50,7 @@ public sealed class ProviderVerificationFixtureTests
     public async Task VerifyAllAsync_BodyMismatch_FailsReport()
     {
         var pact = SamplePact(new ContractInteraction("list", "GET", "/x", ResponseStatus: 200, ResponseBody: "OK"));
-        var fixture = new ProviderVerificationFixture(pact, _ => Task.FromResult((200, (string?)"WRONG")));
+        var fixture = new ProviderVerificationHarness(pact, _ => Task.FromResult((200, (string?)"WRONG")));
 
         var report = await fixture.VerifyAllAsync();
 
@@ -63,7 +63,7 @@ public sealed class ProviderVerificationFixtureTests
         var pact = SamplePact(
             new ContractInteraction("a", "GET", "/a", ResponseStatus: 200),
             new ContractInteraction("b", "GET", "/b", ResponseStatus: 204));
-        var fixture = new ProviderVerificationFixture(pact, i =>
+        var fixture = new ProviderVerificationHarness(pact, i =>
             Task.FromResult((i.ResponseStatus, (string?)null)));
 
         var report = await fixture.VerifyAllAsync();

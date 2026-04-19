@@ -42,7 +42,14 @@ public sealed class PostgresQuirkTests
         var opts = new DbContextOptionsBuilder().UseNpgsql(fx.ConnectionString).Options;
         var ctx = new QuirkContext(opts);
         await ctx.Database.ExecuteSqlRawAsync("DROP TABLE IF EXISTS quirk_docs CASCADE");
-        await ctx.Database.EnsureCreatedAsync();
+        await ctx.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE quirk_docs (
+                ""Id""        serial  PRIMARY KEY,
+                ""FirstName"" text    NOT NULL,
+                ""LastName""  text    NOT NULL,
+                ""FullName""  text    GENERATED ALWAYS AS (""FirstName"" || ' ' || ""LastName"") STORED,
+                ""Payload""   jsonb
+            )");
         return ctx;
     }
 

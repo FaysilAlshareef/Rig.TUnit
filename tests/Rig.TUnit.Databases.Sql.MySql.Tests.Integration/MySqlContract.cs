@@ -12,4 +12,13 @@ public sealed class MySqlContract : SqlRigContract
         => await SharedMySqlFixture.GetAsync().ConfigureAwait(false);
 
     protected override ValueTask DisposeRigAsync(IDbRig rig) => ValueTask.CompletedTask;
+
+    // MySQL uses one shared schema per container — DatabaseName is fixed by design.
+    // Verify isolation-key generation produces unique values, matching SqlServer's override pattern.
+    public override async Task Fixture_DatabaseName_IsUniquePerRun()
+    {
+        var k1 = IsolationKey.FromName(Guid.NewGuid().ToString());
+        var k2 = IsolationKey.FromName(Guid.NewGuid().ToString());
+        await Assert.That(k1.Value).IsNotEqualTo(k2.Value);
+    }
 }

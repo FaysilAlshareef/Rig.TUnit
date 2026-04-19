@@ -109,23 +109,55 @@ Per-project cadence: RED commit with the missing test(s) failing → GREEN commi
 
 **Exit gate:** `TestFileOrganizationTests` enforces uniformly.
 
-### Phase 6 — Documentation parity (3–4 days)
+### Phase 6 — Documentation parity (10–14 days — quality-driven, not size-driven)
 
-**Goal:** OSS-ready documentation.
+> **Scope revision (2026-04-19):** original estimate of 3–4 days assumed 12 new + 2 minimal expansions plus a string-length gate. After audit revision (see [Documentation-Audit.md](Documentation-Audit.md) §2.2 / §2.3), **all 63 READMEs must be rewritten against a 14-section canonical template**, the gate must be tightened from `> 100 chars` to a structural section-presence check, and several supporting deliverables (template file, quality rubric, glossary, troubleshooting consolidation) are now mandatory because the new READMEs reference them. Phase 6 is large enough that it likely runs as its own sub-feature (`005-b-docs-parity`) in parallel with phases 3–5, not strictly sequential.
+
+**Goal:** OSS-ready documentation, every README meets the 14-section quality bar, `ReadmeCompletenessTests` enforces structural conformance.
+
+#### Phase 6a — Foundation (1–2 days, gates everything else)
 
 - T100: Add root `LICENSE` (MIT recommended; confirm with repo owner)
-- T101: Add root `CONTRIBUTING.md` consolidating TDD rules + linking to `Contributing-ProviderTemplate.md`
+- T101: Add root `CONTRIBUTING.md` consolidating TDD rules + linking to `Contributing-ProviderTemplate.md` and the new canonical template
 - T102: Add root `SECURITY.md` with disclosure channel
-- T103: Rewrite root `README.md` per the canonical template in [Documentation-Audit.md §5](Documentation-Audit.md)
-- T104: Add 12 missing per-project READMEs using the extracted canonical template
-- T105: Expand `Messaging/README.md` and `Databases.NoSql/README.md` (minimal → good)
-- T106: Add `CHANGELOG.md` with 001–004 history and the KurrentDB breaking rename
-- T107: Add 6 ADRs under `docs/adr/` (see [Documentation-Audit.md §6 P2](Documentation-Audit.md))
-- T108: Add architecture diagram (Mermaid) + feature matrix to root README
-- T109: Add troubleshooting / glossary / tuning guides under `docs/`
-- T110: Remove `SkipUntilFixed` from `ReadmeCompletenessTests`
+- T103: Author `docs/templates/PROVIDER_README_TEMPLATE.md` — single source of truth for the 14-section canonical README (per [Documentation-Audit.md §3](Documentation-Audit.md))
+- T104: Author `docs/QUALITY-BAR.md` — human-reviewer rubric grading each section Pass / Needs-work / Missing with examples
+- T105: Update `src/Rig.TUnit/Contributing-ProviderTemplate.md` Section 8 to reference the new canonical template instead of the legacy `> 100 chars` floor
 
-**Exit gate:** `ReadmeCompletenessTests` enforces uniformly; root has 5 governance files; OSS-ready.
+#### Phase 6b — Root README + supporting docs (1–2 days)
+
+- T106: Rewrite root `README.md` against the adapted 14-section template (feature matrix replaces "API surface", ecosystem map replaces "Provider quirks") — per [Documentation-Audit.md §7 P0](Documentation-Audit.md)
+- T107: Add `CHANGELOG.md` with 001–004 history and the KurrentDB breaking rename narrative
+- T108: Add architecture diagram (Mermaid) showing family graph + 60-provider matrix — embedded in root README, linked from each leaf README's section 13
+- T109: Add 8 ADRs under `docs/adr/` (per [Documentation-Audit.md §7 P2](Documentation-Audit.md) — was 6, expanded to include IsolationKey rationale and Redis cache/KV split)
+- T110: Add `docs/glossary.md` (mandatory — every term used in any README MUST resolve here)
+- T111: Add `docs/troubleshooting.md` (consolidated; leaf READMEs link to provider-specific subsections)
+- T112: Add `docs/performance-tuning.md` (when to use which provider for which test scenario)
+- T113: Add `docs/migration-001-to-004.md` (notably KurrentDb)
+
+#### Phase 6c — Per-project README rewrites (6–9 days, staged per family)
+
+Acceptance criteria per README defined in [Documentation-Audit.md §9](Documentation-Audit.md). Cadence per family: RED commit (template-only README failing the new structural gate) → GREEN commit (sections filled with provider-specific research). All 63 READMEs in scope — including the previously-EXCELLENT MySql and Outbox.
+
+- T120: 12 missing READMEs created (`Rig.TUnit`, `Rig.TUnit.All`, `Rig.TUnit.Ci`, `Rig.TUnit.Core`, `Rig.TUnit.Grpc`, `Rig.TUnit.Mediator`, `Rig.TUnit.Microservices` base, `Rig.TUnit.Microservices.Contracts`, `Rig.TUnit.Microservices.Saga`, `Rig.TUnit.Parallelism`, `Rig.TUnit.Storage` base, `Rig.TUnit.WebAPI`)
+- T121: SQL family — rewrite all 6 (base + MySql + Oracle + Postgresql + SqlServer + Sqlite) — capture EF-provider compat matrix, AUTO_INCREMENT/PL-SQL/schema quirks, Pomelo EF10 pin
+- T122: NoSQL family — rewrite all 8 (base + Cassandra + Cosmos + Dynamo + ElasticSearch + KurrentDb + Mongo + Redis-as-KV) — RU charges, keyspace-per-test, stream semantics, GSI verification
+- T123: Caching family — rewrite all 5 (base + Fusion + Hybrid + Memory + Redis) — capture cache-vs-KV Redis split rationale, backplane semantics, fail-safe / eager-refresh
+- T124: Messaging family — rewrite all 6 (base + Kafka + Nats + RabbitMq + ServiceBus + Sqs) — listener/sender lifecycle, W3C traceparent, dead-letter, ordering
+- T125: Microservices family — rewrite all 7 (base + Contracts + EventSourcing + Inbox + Outbox + Saga + Snapshots) — exactly-once, CAS contention, snapshot scrubbing
+- T126: Security family — rewrite all 5 (base + Jwt + Mtls + OAuth + Policies) — kid rotation, negative builders, JWKS lifecycle
+- T127: Observability family — rewrite all 6 (base + AppInsights + Logging + Logging.Analyzers + Metrics + Seq + Tracing) — TagCardinalityGuard, ActivitySource lifecycle, snapshot capture
+- T128: Storage family — rewrite all 5 (base + AzureBlob + FileSystem + MinIO + S3) — SAS builders, path sandbox
+- T129: Cross-cutting / utilities — rewrite remaining (Concurrency, Docker, HealthChecks, Http, Resilience, Microservices container)
+
+#### Phase 6d — Gate tightening + verification (1 day)
+
+- T140: Implement structural section-parser in `ReadmeCompletenessTests` — assert all 14 headings present (or explicit `## §N — N/A: <rationale>`); assert Options-table rows match `*FixtureOptions.cs` via reflection; assert benchmark-class link resolves; markdown link checker
+- T141: Remove all `SkipUntilFixed` markers from `ReadmeCompletenessTests`
+- T142: Add markdown link-checker step to CI workflow (broken links in any README fail the build)
+- T143: Add a snippet-extraction arch-test step that copy-pastes Quick Start blocks into a throwaway test project and compiles them (catches stale READMEs after API changes)
+
+**Exit gate:** `ReadmeCompletenessTests` enforces 14-section structure uniformly; zero skip markers; root has 5 governance files (LICENSE, CONTRIBUTING, SECURITY, CHANGELOG, README); 8 ADRs published; `docs/templates/`, `docs/adr/`, `docs/glossary.md`, `docs/troubleshooting.md`, `docs/performance-tuning.md`, `docs/migration-001-to-004.md` all present; OSS-ready.
 
 ### Phase 7 — CI hardening (1 day)
 
@@ -148,8 +180,10 @@ Per-project cadence: RED commit with the missing test(s) failing → GREEN commi
 - **SC-005:** `ReadmeCompletenessTests` has zero skip markers after Phase 6
 - **SC-006:** Every provider reports line ≥ 90% / branch ≥ 85% via the CI coverage gate
 - **SC-007:** Every provider has a BenchmarkDotNet class and a baseline entry in `benchmarks/baseline-005.json`
-- **SC-008:** Root has `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and a rewritten `README.md`
-- **SC-009:** All 63 src projects have a `README.md` > 100 chars
+- **SC-008:** Root has `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, and a rewritten `README.md` against the 14-section template
+- **SC-009:** All 63 src projects have a `README.md` that satisfies the 14-section canonical template (per [Documentation-Audit.md §3](Documentation-Audit.md)) — structural conformance, not character-count
+- **SC-009a:** `ReadmeCompletenessTests` is tightened from `> 100 chars` to a structural section-presence parser; zero `SkipUntilFixed` markers; markdown link checker passes
+- **SC-009b:** `docs/templates/PROVIDER_README_TEMPLATE.md`, `docs/QUALITY-BAR.md`, `docs/glossary.md`, `docs/troubleshooting.md`, `docs/performance-tuning.md`, `docs/migration-001-to-004.md`, and 8 ADRs under `docs/adr/` all exist
 - **SC-010:** Commit history on the feature branch shows RED → GREEN cadence for every src-touching commit (FR-031 / FR-034)
 - **SC-011:** Three stale orphan folders deleted
 - **SC-012:** Final green test count > current 004-era baseline; zero regressions
@@ -163,9 +197,11 @@ Per-project cadence: RED commit with the missing test(s) failing → GREEN commi
 | 3 — Test-category fill-in | 5–7 days |
 | 4 — Canonical layout | 2–3 days |
 | 5 — Test-file hygiene | 3–4 days |
-| 6 — Documentation | 3–4 days |
+| 6 — Documentation (quality-driven, all 63 READMEs) | **10–14 days** |
 | 7 — CI hardening | 1 day |
-| **Total** | **16–22 days** |
+| **Total** | **23–32 days** |
+
+> Phase 6 was originally 3–4 days when the scope was "12 new + 2 expansions + size gate." After scope revision to "all 63 rewritten against 14-section template + structural gate + supporting docs" the effort grew to 10–14 days. See [Documentation-Audit.md §8](Documentation-Audit.md) for the line-item breakdown.
 
 ## Risks & mitigations
 
@@ -187,11 +223,22 @@ Per-project cadence: RED commit with the missing test(s) failing → GREEN commi
 
 ## Branch strategy
 
-Single long-lived branch `feat/005-legacy-coverage-and-docs-parity` off `master` after Phase 1 lands as a hotfix via its own short-lived branch `fix/005-phase-1-ci-stabilisation` — so master becomes green immediately even if later phases take weeks.
+Phase 1 lands as a hotfix via its own short-lived branch `fix/005-phase-1-ci-stabilisation` — so master becomes green immediately even if later phases take weeks.
+
+Two long-lived feature branches off `master` after Phase 1 lands, run in parallel because Phase 6 is now large enough to justify its own owner / reviewer cadence:
+
+- `feat/005-a-legacy-coverage-and-tests` — Phases 2, 3, 4, 5, 7 (test-quality + CI hardening)
+- `feat/005-b-docs-parity` — Phase 6 (all 63 READMEs + supporting docs + gate tightening)
+
+Phase 6's gate-tightening (T140) requires every README to be rewritten first, so within the docs branch the order is strictly 6a → 6b → 6c → 6d.
+
+The two branches are independent at the file level (docs vs tests) so merge conflicts are minimal. They merge to `master` in either order.
 
 ## Open questions
 
 1. Should the `LICENSE` be MIT, Apache-2.0, or another choice? (Owner decision.)
 2. Should Phase 3 / 4 / 5 land as one giant PR or staged PRs per family? (Recommend per-family PRs for review cadence.)
 3. Should the benchmark gate's 20% threshold from 004 carry forward or tighten? (Recommend keep 20% for now; tighten after one release.)
-4. Do we need a separate `docs-only` branch for Phase 6, or bundle with Phase 5? (Recommend bundle — reviewers read code + docs together.)
+4. ~~Do we need a separate `docs-only` branch for Phase 6, or bundle with Phase 5?~~ **Resolved 2026-04-19**: separate branch `feat/005-b-docs-parity` runs in parallel — Phase 6 is now 10–14 days, too large to bundle.
+5. Should `ReadmeCompletenessTests` parse Markdown with `Markdig` (transitive dep) or use a regex-based heading scan? (Recommend `Markdig` for robustness; the dep is already pulled in by `dotnet-format` toolchain.)
+6. Should the snippet-extraction gate (T143) run on every PR or only on `master` pushes? (Recommend PR — catches stale README quick-starts at review time.)

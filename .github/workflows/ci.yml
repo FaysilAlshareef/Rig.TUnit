@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: dotnet build Rig.TUnit.slnx --no-restore -c Release
       - name: Test (unit + arch only — exclude Integration)
-        run: dotnet test Rig.TUnit.slnx --no-build -c Release --filter "FullyQualifiedName!~Tests.Integration"
+        run: dotnet test --solution Rig.TUnit.slnx --no-build -c Release --filter "FullyQualifiedName!~Tests.Integration"
 
   integration-sql:
     name: Integration — SQL matrix
@@ -51,7 +51,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
 
   integration-nosql:
     name: Integration — NoSQL matrix
@@ -83,4 +83,4 @@ jobs:
           dotnet build tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
-        run: dotnet test tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release

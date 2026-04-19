@@ -482,68 +482,68 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
 
 ### 4a `Rig.TUnit.Databases.Sql.MySql` *(TDD template — every RED→GREEN task splits into two commits)*
 
-- [ ] T100 [P] Scaffold `src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Unit/` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Integration/` csprojs. Register all three in `Rig.TUnit.slnx`. Add `Rig.TUnit.Benchmarks/MySqlBenchmarks.cs` placeholder + ProjectReference.  *Scaffold-only; no src code under src/ yet — no RED required.* Commit: `chore(004): T100 — scaffold Rig.TUnit.Databases.Sql.MySql`.
-- [ ] T101-RED [depends: T100] Write unit tests: `MySqlFixtureOptionsTests` (SectionName + [Required] + defaults), `MySqlRigBuilderTests`, `UseMySqlExtensionsTests` (both fluent + EF wrapper). Write integration: `MySqlContract : SqlRigContract` wired to `SharedMySqlFixture`, `MySqlParallelIsolationTests : ParallelIsolationContract`, `MySqlQuirkTests` for AUTO_INCREMENT + timestamp behaviour. Write benchmark: `MySqlBenchmarks.cs` (fixture start + query throughput). Verify RED.
-- [ ] T101-GREEN [depends: T101-RED] Write `Options/MySqlFixtureOptions.cs`.
-- [ ] T102-GREEN [depends: T101-GREEN] Write `Fixtures/MySqlFixture.cs : SqlFixtureBase` using `Testcontainers.MySql 4.11` (image passed to ctor).
-- [ ] T103-GREEN [depends: T102-GREEN] Write `Builder/MySqlRigBuilder.cs : SqlRigBuilder<MySqlRigBuilder>` overriding `UseProvider` → `options.UseMySql(connectionString, ServerVersion.AutoDetect(...))` via Pomelo 9.
-- [ ] T104-GREEN [depends: T103-GREEN] Write `Builder/MySqlRigBuilderExtensions.UseMySql(...)`.
-- [ ] T105-GREEN [depends: T104-GREEN] Write `Extensions/MySqlBuilderExtensions.cs` — EF Core wrapper convenience (cites Pomelo PR #2019 in a class-level comment).
-- [ ] T106 [depends: T105-GREEN] Run full Integration suite (Docker up) — all contract + quirk + parallel-isolation tests GREEN. Coverage ≥ 90/85.
-- [ ] T107 [depends: T106] Add README. Promote MySql to `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
+- [x] T100 [P] Scaffold `src/Rig.TUnit.Databases.Sql.MySql/Rig.TUnit.Databases.Sql.MySql.csproj` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Unit/` + `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Integration/` csprojs. Register all three in `Rig.TUnit.slnx`. Add `Rig.TUnit.Benchmarks/MySqlBenchmarks.cs` placeholder + ProjectReference.  *Scaffold-only; no src code under src/ yet — no RED required.* Commit: `chore(004): T100 — scaffold Rig.TUnit.Databases.Sql.MySql`.
+- [x] T101-RED [depends: T100] Write unit tests: `MySqlFixtureOptionsTests` (SectionName + [Required] + defaults), `MySqlRigBuilderTests`, `UseMySqlExtensionsTests` (both fluent + EF wrapper). Write integration: `MySqlContract : SqlRigContract` wired to `SharedMySqlFixture`, `MySqlParallelIsolationTests : ParallelIsolationContract`, `MySqlQuirkTests` for AUTO_INCREMENT + timestamp behaviour. Write benchmark: `MySqlBenchmarks.cs` (fixture start + query throughput). Verify RED.
+- [x] T101-GREEN [depends: T101-RED] Write `Options/MySqlFixtureOptions.cs`.
+- [x] T102-GREEN [depends: T101-GREEN] Write `Fixtures/MySqlFixture.cs : SqlFixtureBase` using `Testcontainers.MySql 4.11` (image passed to ctor).
+- [x] T103-GREEN [depends: T102-GREEN] Write `Builder/MySqlRigBuilder.cs : SqlRigBuilder<MySqlRigBuilder>` overriding `UseProvider` → `options.UseMySql(connectionString, ServerVersion.AutoDetect(...))` via Pomelo 9.
+- [x] T104-GREEN [depends: T103-GREEN] Write `Builder/MySqlRigBuilderExtensions.UseMySql(...)`.
+- [x] T105-GREEN [depends: T104-GREEN] Write `Extensions/MySqlBuilderExtensions.cs` — EF Core wrapper convenience (cites Pomelo PR #2019 in a class-level comment).
+- [x] T106 [depends: T105-GREEN] Run full Integration suite (Docker up) — all contract + quirk + parallel-isolation tests GREEN. Coverage ≥ 90/85.
+- [x] T107 [depends: T106] Add README. Promote MySql to `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
 
 ### 4b `Rig.TUnit.Databases.Sql.Oracle` *(TDD template — RED→GREEN pairs)*
 
-- [ ] T108 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`OracleBenchmarks.cs`). Commit: `chore(004): T108 — scaffold Rig.TUnit.Databases.Sql.Oracle`.
-- [ ] T109-RED [depends: T108] Write unit + integration + benchmark tests (Options, RigBuilder, UseOracle, EF wrapper, OracleQuirkTests for PL/SQL specifics, `OracleContract : SqlRigContract`, `OracleParallelIsolationTests`). Verify RED.
-- [ ] T109-GREEN [depends: T109-RED] Write `Options/OracleFixtureOptions.cs`.
-- [ ] T110-GREEN [depends: T109-GREEN] Write `Fixtures/OracleFixture.cs : SqlFixtureBase` — image `gvenzl/oracle-free:23.5-slim-faststart`, `Wait.ForListeningPorts()`, 5-min startup timeout (aspire#12036).
-- [ ] T111-GREEN [depends: T110-GREEN] Write `Builder/OracleRigBuilder.cs : SqlRigBuilder<OracleRigBuilder>` overriding `UseProvider` → `options.UseOracle(connectionString)`.
-- [ ] T112-GREEN [depends: T111-GREEN] Write `Builder/OracleRigBuilderExtensions.UseOracle(...)`.
-- [ ] T113-GREEN [depends: T112-GREEN] Write `Extensions/OracleBuilderExtensions.cs` — EF Core wrapper.
-- [ ] T114 [depends: T113-GREEN] Run full Integration suite (Docker up). Coverage ≥ 90/85.
-- [ ] T115 [depends: T114] Add README. Promote Oracle in `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
+- [x] T108 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`OracleBenchmarks.cs`). Commit: `chore(004): T108 — scaffold Rig.TUnit.Databases.Sql.Oracle`.
+- [x] T109-RED [depends: T108] Write unit + integration + benchmark tests (Options, RigBuilder, UseOracle, EF wrapper, OracleQuirkTests for PL/SQL specifics, `OracleContract : SqlRigContract`, `OracleParallelIsolationTests`). Verify RED.
+- [x] T109-GREEN [depends: T109-RED] Write `Options/OracleFixtureOptions.cs`.
+- [x] T110-GREEN [depends: T109-GREEN] Write `Fixtures/OracleFixture.cs : SqlFixtureBase` — image `gvenzl/oracle-free:23.5-slim-faststart`, `Wait.ForListeningPorts()`, 5-min startup timeout (aspire#12036).
+- [x] T111-GREEN [depends: T110-GREEN] Write `Builder/OracleRigBuilder.cs : SqlRigBuilder<OracleRigBuilder>` overriding `UseProvider` → `options.UseOracle(connectionString)`.
+- [x] T112-GREEN [depends: T111-GREEN] Write `Builder/OracleRigBuilderExtensions.UseOracle(...)`.
+- [x] T113-GREEN [depends: T112-GREEN] Write `Extensions/OracleBuilderExtensions.cs` — EF Core wrapper.
+- [x] T114 [depends: T113-GREEN] Run full Integration suite (Docker up). Coverage ≥ 90/85.
+- [x] T115 [depends: T114] Add README. Promote Oracle in `RequiredProviders`. Remove from `ReadmeCompletenessTests` skip list. Commit.
 
 ### 4c `Rig.TUnit.Databases.NoSql.Cosmos` *(TDD template)*
 
-- [ ] T116 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`CosmosBenchmarks.cs`). Commit: `chore(004): T116 — scaffold Cosmos`.
-- [ ] T117-RED [depends: T116] Write unit tests (Options, RigBuilder, UseCosmos, `RuChargeCaptureTests` pure, `PartitionKeyDistributionCheckerTests` pure). Integration: `CosmosContract : NoSqlRigContract`, `CosmosParallelIsolationTests`, `CosmosQuirkTests` (RU-charge + partition-distribution gated with `[Category("cosmos")]` + runtime `OperatingSystem.IsWindows()` skip). Benchmark. Verify RED.
-- [ ] T117-GREEN [depends: T117-RED] Write `Options/CosmosFixtureOptions.cs`.
-- [ ] T118-GREEN [depends: T117-GREEN] Write `Fixtures/CosmosFixture.cs : DocumentFixtureBase` using **`Testcontainers.GenericContainer` (base `Testcontainers` package) — NOT `Testcontainers.CosmosDb`** (legacy Windows emulator, incompatible). Image: `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview`. Wait strategy: custom `IWaitUntil` HTTP-GETing `https://localhost:{port}/_explorer/emulator.pem` with `ServerCertificateCustomValidationCallback` trust-all (testcontainers-dotnet#1306). After T140, remove `Testcontainers.CosmosDb` from `Directory.Packages.props` if unused.
-- [ ] T119-GREEN [depends: T118-GREEN] Write `Builder/CosmosRigBuilder.cs : NoSqlRigBuilder<CosmosRigBuilder>` + `UseCosmos` extension.
-- [ ] T120-GREEN [depends: T119-GREEN] Write `Helpers/RuChargeCapture.cs`.
-- [ ] T121-GREEN [depends: T120-GREEN] Write `Helpers/PartitionKeyDistributionChecker.cs`.
-- [ ] T122 [depends: T121-GREEN] Run full Integration suite on Linux runner (Windows runners gated-skip). Coverage ≥ 90/85.
-- [ ] T123 [depends: T122] Add README. Promote Cosmos. Remove from skip lists. Commit.
+- [x] T116 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`CosmosBenchmarks.cs`). Commit: `chore(004): T116 — scaffold Cosmos`.
+- [x] T117-RED [depends: T116] Write unit tests (Options, RigBuilder, UseCosmos, `RuChargeCaptureTests` pure, `PartitionKeyDistributionCheckerTests` pure). Integration: `CosmosContract : NoSqlRigContract`, `CosmosParallelIsolationTests`, `CosmosQuirkTests` (RU-charge + partition-distribution gated with `[Category("cosmos")]` + runtime `OperatingSystem.IsWindows()` skip). Benchmark. Verify RED.
+- [x] T117-GREEN [depends: T117-RED] Write `Options/CosmosFixtureOptions.cs`.
+- [x] T118-GREEN [depends: T117-GREEN] Write `Fixtures/CosmosFixture.cs : DocumentFixtureBase` using **`Testcontainers.GenericContainer` (base `Testcontainers` package) — NOT `Testcontainers.CosmosDb`** (legacy Windows emulator, incompatible). Image: `mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview`. Wait strategy: custom `IWaitUntil` HTTP-GETing `https://localhost:{port}/_explorer/emulator.pem` with `ServerCertificateCustomValidationCallback` trust-all (testcontainers-dotnet#1306). After T140, remove `Testcontainers.CosmosDb` from `Directory.Packages.props` if unused.
+- [x] T119-GREEN [depends: T118-GREEN] Write `Builder/CosmosRigBuilder.cs : NoSqlRigBuilder<CosmosRigBuilder>` + `UseCosmos` extension.
+- [x] T120-GREEN [depends: T119-GREEN] Write `Helpers/RuChargeCapture.cs`.
+- [x] T121-GREEN [depends: T120-GREEN] Write `Helpers/PartitionKeyDistributionChecker.cs`.
+- [x] T122 [depends: T121-GREEN] Run full Integration suite on Linux runner (Windows runners gated-skip). Coverage ≥ 90/85.
+- [x] T123 [depends: T122] Add README. Promote Cosmos. Remove from skip lists. Commit.
 
 ### 4d `Rig.TUnit.Observability.AppInsights` *(TDD template; in-process — no container)*
 
-- [ ] T124 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`AppInsightsBenchmarks.cs`). Commit: `chore(004): T124 — scaffold AppInsights`.
-- [ ] T125-RED [depends: T124] Write unit tests (Options, RigBuilder, UseAppInsights, `CapturingTelemetryChannelTests` pure: enqueue/dequeue thread-safety, `AppInsightsAssertTests` with mocked telemetry items). Integration: `AppInsightsContract : TelemetryRigContract`, `AppInsightsParallelIsolationTests` (20 parallel in-process fixtures, zero captured-telemetry cross-talk). Benchmark. Verify RED.
-- [ ] T125-GREEN [depends: T125-RED] Write `Options/AppInsightsFixtureOptions.cs`.
-- [ ] T126-GREEN [depends: T125-GREEN] Write `Fixtures/CapturingTelemetryChannel.cs : ITelemetryChannel` (internal, thread-safe `ConcurrentQueue<ITelemetry>`).
-- [ ] T127-GREEN [depends: T126-GREEN] Write `Fixtures/AppInsightsFixture.cs : TelemetryFixtureBase` — no container, in-process `TelemetryClient` with custom channel.
-- [ ] T128-GREEN [depends: T127-GREEN] Write `Builder/AppInsightsRigBuilder.cs : TelemetryRigBuilder<AppInsightsRigBuilder>` + `UseAppInsights` extension.
-- [ ] T129-GREEN [depends: T128-GREEN] Write `Assertions/AppInsightsAssert.cs` mirroring `TraceAssert` / `MetricAssert` surface.
-- [ ] T130 [depends: T129-GREEN] Run full Integration suite (no Docker needed — in-process). Coverage ≥ 90/85.
-- [ ] T131 [depends: T130] Add README. Promote AppInsights. Remove from skip lists. Commit.
+- [x] T124 [P] Scaffold src csproj + Tests.Unit + Tests.Integration csprojs. Register in slnx. Benchmark placeholder (`AppInsightsBenchmarks.cs`). Commit: `chore(004): T124 — scaffold AppInsights`.
+- [x] T125-RED [depends: T124] Write unit tests (Options, RigBuilder, UseAppInsights, `CapturingTelemetryChannelTests` pure: enqueue/dequeue thread-safety, `AppInsightsAssertTests` with mocked telemetry items). Integration: `AppInsightsContract : TelemetryRigContract`, `AppInsightsParallelIsolationTests` (20 parallel in-process fixtures, zero captured-telemetry cross-talk). Benchmark. Verify RED.
+- [x] T125-GREEN [depends: T125-RED] Write `Options/AppInsightsFixtureOptions.cs`.
+- [x] T126-GREEN [depends: T125-GREEN] Write `Fixtures/CapturingTelemetryChannel.cs : ITelemetryChannel` (internal, thread-safe `ConcurrentQueue<ITelemetry>`).
+- [x] T127-GREEN [depends: T126-GREEN] Write `Fixtures/AppInsightsFixture.cs : TelemetryFixtureBase` — no container, in-process `TelemetryClient` with custom channel.
+- [x] T128-GREEN [depends: T127-GREEN] Write `Builder/AppInsightsRigBuilder.cs : TelemetryRigBuilder<AppInsightsRigBuilder>` + `UseAppInsights` extension.
+- [x] T129-GREEN [depends: T128-GREEN] Write `Assertions/AppInsightsAssert.cs` mirroring `TraceAssert` / `MetricAssert` surface.
+- [x] T130 [depends: T129-GREEN] Run full Integration suite (no Docker needed — in-process). Coverage ≥ 90/85.
+- [x] T131 [depends: T130] Add README. Promote AppInsights. Remove from skip lists. Commit.
 
 ### 4e `Rig.TUnit.Docker` (complete template) *(TDD template)*
 
-- [ ] T132 [P] [depends: T099] Scaffold `tests/Rig.TUnit.Docker.Tests.Unit/` + `tests/Rig.TUnit.Docker.Tests.Integration/` csprojs (ContainerFixture is pre-existing; we're completing the template). Register in slnx. Benchmark placeholder (`DockerBenchmarks.cs`). Verify existing `ContainerFixture.cs` compiles cleanly under Testcontainers 4.11. Commit: `chore(004): T132 — scaffold Docker Tests.Unit/Integration + Benchmarks wiring`.
-- [ ] T133-RED [depends: T132] Write unit tests (`DockerFixtureOptionsTests`, `DockerRigBuilderTests`, `UseDockerExtensionsTests`, `DockerComposeFixtureTests` — compose-file parser, no Docker). Integration: basic `alpine:3` echo container test + 2-container compose test + `DockerParallelIsolationTests : ParallelIsolationContract<ContainerFixture>` (20 parallel `alpine:3` containers, distinct `IsolationKey`, zero cross-talk on per-test networks). Benchmark: container start cost, compose up/down cost. Verify RED.
-- [ ] T133-GREEN [depends: T133-RED] Write `Options/DockerFixtureOptions.cs` (image-pull cache reuse, per-test networks, healthcheck ready-detection toggles).
-- [ ] T134-GREEN [depends: T133-GREEN] Write `Builder/DockerRigBuilder.cs` + `DockerRigBuilderExtensions.cs` (no family base — ships its own fluent surface).
-- [ ] T135-GREEN [depends: T134-GREEN] Write `Fixtures/DockerComposeFixture.cs` — primary `Testcontainers` native compose; fallback to `Ductus.FluentDocker` only if regressed (activation criteria documented in README).
-- [ ] T136 [depends: T135-GREEN] Run full Integration suite. Coverage ≥ 90/85.
-- [ ] T137 [depends: T136] Add README (document compose-backend activation criteria). Promote Docker. Remove from skip lists. Commit.
+- [x] T132 [P] [depends: T099] Scaffold `tests/Rig.TUnit.Docker.Tests.Unit/` + `tests/Rig.TUnit.Docker.Tests.Integration/` csprojs (ContainerFixture is pre-existing; we're completing the template). Register in slnx. Benchmark placeholder (`DockerBenchmarks.cs`). Verify existing `ContainerFixture.cs` compiles cleanly under Testcontainers 4.11. Commit: `chore(004): T132 — scaffold Docker Tests.Unit/Integration + Benchmarks wiring`.
+- [x] T133-RED [depends: T132] Write unit tests (`DockerFixtureOptionsTests`, `DockerRigBuilderTests`, `UseDockerExtensionsTests`, `DockerComposeFixtureTests` — compose-file parser, no Docker). Integration: basic `alpine:3` echo container test + 2-container compose test + `DockerParallelIsolationTests : ParallelIsolationContract<ContainerFixture>` (20 parallel `alpine:3` containers, distinct `IsolationKey`, zero cross-talk on per-test networks). Benchmark: container start cost, compose up/down cost. Verify RED.
+- [x] T133-GREEN [depends: T133-RED] Write `Options/DockerFixtureOptions.cs` (image-pull cache reuse, per-test networks, healthcheck ready-detection toggles).
+- [x] T134-GREEN [depends: T133-GREEN] Write `Builder/DockerRigBuilder.cs` + `DockerRigBuilderExtensions.cs` (no family base — ships its own fluent surface).
+- [x] T135-GREEN [depends: T134-GREEN] Write `Fixtures/DockerComposeFixture.cs` — primary `Testcontainers` native compose; fallback to `Ductus.FluentDocker` only if regressed (activation criteria documented in README).
+- [x] T136 [depends: T135-GREEN] Run full Integration suite. Coverage ≥ 90/85.
+- [x] T137 [depends: T136] Add README (document compose-backend activation criteria). Promote Docker. Remove from skip lists. Commit.
 
 ### Phase 4 gate
 
-- [ ] T138 [depends: T107, T115, T123, T131, T137] Update `Rig.TUnit.All/Rig.TUnit.All.csproj` — add `<ProjectReference>` for MySql, Oracle, Cosmos, AppInsights, Docker (if not transitive already).
-- [ ] T139 [depends: T138] Run full `dotnet test` including new Integration projects. Confirm zero regression + new tests GREEN.
-- [ ] T140 [depends: T139] Verify coverage gate per new package (MySql, Oracle, Cosmos, AppInsights, Docker): line ≥ 90% / branch ≥ 85% using the same `coverlet.msbuild` commands documented in T097. Record per-package numbers in the PR description.
-- [ ] T141 [P] [depends: T140] Commit Phase 4: `feat(004): Phase 4 — 4 new packages + Docker template complete`.
+- [x] T138 [depends: T107, T115, T123, T131, T137] Update `Rig.TUnit.All/Rig.TUnit.All.csproj` — add `<ProjectReference>` for MySql, Oracle, Cosmos, AppInsights, Docker (if not transitive already).
+- [x] T139 [depends: T138] Run full `dotnet test` including new Integration projects. Confirm zero regression + new tests GREEN.
+- [~] T140 [depends: T139] Verify coverage gate per new package (MySql, Oracle, Cosmos, AppInsights, Docker): line ≥ 90% / branch ≥ 85% using the same `coverlet.msbuild` commands documented in T097. Record per-package numbers in the PR description.
+- [x] T141 [P] [depends: T140] Commit Phase 4: `feat(004): Phase 4 — 4 new packages + Docker template complete`.
 
 ---
 

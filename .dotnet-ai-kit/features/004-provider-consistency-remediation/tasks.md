@@ -642,8 +642,8 @@ Wires Jwt / OAuth / Mtls / Policies to the existing `SecurityRigBuilder<TSelf>` 
   git log master..HEAD --oneline --grep='T[0-9]\+-GREEN'    # list every GREEN commit — each MUST have a matching TNNN-RED before it
   ```
 - [x] T171a [depends: T171] `TestCompletenessTests` (T157a) GREEN — every provider has unit + integration + contract + benchmark test file. No exceptions.
-- [ ] T172 [depends: T171a] Open PR against `master`. Title: `feat(004): Provider Consistency Remediation — uniform provider shape + 4 new packages + architecture-test enforcement (unit + integration + contract + benchmark per provider, 90/85 coverage)`.
-- [ ] T173 [depends: T172] Update `.dotnet-ai-kit/features/004-provider-consistency-remediation/spec.md` — change Status from `Draft` to `Shipped` once PR merges.
+- [x] T172 [depends: T171a] Open PR against `master`. Title: `feat(004): Provider Consistency Remediation — uniform provider shape + 4 new packages + architecture-test enforcement (unit + integration + contract + benchmark per provider, 90/85 coverage)`.
+- [~] T173 [depends: T172] Update `.dotnet-ai-kit/features/004-provider-consistency-remediation/spec.md` — change Status from `Draft` to `Shipped` once PR merges.
 
 ---
 

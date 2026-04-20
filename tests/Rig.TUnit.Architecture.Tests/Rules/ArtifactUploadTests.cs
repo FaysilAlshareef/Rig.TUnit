@@ -26,6 +26,10 @@ public sealed class ArtifactUploadTests
     {
         // Phase 1 T008 meta-job — walks git log, no test output to upload.
         "commit-discipline-gate",
+        // Phase 2 T013 summary job — uploads its own `coverage-report` artefact with a
+        // longer 30-day retention per FR-021. CoverageSummaryJobTests enforces that shape
+        // separately; this rule would otherwise reject the intentional retention-days: 30.
+        "coverage-summary",
     };
 
     [Test]

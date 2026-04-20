@@ -312,6 +312,58 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+  # ─── Coverage summary (T013) ───────────────────────────────────────────────
+  # Fans in every job's cobertura XML, merges into HTML + Markdown via
+  # ReportGenerator, publishes the markdown to $GITHUB_STEP_SUMMARY, and uploads
+  # the rendered report as `coverage-report` (30-day retention).
+  # Threshold enforcement is added in T015 (non-blocking); T069b flips to blocking
+  # at the Phase 3 close once every provider is at ≥ 90/85.
+  coverage-summary:
+    name: Coverage summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - build-unit-arch
+      - integration-sql
+      - integration-nosql
+      - integration-caching
+      - integration-messaging
+      - integration-microservices
+      - integration-security
+      - integration-observability
+      - integration-storage
+      - integration-core
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Download all test-results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: ./artefacts
+          merge-multiple: false
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      - name: Generate merged coverage report
+        run: |
+          reportgenerator \
+            "-reports:./artefacts/**/coverage.cobertura.xml" \
+            "-targetdir:./coverage-report" \
+            "-reporttypes:Html;Cobertura;MarkdownSummaryGithub" \
+            "-title:Rig.TUnit coverage (${{ github.sha }})"
+      - name: Publish markdown summary
+        run: cat ./coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: ./coverage-report/**
+          retention-days: 30
+          if-no-files-found: warn
+
   # ─── Phase 1 minimal commit-discipline gate (T008) ─────────────────────────
   # Checks that every `feat(005): T<nnn> — GREEN …` commit on the PR is preceded
   # by a matching `test(005): T<nnn> — RED …` commit with the same T<nnn> id.

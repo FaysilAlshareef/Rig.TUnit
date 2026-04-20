@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Microservices.Outbox;
 
 namespace Rig.TUnit.Benchmarks;
 
@@ -6,5 +7,6 @@ namespace Rig.TUnit.Benchmarks;
 public class OutboxBenchmarks
 {
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T063 populates this benchmark.");
+    public OutboxMessage Construct_OutboxMessage()
+        => new(Guid.NewGuid(), "agg", "E", "{}", DateTimeOffset.UtcNow);
 }

@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Microservices.Contracts;
 
 namespace Rig.TUnit.Benchmarks;
 
@@ -6,5 +7,6 @@ namespace Rig.TUnit.Benchmarks;
 public class ContractsBenchmarks
 {
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T057 populates this benchmark.");
+    public ContractPact Construct_ContractPact()
+        => new("Consumer", "Provider", Array.Empty<ContractInteraction>());
 }

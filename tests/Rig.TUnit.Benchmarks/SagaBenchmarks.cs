@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Microservices.Saga.Helpers;
 
 namespace Rig.TUnit.Benchmarks;
 
@@ -6,5 +7,6 @@ namespace Rig.TUnit.Benchmarks;
 public class SagaBenchmarks
 {
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T059 populates this benchmark.");
+    public bool SagaTimeoutHelper_HasTimedOut()
+        => SagaTimeoutHelper.HasTimedOut(TimeSpan.FromMilliseconds(250), TimeSpan.FromMilliseconds(500));
 }

@@ -1,10 +1,17 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Microservices.Inbox;
 
 namespace Rig.TUnit.Benchmarks;
 
 [MemoryDiagnoser]
 public class InboxBenchmarks
 {
+    private SequenceTracker _tracker = null!;
+    private long _seq;
+
+    [GlobalSetup]
+    public void Setup() => _tracker = new SequenceTracker();
+
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T061 populates this benchmark.");
+    public bool TryApply_IncreasingSequence() => _tracker.TryApply("agg", Interlocked.Increment(ref _seq));
 }

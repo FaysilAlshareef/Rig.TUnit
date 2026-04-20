@@ -90,7 +90,7 @@ See [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`GrpcHostBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/GrpcHostBenchmarks.cs);
+See [`GrpcBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/GrpcBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

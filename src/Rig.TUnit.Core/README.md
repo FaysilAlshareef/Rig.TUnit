@@ -95,8 +95,8 @@ See [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`RigBuilderBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/RigBuilderBenchmarks.cs)
-and [`IsolationKeyBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/IsolationKeyBenchmarks.cs);
+See [`CoreBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/CoreBenchmarks.cs)
+and [`CoreBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/CoreBenchmarks.cs);
 baseline numbers are tracked in `benchmarks/baseline-005.json`.
 
 ## Related docs

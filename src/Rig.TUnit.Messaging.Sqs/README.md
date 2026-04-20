@@ -91,7 +91,7 @@ See [docs/troubleshooting.md#sqs](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`SqsBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/SqsBenchmarks.cs);
+See [`SqsMessagingBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/SqsMessagingBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

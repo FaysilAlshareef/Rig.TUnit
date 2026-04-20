@@ -95,7 +95,7 @@ See [docs/troubleshooting.md#servicebus](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`ServiceBusBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/ServiceBusBenchmarks.cs);
+See [`ServiceBusMessagingBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/ServiceBusMessagingBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

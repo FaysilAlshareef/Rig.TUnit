@@ -95,7 +95,7 @@ See [docs/troubleshooting.md#cassandra](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`CassandraBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/CassandraBenchmarks.cs);
+See [`CassandraKeyspaceBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/CassandraKeyspaceBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

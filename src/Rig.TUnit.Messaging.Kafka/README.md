@@ -99,7 +99,7 @@ See [docs/troubleshooting.md#kafka](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`KafkaBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/KafkaBenchmarks.cs);
+See [`KafkaMessagingBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/KafkaMessagingBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

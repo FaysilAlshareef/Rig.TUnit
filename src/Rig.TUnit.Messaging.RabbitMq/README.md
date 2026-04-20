@@ -90,7 +90,7 @@ See [docs/troubleshooting.md#rabbitmq](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`RabbitMqBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/RabbitMqBenchmarks.cs);
+See [`RabbitMqMessagingBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/RabbitMqMessagingBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

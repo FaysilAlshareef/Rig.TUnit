@@ -85,7 +85,7 @@ See [docs/troubleshooting.md#policies](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`PoliciesBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/PoliciesBenchmarks.cs);
+See [`PolicyBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/PolicyBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

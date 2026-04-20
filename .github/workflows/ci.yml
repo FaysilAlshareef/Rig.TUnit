@@ -515,9 +515,21 @@ jobs:
           scratch = pathlib.Path('./snippet-scratch')
           quickstart = re.compile(r'^## Quick start\s*$', re.MULTILINE)
           fence = re.compile(r'```csharp\s*\n(.*?)\n```', re.MULTILINE | re.DOTALL)
-          # Lift `using X;` and `using static X;` directives to file top — they
-          # are illegal inside a class body. Keep trailing body as method body.
-          using_re = re.compile(r'^\s*using\s+[^;]+;\s*$', re.MULTILINE)
+          # Directive-form `using X;` / `using static X;` — lift to file top.
+          # The negative lookaheads reject statement forms:
+          #   `using (var x = ...)`        — parenthesised
+          #   `using var x = ...;`         — declaration
+          #   `await using var x = ...;`   — async declaration
+          using_re = re.compile(
+              r'^[ \t]*using\s+(?!static\b)(?!var\b)(?!\()[A-Za-z_][\w.]*(?:\s*=\s*[^;]+)?;[ \t]*$',
+              re.MULTILINE)
+          using_static_re = re.compile(r'^[ \t]*using\s+static\s+[^;]+;[ \t]*$', re.MULTILINE)
+          # Heuristic: snippet is a declaration form when its first non-blank
+          # line (after lifting usings) starts with a type-declaration keyword.
+          # Nested class / record / interface declarations inside a method body
+          # are illegal — emit those at namespace scope instead of wrapping.
+          decl_first_token_re = re.compile(
+              r'^\s*(public|internal|private|protected|sealed|abstract|static|partial|class|record|struct|interface|enum|namespace|readonly|file)\b')
 
           count = 0
           for readme in pathlib.Path('src').rglob('README.md'):
@@ -528,24 +540,33 @@ jobs:
               for m in fence.finditer(after):
                   body = m.group(1)
                   usings = [u.group(0).strip() for u in using_re.finditer(body)]
-                  body_no_usings = using_re.sub('', body)
+                  usings += [u.group(0).strip() for u in using_static_re.finditer(body)]
+                  body_rest = using_static_re.sub('', using_re.sub('', body))
                   digest = hashlib.md5(body.encode()).hexdigest()[:10]
                   name = f'{readme.parent.name}_{digest}'
                   out = scratch / f'{name}.cs'
-                  out.write_text(
+                  is_decl = bool(decl_first_token_re.match(body_rest.lstrip('\n')))
+                  preamble = (
                       '// Extracted from ' + str(readme) + '\n'
                       '// Rig.TUnit snippet-extraction CI job (FR-068).\n'
-                      '// using-directives lifted to file top; remaining body wrapped\n'
-                      '// in a dummy method so arbitrary snippets compile.\n'
                       '#nullable disable\n'
                       '#pragma warning disable\n'
                       + '\n'.join(usings) + ('\n' if usings else '')
-                      + 'internal static class _' + digest + ' {\n'
-                      + '    internal static void Run() {\n'
-                      + body_no_usings.rstrip() + '\n'
-                      + '    }\n'
-                      + '}\n',
-                      encoding='utf-8')
+                      + 'using System.Threading.Tasks;\n'
+                      + 'namespace SnippetScratch._' + digest + ';\n'
+                  )
+                  if is_decl:
+                      payload = body_rest.rstrip() + '\n'
+                  else:
+                      payload = (
+                          'internal static class _' + digest + ' {\n'
+                          + '    internal static async Task Run() {\n'
+                          + body_rest.rstrip() + '\n'
+                          + '        await Task.Yield();\n'
+                          + '    }\n'
+                          + '}\n'
+                      )
+                  out.write_text(preamble + payload, encoding='utf-8')
                   count += 1
           print(f'Extracted {count} snippet(s) into ./snippet-scratch/')
           PYEOF

@@ -102,7 +102,7 @@ See [docs/troubleshooting.md#postgresql](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`PostgresBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/PostgresBenchmarks.cs);
+See [`PostgresUseBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/PostgresUseBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`. Ephemeral-DB create/drop is
 the main tracked hot path.
 

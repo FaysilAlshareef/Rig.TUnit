@@ -88,7 +88,7 @@ See [docs/troubleshooting.md#nats](../../docs/troubleshooting.md).
 
 ## Benchmarks
 
-See [`NatsBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/NatsBenchmarks.cs);
+See [`NatsMessagingBenchmarks.cs`](../../tests/Rig.TUnit.Benchmarks/NatsMessagingBenchmarks.cs);
 baseline in `benchmarks/baseline-005.json`.
 
 ## Related docs

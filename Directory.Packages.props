@@ -139,6 +139,8 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
     <!-- YAML parser for architecture rules that assert on .github/workflows/*.yml structure. MIT-licensed. -->
     <PackageVersion Include="YamlDotNet" Version="16.3.0" />
+    <!-- Markdown parser used by ReadmeCompletenessTests for structural section-heading assertions. BSD-2-Clause, MIT-compatible per 005 C-003. -->
+    <PackageVersion Include="Markdig" Version="0.38.0" />
   </ItemGroup>
 
   <ItemGroup Label="Coverage">

@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Observability.Seq.Options;
 
 namespace Rig.TUnit.Benchmarks;
 
@@ -6,5 +7,5 @@ namespace Rig.TUnit.Benchmarks;
 public class SeqBenchmarks
 {
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T053 populates this benchmark.");
+    public SeqFixtureOptions Construct_DefaultOptions() => new();
 }

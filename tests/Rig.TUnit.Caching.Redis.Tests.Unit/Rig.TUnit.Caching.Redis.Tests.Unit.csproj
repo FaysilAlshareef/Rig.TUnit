@@ -2,6 +2,8 @@
   <ItemGroup>
     <PackageReference Include="TUnit" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />

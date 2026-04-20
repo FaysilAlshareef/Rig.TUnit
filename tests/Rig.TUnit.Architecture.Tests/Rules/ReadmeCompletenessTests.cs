@@ -171,13 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T144 — Caching (5)
-        ("Rig.TUnit.Caching", "T144"),
-        ("Rig.TUnit.Caching.Fusion", "T144"),
-        ("Rig.TUnit.Caching.Hybrid", "T144"),
-        ("Rig.TUnit.Caching.Memory", "T144"),
-        ("Rig.TUnit.Caching.Redis", "T144"),
-
         // T146 — Messaging (6)
         ("Rig.TUnit.Messaging", "T146"),
         ("Rig.TUnit.Messaging.Kafka", "T146"),

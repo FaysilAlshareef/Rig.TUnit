@@ -171,20 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T138 — base / meta packages (12)
-        ("Rig.TUnit", "T138"),
-        ("Rig.TUnit.All", "T138"),
-        ("Rig.TUnit.Ci", "T138"),
-        ("Rig.TUnit.Core", "T138"),
-        ("Rig.TUnit.Grpc", "T138"),
-        ("Rig.TUnit.Mediator", "T138"),
-        ("Rig.TUnit.Microservices", "T138"),
-        ("Rig.TUnit.Microservices.Contracts", "T138"),
-        ("Rig.TUnit.Microservices.Saga", "T138"),
-        ("Rig.TUnit.Parallelism", "T138"),
-        ("Rig.TUnit.Storage", "T138"),
-        ("Rig.TUnit.WebAPI", "T138"),
-
         // T140 — SQL (6)
         ("Rig.TUnit.Databases.Sql", "T140"),
         ("Rig.TUnit.Databases.Sql.MySql", "T140"),
@@ -490,42 +476,45 @@ public sealed class ReadmeCompletenessTests
         var sb = new System.Text.StringBuilder();
         foreach (var block in blocks)
         {
-            foreach (var leaf in block.Descendants<LeafBlock>())
-            {
-                if (leaf.Inline is not null)
-                {
-                    foreach (var inline in leaf.Inline.Descendants())
-                    {
-                        if (inline is LiteralInline lit)
-                        {
-                            sb.Append(lit.Content.ToString());
-                            sb.Append(' ');
-                        }
-                        else if (inline is CodeInline code)
-                        {
-                            sb.Append(code.Content);
-                            sb.Append(' ');
-                        }
-                        else if (inline is LinkInline link)
-                        {
-                            sb.Append(link.Url);
-                            sb.Append(' ');
-                        }
-                    }
-                }
-                else if (leaf is FencedCodeBlock fenced)
-                {
-                    sb.Append(fenced.Lines.ToString());
-                    sb.Append(' ');
-                }
-                else if (leaf is CodeBlock cb)
-                {
-                    sb.Append(cb.Lines.ToString());
-                    sb.Append(' ');
-                }
-            }
+            CollectBlockText(block, sb);
         }
         return sb.ToString();
+    }
+
+    private static void CollectBlockText(Block block, System.Text.StringBuilder sb)
+    {
+        switch (block)
+        {
+            case FencedCodeBlock fenced:
+                sb.Append(fenced.Lines.ToString()).Append(' ');
+                return;
+            case CodeBlock cb:
+                sb.Append(cb.Lines.ToString()).Append(' ');
+                return;
+            case LeafBlock leaf when leaf.Inline is not null:
+                foreach (var inline in leaf.Inline.Descendants())
+                {
+                    if (inline is LiteralInline lit)
+                    {
+                        sb.Append(lit.Content.ToString()).Append(' ');
+                    }
+                    else if (inline is CodeInline code)
+                    {
+                        sb.Append(code.Content).Append(' ');
+                    }
+                    else if (inline is LinkInline link)
+                    {
+                        sb.Append(link.Url ?? string.Empty).Append(' ');
+                    }
+                }
+                return;
+            case ContainerBlock container:
+                foreach (var child in container)
+                {
+                    CollectBlockText(child, sb);
+                }
+                return;
+        }
     }
 
     private static string ExtractHeadingText(HeadingBlock h)

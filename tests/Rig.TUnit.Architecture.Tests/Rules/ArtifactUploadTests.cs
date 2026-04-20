@@ -30,6 +30,20 @@ public sealed class ArtifactUploadTests
         // longer 30-day retention per FR-021. CoverageSummaryJobTests enforces that shape
         // separately; this rule would otherwise reject the intentional retention-days: 30.
         "coverage-summary",
+        // Phase 7 T164 — runs the arch tests; architecture tests don't produce
+        // meaningful TRX/HTML artefacts beyond the existing build-unit-arch upload.
+        "architecture-tests",
+        // Phase 7 T166/T167 — benchmark-regression uploads its own `benchmark-results`
+        // artefact (not test-results).
+        "benchmark-regression",
+        // Phase 7 T170/T171 — red-commit-verification walks git log, no test output.
+        "red-commit-verification",
+        // Phase 6d T160 — markdown-link-check is a third-party action with its own
+        // reporting; no upload needed.
+        "markdown-link-check",
+        // Phase 6d T162 — snippet-extraction runs dotnet build, emits compiler output
+        // to the action log; no artefact.
+        "snippet-extraction",
     };
 
     [Test]

@@ -33,7 +33,7 @@
 - 250 test files, 1264 `[Test]` methods, co-located Unit / Integration / Contract / Benchmark projects per provider.
 - 8 self-enforcing architecture rules live in `tests/Rig.TUnit.Architecture.Tests/Rules/`:
   `ProviderCompletenessTests`, `TestFileOrganizationTests`, `ReadmeCompletenessTests`, `CodeOrganizationTests`, `ForbiddenApiTests`, `DependencyDirectionTests`, `CoverageRuleTests`, `TestCompletenessTests`.
-- CI matrix at [.github/workflows/ci.yml](.github/workflows/ci.yml) segments build/unit/arch, contract, integration, benchmarks.
+- CI matrix at [.github/workflows/ci.yml](../../../.github/workflows/ci.yml) segments build/unit/arch, contract, integration, benchmarks.
 
 ### Check 6 — Security: PASS (1 LOW advisory)
 - **No hardcoded secrets / tokens / API keys** in src (scan patterns: `password=`, `secret=`, `token="…"`, etc.).

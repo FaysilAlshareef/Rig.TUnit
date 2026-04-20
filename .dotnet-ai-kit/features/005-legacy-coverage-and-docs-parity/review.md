@@ -51,15 +51,15 @@ Action: **none** — the code is correct; CodeRabbit's analyzer needs more conte
 - No violations found in sampled files.
 
 ### Check 2 — Architecture Boundary  **PASS**
-- Only 1 `src/` C# change: [PostgresDbContextHelper.cs](src/Rig.TUnit.Databases.Sql.Postgresql/Helpers/PostgresDbContextHelper.cs) — lives under the Postgres provider, no cross-layer leakage.
+- Only 1 `src/` C# change: [PostgresDbContextHelper.cs](../../../src/Rig.TUnit.Databases.Sql.Postgresql/Helpers/PostgresDbContextHelper.cs) — lives under the Postgres provider, no cross-layer leakage.
 - New test projects reference only their own `src/` provider + TUnit. No inverted dependencies.
-- `Rig.TUnit.Architecture.Tests` stays the sole owner of structural rules (FR-004 enforcement via [NoSkipMarkersTests.cs](tests/Rig.TUnit.Architecture.Tests/Rules/NoSkipMarkersTests.cs)).
+- `Rig.TUnit.Architecture.Tests` stays the sole owner of structural rules (FR-004 enforcement via [NoSkipMarkersTests.cs](../../../tests/Rig.TUnit.Architecture.Tests/Rules/NoSkipMarkersTests.cs)).
 
 ### Check 3 — Localization  **N/A**
 Project does not use resource files. Not added by this branch.
 
 ### Check 4 — Error Handling  **PASS with 1 MEDIUM**
-- [PostgresDbContextHelper.cs](src/Rig.TUnit.Databases.Sql.Postgresql/Helpers/PostgresDbContextHelper.cs):
+- [PostgresDbContextHelper.cs](../../../src/Rig.TUnit.Databases.Sql.Postgresql/Helpers/PostgresDbContextHelper.cs):
   - `async`/`await` end-to-end, `ConfigureAwait(false)` in library code ✅
   - `CancellationToken` propagated through `CreateEphemeralDatabaseAsync` ✅
   - `ArgumentException.ThrowIfNullOrWhiteSpace` guard ✅
@@ -68,8 +68,8 @@ Project does not use resource files. Not added by this branch.
 
 ### Check 5 — Testing  **PASS**
 - Feature 005's thesis is testing parity — 85 new test files, one per provider-category, matching `Unit/Integration/Contract/Benchmark` quadrants (FR-030).
-- TDD discipline enforced by `commit-discipline-gate` CI job (see [tasks.md](.dotnet-ai-kit/features/005-legacy-coverage-and-docs-parity/tasks.md) Phase 7).
-- `[InheritsTests]` pattern (e.g., [ConcurrencyRigContract_BaselineTests.cs](tests/Rig.TUnit.Concurrency.Tests.Contract/ConcurrencyRigContract_BaselineTests.cs)) is correct TUnit idiom.
+- TDD discipline enforced by `commit-discipline-gate` CI job (see [tasks.md](tasks.md) Phase 7).
+- `[InheritsTests]` pattern (e.g., [ConcurrencyRigContract_BaselineTests.cs](../../../tests/Rig.TUnit.Concurrency.Tests.Contract/ConcurrencyRigContract_BaselineTests.cs)) is correct TUnit idiom.
 - `PostgresDbContextHelper.CreateEphemeralDatabaseAsync` has no direct unit test — acceptable since it's an IO shim tested by every Postgres integration test that consumes it.
 
 ### Check 6 — Security  **PASS**

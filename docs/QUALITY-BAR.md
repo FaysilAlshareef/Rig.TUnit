@@ -79,7 +79,7 @@ provider README is scored on a 3-level scale.
 - **Missing**: no cross-links
 
 ### §14 — License
-- **Pass**: "MIT. See [LICENSE](…)."
+- **Pass**: "MIT. See [LICENSE](../LICENSE)."
 - **Needs work**: license named but no link
 - **Missing**: no license declaration
 

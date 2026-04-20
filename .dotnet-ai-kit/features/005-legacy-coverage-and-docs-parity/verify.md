@@ -101,7 +101,7 @@ No `.resx` files in the solution; project does not use `IStringLocalizer`.
 
 ## Check 4 — Proto: **SKIP**
 
-One `.proto` discovered — [tests/Rig.TUnit.Grpc.Tests.Unit/Protos/test.proto](tests/Rig.TUnit.Grpc.Tests.Unit/Protos/test.proto). It's test-scaffolding only, not a shared contract. Nothing to cross-reference.
+One `.proto` discovered — [tests/Rig.TUnit.Grpc.Tests.Unit/Protos/test.proto](../../../tests/Rig.TUnit.Grpc.Tests.Unit/Protos/test.proto). It's test-scaffolding only, not a shared contract. Nothing to cross-reference.
 
 ## Check 5 — K8s: **SKIP**
 

@@ -75,6 +75,8 @@
     <Project Path="tests/Rig.TUnit.Grpc.Tests.Integration/Rig.TUnit.Grpc.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Grpc.Tests.Contract/Rig.TUnit.Grpc.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.WebAPI.Tests.Unit/Rig.TUnit.WebAPI.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.WebAPI.Tests.Integration/Rig.TUnit.WebAPI.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.WebAPI.Tests.Contract/Rig.TUnit.WebAPI.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj" />
     <Project Path="tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Tests.Unit/Rig.TUnit.Databases.Tests.Unit.csproj" />

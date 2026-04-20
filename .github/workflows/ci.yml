@@ -73,7 +73,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -106,7 +106,7 @@ jobs:
           dotnet build tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
-        run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -134,7 +134,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -162,7 +162,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -190,7 +190,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -218,7 +218,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -246,7 +246,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -274,7 +274,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -302,7 +302,7 @@ jobs:
           dotnet restore Rig.TUnit.slnx
           dotnet build tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
-        run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release
+        run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()

@@ -171,12 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T148 — Microservices (4 remaining; Contracts + Saga are in T138)
-        ("Rig.TUnit.Microservices.EventSourcing", "T148"),
-        ("Rig.TUnit.Microservices.Inbox", "T148"),
-        ("Rig.TUnit.Microservices.Outbox", "T148"),
-        ("Rig.TUnit.Microservices.Snapshots", "T148"),
-
         // T150 — Security (5)
         ("Rig.TUnit.Security", "T150"),
         ("Rig.TUnit.Security.Jwt", "T150"),

@@ -171,12 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T154 — Storage leaves (4; Storage base is in T138)
-        ("Rig.TUnit.Storage.AzureBlob", "T154"),
-        ("Rig.TUnit.Storage.FileSystem", "T154"),
-        ("Rig.TUnit.Storage.MinIO", "T154"),
-        ("Rig.TUnit.Storage.S3", "T154"),
-
         // T156 — Cross-cutting (5)
         ("Rig.TUnit.Concurrency", "T156"),
         ("Rig.TUnit.Docker", "T156"),

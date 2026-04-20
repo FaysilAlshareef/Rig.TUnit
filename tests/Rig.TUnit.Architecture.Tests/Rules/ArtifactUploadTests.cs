@@ -22,7 +22,11 @@ public sealed class ArtifactUploadTests
     /// exempt from the upload requirement. Keep the list empty when the workflow is well-formed;
     /// any future bookkeeping / meta-only job gets added here with a rationale comment.
     /// </summary>
-    private static readonly HashSet<string> ExemptJobs = new(StringComparer.Ordinal);
+    private static readonly HashSet<string> ExemptJobs = new(StringComparer.Ordinal)
+    {
+        // Phase 1 T008 meta-job — walks git log, no test output to upload.
+        "commit-discipline-gate",
+    };
 
     [Test]
     public async Task EveryCiJob_UploadsTestArtifacts()

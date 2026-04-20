@@ -45,10 +45,10 @@ The bases themselves are healthy — `MessageAssert`, `BlobAssert`, `CacheAssert
 
 Test files currently mix test methods with inline test infrastructure: `SharedFixture` class declarations at the top, custom DbContext/entity classes inside `*Tests.cs`, handler stubs defined next to `[Test]` methods. Examples:
 
-- [Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs:185](tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs) — test methods next to `OutboxMessage` builders and envelope types.
-- [Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs:355](tests/Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs) — `ActivitySource`, `TracerProvider` setup inline before each test.
-- [Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs:251](tests/Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs) — Polly policy builders inlined.
-- [Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs:231](tests/Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs) — custom matchers and response builders mixed with assertions.
+- [Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs:185](../../tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs) — test methods next to `OutboxMessage` builders and envelope types.
+- [Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs:355](../../tests/Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs) — `ActivitySource`, `TracerProvider` setup inline before each test.
+- [Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs:251](../../tests/Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs) — Polly policy builders inlined.
+- [Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs:231](../../tests/Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs) — custom matchers and response builders mixed with assertions.
 
 **Rule for this feature:** Test files contain **tests only** — setup objects, fake handlers, test entities, and shared fixtures move into a per-project `TestInfrastructure/` (or `Fixtures/`, `Fakers/`, `Helpers/`) subfolder. This matches what `Rig.TUnit.Core.Tests.Unit/`, `Rig.TUnit.Grpc.Tests.Unit/`, `Rig.TUnit.WebAPI.Tests.Unit/`, and `Rig.TUnit.Mediator.Tests.Unit/` already do correctly. **We do NOT split test files by method-under-test** — a 355-line `TraceAssertTests.cs` staying as one class is fine, as long as all the tracer-provider scaffolding is extracted.
 
@@ -204,11 +204,11 @@ The 003 design promises `SecurityRigBuilder<TSelf>` base (§3.3) — doesn't exi
 
 **Targets (by project, worst offenders first):**
 
-1. [Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs](tests/Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs) — extract `ActivitySource` + `TracerProvider` factory into `TestInfrastructure/TracingTestHarness.cs`.
-2. [Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs](tests/Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs) — extract custom matchers into `TestInfrastructure/`.
-3. [Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs](tests/Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs) — extract Polly pipeline builders.
-4. [Rig.TUnit.Security.OAuth.Tests.Integration/MockOAuthServerTests.cs](tests/Rig.TUnit.Security.OAuth.Tests.Integration/MockOAuthServerTests.cs) — extract JWKS/key-generation helpers.
-5. [Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs](tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs) — extract `OutboxMessage` seed builders, envelope fakers.
+1. [Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs](../../tests/Rig.TUnit.Observability.Tracing.Tests.Integration/TraceAssertTests.cs) — extract `ActivitySource` + `TracerProvider` factory into `TestInfrastructure/TracingTestHarness.cs`.
+2. [Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs](../../tests/Rig.TUnit.Http.Tests.Unit/HttpMockTests.cs) — extract custom matchers into `TestInfrastructure/`.
+3. [Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs](../../tests/Rig.TUnit.Resilience.Tests.Integration/ResilienceTests.cs) — extract Polly pipeline builders.
+4. [Rig.TUnit.Security.OAuth.Tests.Integration/MockOAuthServerTests.cs](../../tests/Rig.TUnit.Security.OAuth.Tests.Integration/MockOAuthServerTests.cs) — extract JWKS/key-generation helpers.
+5. [Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs](../../tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/OutboxTests.cs) — extract `OutboxMessage` seed builders, envelope fakers.
 6. All `*Contract.cs` files — they're already well-structured but verify no inline fixture registration.
 7. Every `*QuirkTests.cs` — scan for inline test entities; move to `TestInfrastructure/`.
 

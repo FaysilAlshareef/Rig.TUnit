@@ -5,6 +5,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <!-- Roslyn CSharp parser used by TestFileOrganizationTests to count top-level type declarations. -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <!-- YAML parser used by ArtifactUploadTests / CoverageCollectionTests to assert .github/workflows/ci.yml structure. -->
+    <PackageReference Include="YamlDotNet" />
+    <PackageReference Include="Markdig" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Core\Rig.TUnit.Core.csproj" />

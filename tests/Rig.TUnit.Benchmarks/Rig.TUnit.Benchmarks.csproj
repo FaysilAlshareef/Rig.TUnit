@@ -58,5 +58,26 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Microservices.Contracts\Rig.TUnit.Microservices.Contracts.csproj" />
 
     <PackageReference Include="Microsoft.ApplicationInsights" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
+    <PackageReference Include="Mediator.Abstractions" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Ci\Rig.TUnit.Ci.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Concurrency\Rig.TUnit.Concurrency.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.HealthChecks\Rig.TUnit.HealthChecks.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Parallelism\Rig.TUnit.Parallelism.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Resilience\Rig.TUnit.Resilience.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Memory\Rig.TUnit.Caching.Memory.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Sqlite\Rig.TUnit.Databases.Sql.Sqlite.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.SqlServer\Rig.TUnit.Databases.Sql.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Redis\Rig.TUnit.Databases.NoSql.Redis.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Tracing\Rig.TUnit.Observability.Tracing.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Microservices.Inbox\Rig.TUnit.Microservices.Inbox.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Microservices.Outbox\Rig.TUnit.Microservices.Outbox.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Microservices.Snapshots\Rig.TUnit.Microservices.Snapshots.csproj" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="Grpc.Net.Client" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Grpc\Rig.TUnit.Grpc.csproj" />
+  </ItemGroup>
+</Project>

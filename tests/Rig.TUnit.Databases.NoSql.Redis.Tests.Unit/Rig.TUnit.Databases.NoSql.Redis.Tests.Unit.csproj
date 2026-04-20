@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Redis\Rig.TUnit.Databases.NoSql.Redis.csproj" />
+  </ItemGroup>
+</Project>

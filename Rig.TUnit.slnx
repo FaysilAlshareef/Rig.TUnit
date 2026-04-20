@@ -116,6 +116,7 @@
     <Project Path="tests/Rig.TUnit.Caching.Redis.Tests.Integration/Rig.TUnit.Caching.Redis.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Redis.Tests.Unit/Rig.TUnit.Caching.Redis.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Unit/Rig.TUnit.Databases.NoSql.Redis.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Rig.TUnit.Messaging.ServiceBus.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Unit/Rig.TUnit.Databases.Sql.SqlServer.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration.csproj" />

@@ -171,12 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T156 — Cross-cutting (5)
-        ("Rig.TUnit.Concurrency", "T156"),
-        ("Rig.TUnit.Docker", "T156"),
-        ("Rig.TUnit.HealthChecks", "T156"),
-        ("Rig.TUnit.Http", "T156"),
-        ("Rig.TUnit.Resilience", "T156"),
     ];
 
     [Test]

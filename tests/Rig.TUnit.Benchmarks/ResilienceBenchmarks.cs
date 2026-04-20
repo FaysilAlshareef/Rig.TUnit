@@ -1,10 +1,16 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Resilience;
 
 namespace Rig.TUnit.Benchmarks;
 
 [MemoryDiagnoser]
 public class ResilienceBenchmarks
 {
+    private ResilienceClock _clock = null!;
+
+    [GlobalSetup]
+    public void Setup() => _clock = new ResilienceClock(DateTimeOffset.UtcNow);
+
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T039 populates this benchmark.");
+    public void ResilienceClock_Advance() => _clock.Advance(TimeSpan.FromMilliseconds(1));
 }

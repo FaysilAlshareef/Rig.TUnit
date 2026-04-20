@@ -100,6 +100,7 @@
     <Project Path="tests/Rig.TUnit.Http.Tests.Integration/Rig.TUnit.Http.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Http.Tests.Contract/Rig.TUnit.Http.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Resilience.Tests.Integration/Rig.TUnit.Resilience.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Resilience.Tests.Unit/Rig.TUnit.Resilience.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Memory.Tests.Integration/Rig.TUnit.Caching.Memory.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Concurrency.Tests.Integration/Rig.TUnit.Concurrency.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Concurrency.Tests.Unit/Rig.TUnit.Concurrency.Tests.Unit.csproj" />

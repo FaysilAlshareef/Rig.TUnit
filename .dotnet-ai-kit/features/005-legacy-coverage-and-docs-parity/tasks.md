@@ -422,12 +422,12 @@ GREEN: finish harness population; original *Tests.cs now tests-only
 
 ### Phase 6a — Foundation (blocks 6b onwards)
 
-- [ ] **T120** RED — governance-files-present architecture test
+- [x] **T120** RED — governance-files-present architecture test
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/GovernanceFilesTests.cs`
       Content: assert `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `README.md` present at repo root.
       Expected: **RED** — only `README.md` exists.
 
-- [ ] **T121** GREEN — add governance files + rewrite root README `[depends: T120]`
+- [x] **T121** GREEN — add governance files + rewrite root README `[depends: T120]`
       Files:
         `LICENSE` (standard MIT text, attributed to `Faysil Alshareef`, year `2026`) — per C-002
         `CONTRIBUTING.md` (full; replaces T017 stub — TDD rules / coverage command / skip-forbidden / links)
@@ -436,19 +436,19 @@ GREEN: finish harness population; original *Tests.cs now tests-only
         `README.md` (rewritten against adapted 14-section template — feature matrix replaces "API surface"; ecosystem map replaces "Provider quirks")
       Expected: **GREEN**. Satisfies FR-060, SC-008.
 
-- [ ] **T122** RED — canonical-template-present architecture test
+- [x] **T122** RED — canonical-template-present architecture test
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/CanonicalTemplateTests.cs`
       Content: assert `docs/templates/PROVIDER_README_TEMPLATE.md` and `docs/QUALITY-BAR.md` present; assert template contains the 14 section headings from [Documentation-Audit.md §3.1](../../../planning/post-004-remediation/Documentation-Audit.md).
       Expected: **RED**.
 
-- [ ] **T123** GREEN — author canonical template + QUALITY-BAR `[depends: T122]`
+- [x] **T123** GREEN — author canonical template + QUALITY-BAR `[depends: T122]`
       Files:
         `docs/templates/PROVIDER_README_TEMPLATE.md` (14 sections, placeholders per Documentation-Audit §3.1)
         `docs/QUALITY-BAR.md` (reviewer rubric Pass / Needs-work / Missing with examples per Documentation-Audit §3)
         `src/Rig.TUnit/Contributing-ProviderTemplate.md` (§8 updated to reference the new template, per Documentation-Audit §4)
       Expected: **GREEN**. Satisfies FR-061, FR-062, SC-010.
 
-- [ ] **T123b** `chore` — add `Markdig` dependency pin `[depends: T123]`
+- [x] **T123b** `chore` — add `Markdig` dependency pin `[depends: T123]`
       Addresses analysis finding #9 (don't bundle dependency with production rewrite).
       Files:
         `Directory.Packages.props` (new `<PackageVersion Include="Markdig" Version="0.38.*" />` with comment `<!-- BSD-2-Clause, MIT-compatible per 005 C-003 -->`)
@@ -474,10 +474,10 @@ GREEN: finish harness population; original *Tests.cs now tests-only
 
 ### Phase 6b — Supporting docs `[depends: T121, T123]`
 
-- [ ] **T124** RED + T125 GREEN — architecture Mermaid diagram
+- [x] **T124** RED + T125 GREEN — architecture Mermaid diagram
       File: `docs/architecture-diagram.md` — Mermaid family-graph + 60-provider matrix; embedded from root `README.md`; linked from every leaf README's Section 13.
 
-- [ ] **T126** RED + T127 GREEN `[P]` — 8 ADRs under `docs/adr/`
+- [x] **T126** RED + T127 GREEN `[P]` — 8 ADRs under `docs/adr/`
       Files:
         `docs/adr/ADR-001-testcontainers-over-compose.md`
         `docs/adr/ADR-002-crtp-rigbuilder.md`
@@ -489,19 +489,19 @@ GREEN: finish harness population; original *Tests.cs now tests-only
         `docs/adr/ADR-008-kurrentdb-rename.md`
       FR-063, SC-010.
 
-- [ ] **T128** RED + T129 GREEN `[P]` — `docs/glossary.md`
+- [x] **T128** RED + T129 GREEN `[P]` — `docs/glossary.md`
       Scope: every term used in any README MUST resolve here — Fixture, Rig, Contract, Stampede, Backplane, IsolationKey, Sender, Listener, RigConnect, ParallelIsolationContract, QuirkTests, EventSender, OutboxRelaySimulator, etc. FR-064.
 
-- [ ] **T130** RED + T131 GREEN `[P]` — `docs/troubleshooting.md`
+- [x] **T130** RED + T131 GREEN `[P]` — `docs/troubleshooting.md`
       Consolidated; leaf READMEs link to provider-specific subsections. FR-064.
 
-- [ ] **T132** RED + T133 GREEN `[P]` — `docs/performance-tuning.md`
+- [x] **T132** RED + T133 GREEN `[P]` — `docs/performance-tuning.md`
       When to use which cache / storage / db provider for which test scenario. FR-064.
 
-- [ ] **T134** RED + T135 GREEN `[P]` — `docs/migration-001-to-004.md`
+- [x] **T134** RED + T135 GREEN `[P]` — `docs/migration-001-to-004.md`
       Version-upgrade path 001 → 002 → 003 → 004 (notably KurrentDb rename). FR-064.
 
-- [ ] **T136** GREEN-only `[P]` — `docs/third-party-notices.md`
+- [x] **T136** GREEN-only `[P]` — `docs/third-party-notices.md`
       Enumerate every NuGet dependency's licence per R14 research. Dual-use for downstream due-diligence. Recommended even though MIT doesn't require NOTICE.
 
 ### Phase 6c — Per-project README rewrites (per-family batches) `[depends: T123d]`

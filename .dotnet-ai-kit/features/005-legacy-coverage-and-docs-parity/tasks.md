@@ -385,33 +385,33 @@ GREEN: finish harness population; original *Tests.cs now tests-only
        remove project from TestFileOrganizationTests SkipUntilFixed list
 ```
 
-- [ ] **T105** RED + T106 GREEN — `Rig.TUnit.Observability.Tracing.Tests.Integration`
+- [x] **T105** RED + T106 GREEN — `Rig.TUnit.Observability.Tracing.Tests.Integration`
       File: `tests/Rig.TUnit.Observability.Tracing.Tests.Integration/TestInfrastructure/TracingTestHarness.cs`
       Extract: `ActivitySource` + `TracerProvider` factories from `TraceAssertTests.cs`. File stays one class. FR-051, FR-052.
 
-- [ ] **T107** RED + T108 GREEN `[P]` — `Rig.TUnit.Http.Tests.Unit`
+- [x] **T107** RED + T108 GREEN `[P]` — `Rig.TUnit.Http.Tests.Unit`
       File: `tests/Rig.TUnit.Http.Tests.Unit/TestInfrastructure/HttpMockTestHarness.cs`. Extract custom matchers + response-builder helpers.
 
-- [ ] **T109** RED + T110 GREEN `[P]` — `Rig.TUnit.Resilience.Tests.Integration`
+- [x] **T109** RED + T110 GREEN `[P]` — `Rig.TUnit.Resilience.Tests.Integration`
       File: `tests/Rig.TUnit.Resilience.Tests.Integration/TestInfrastructure/ResiliencePipelines.cs`. Extract Polly pipeline builders.
 
-- [ ] **T111** RED + T112 GREEN `[P]` — `Rig.TUnit.Security.OAuth.Tests.Integration`
+- [x] **T111** RED + T112 GREEN `[P]` — `Rig.TUnit.Security.OAuth.Tests.Integration`
       File: `tests/Rig.TUnit.Security.OAuth.Tests.Integration/TestInfrastructure/OAuthTestHarness.cs`. Extract JWKS + RSA key factories.
 
-- [ ] **T113** RED + T114 GREEN `[P]` — `Rig.TUnit.Microservices.Outbox.Tests.Integration`
+- [x] **T113** RED + T114 GREEN `[P]` — `Rig.TUnit.Microservices.Outbox.Tests.Integration`
       File: `tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/TestInfrastructure/OutboxTestData.cs`. Extract `OutboxMessage` seed builders, envelope fakers, custom store stubs.
 
-- [ ] **T115** RED + T116 GREEN `[P]` — `*QuirkTests.cs` sweep (all projects)
+- [x] **T115** RED + T116 GREEN `[P]` — `*QuirkTests.cs` sweep (all projects)
       Scope: every `*QuirkTests.cs` with inline test entities / fake handlers / shared fixtures → extract to per-project `TestInfrastructure/`. Bundle ≤ 4 files per PR.
       FR-051.
 
-- [ ] **T117** RED + T118 GREEN `[P]` — `*Contract.cs` helpers sweep
+- [x] **T117** RED + T118 GREEN `[P]` — `*Contract.cs` helpers sweep
       Scope: abstract contract base classes with inline helper types → extract to `TestInfrastructure/ContractHelpers/` under their owning contract-test project. Preserves 004 C-003 resolution.
       FR-050, FR-051.
 
 **Phase 5 exit gate (SC-004):**
 
-- [ ] **T119** Verification (GREEN only)
+- [x] **T119** Verification (GREEN only)
       Asserts: `grep -rn "SkipUntilFixed" tests/Rig.TUnit.Architecture.Tests/Rules/TestFileOrganizationTests.cs` returns 0 matches in skip list body; rule enforces uniformly.
 
 ---

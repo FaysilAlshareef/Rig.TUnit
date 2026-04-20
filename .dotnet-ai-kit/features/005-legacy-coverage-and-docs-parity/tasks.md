@@ -224,31 +224,31 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3d — P1 Observability leaves `[depends: T041-T049]`
 
-- [ ] **T050** RED + T051 GREEN `[P]` — `Rig.TUnit.Observability.Logging` missing Unit + Benchmark
+- [x] **T050** RED + T051 GREEN `[P]` — `Rig.TUnit.Observability.Logging` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Observability.Logging.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/LoggingBenchmarks.cs`. FR-034.
 
-- [ ] **T052** RED + T053 GREEN `[P]` — `Rig.TUnit.Observability.Seq` missing Unit + Benchmark
+- [x] **T052** RED + T053 GREEN `[P]` — `Rig.TUnit.Observability.Seq` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Observability.Seq.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/SeqBenchmarks.cs`. FR-034.
 
-- [ ] **T054** RED + T055 GREEN `[P]` — `Rig.TUnit.Observability.Tracing` missing Unit + Benchmark
+- [x] **T054** RED + T055 GREEN `[P]` — `Rig.TUnit.Observability.Tracing` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Observability.Tracing.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/TracingBenchmarks.cs`.
       Constraint: existing 355-line `TraceAssertTests.cs` stays one class; only setup extracted (Phase 5 territory, cross-referenced here). FR-034, FR-052.
 
 ### Phase 3e — P1 Microservices `[depends: T051-T055]`
 
-- [ ] **T056** RED + T057 GREEN `[P]` — `Rig.TUnit.Microservices.Contracts` missing Benchmark
+- [x] **T056** RED + T057 GREEN `[P]` — `Rig.TUnit.Microservices.Contracts` missing Benchmark
       File: `tests/Rig.TUnit.Benchmarks/ContractsBenchmarks.cs`. FR-035.
 
-- [ ] **T058** RED + T059 GREEN `[P]` — `Rig.TUnit.Microservices.Saga` missing Benchmark
+- [x] **T058** RED + T059 GREEN `[P]` — `Rig.TUnit.Microservices.Saga` missing Benchmark
       File: `tests/Rig.TUnit.Benchmarks/SagaBenchmarks.cs`. FR-035.
 
-- [ ] **T060** RED + T061 GREEN `[P]` — `Rig.TUnit.Microservices.Inbox` missing Unit + Benchmark
+- [x] **T060** RED + T061 GREEN `[P]` — `Rig.TUnit.Microservices.Inbox` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Microservices.Inbox.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/InboxBenchmarks.cs`. FR-035.
 
-- [ ] **T062** RED + T063 GREEN `[P]` — `Rig.TUnit.Microservices.Outbox` missing Unit + Benchmark
+- [x] **T062** RED + T063 GREEN `[P]` — `Rig.TUnit.Microservices.Outbox` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Microservices.Outbox.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/OutboxBenchmarks.cs`. FR-035.
 
-- [ ] **T064** RED + T065 GREEN `[P]` — `Rig.TUnit.Microservices.Snapshots` missing Unit + Benchmark
+- [x] **T064** RED + T065 GREEN `[P]` — `Rig.TUnit.Microservices.Snapshots` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Microservices.Snapshots.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/SnapshotsBenchmarks.cs`. FR-035.
 
 ### Phase 3 — Shared-fixture conversion sub-thread

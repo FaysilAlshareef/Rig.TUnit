@@ -40,44 +40,45 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 **Goal:** master CI goes green within one day; shared-fixture anti-pattern is machine-visible.
 
-- [ ] **T001** RED — add `OrphanFolderTests`
+- [x] **T001** RED — add `OrphanFolderTests`
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/OrphanFolderTests.cs`
       Content: 3 `[Test]` asserting `src/Rig.TUnit.ServiceBus/`, `tests/Rig.TUnit.ServiceBus.Tests.Integration/`, `tests/Rig.TUnit.SqlServer.Tests.Integration/` absent.
       Expected: **RED** — folders currently exist; test fails.
 
-- [ ] **T002** GREEN — delete the 3 orphan folders `[depends: T001]`
+- [x] **T002** GREEN — delete the 3 orphan folders `[depends: T001]`
       Run: `git rm -r src/Rig.TUnit.ServiceBus tests/Rig.TUnit.ServiceBus.Tests.Integration tests/Rig.TUnit.SqlServer.Tests.Integration`
       Files removed: 3 directories.
       Expected: **GREEN** — `OrphanFolderTests` passes. Satisfies FR-012, SC-014.
 
-- [ ] **T003** RED — deterministic Postgres isolation assertion
+- [x] **T003** RED — deterministic Postgres isolation assertion
       File: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/UsePostgresFluentTests.cs`
       Change: each test creates `Samples_{Guid}` table; assert only ITS table exists at `SaveChangesAsync`.
       Expected: **RED** — current `SharedPostgresFixture` hands one physical DB; parallel siblings drop/create schema; schema-visibility assertion fails deterministically.
 
-- [ ] **T004** GREEN — per-test ephemeral database `[depends: T003]`
+- [x] **T004** GREEN — per-test ephemeral database `[depends: T003]`
       Files:
         `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Integration/UsePostgresFluentTests.cs` (switch to `PostgresDbContextHelper.CreateEphemeralDatabaseAsync`)
         `src/Rig.TUnit.Databases.Sql.Postgresql/Helpers/PostgresDbContextHelper.cs` (add `CreateEphemeralDatabaseAsync` if not already shipped per 004 FR-005)
       Expected: **GREEN** — test passes deterministically on 10 local loops. Satisfies FR-010, SC-001.
 
-- [ ] **A005** Audit (no-code task, single commit) — shared-fixture inventory
+- [x] **A005** Audit (no-code task, single commit) — shared-fixture inventory
       File: `planning/post-005-phase-1/SharedFixture-Audit.md`
       Content: table of all `Shared*Fixture.cs` (22 files); per-file classification — (a) safe-because-IsolationKey, (b) unsafe-needs-Phase-3-conversion, (c) needs-`[NotInParallel]`-stopgap with Phase-3 conversion ticket.
       Commit subject: `docs(005): A005 — Phase 1 shared-fixture audit inventory (FR-011)`
       ID uses `A` (audit namespace) per analysis #7 resolution — signals audit-only / no `src/` / exempt from RED-GREEN pairing per FR-001 scope. Planning docs + audit documents use `A` prefix; `T` remains reserved for code tasks.
 
-- [ ] **T006** RED — artefact-upload YAML assertion
+- [x] **T006** RED — artefact-upload YAML assertion
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ArtifactUploadTests.cs`
       Content: parse `.github/workflows/ci.yml` via `YamlDotNet` (add pin in same commit); assert every `jobs.*` block contains a step using `actions/upload-artifact@v4` with `if: always()` and `retention-days: 14`.
       Expected: **RED** — current YAML has no upload steps.
 
-- [ ] **T007** GREEN — add HTML + TRX artefact upload to every job `[depends: T006]`
+- [x] **T007** GREEN — add HTML + TRX artefact upload to every job `[depends: T006]`
       File: `.github/workflows/ci.yml`
       Change: after every `dotnet test` step, add `- name: Upload test artifacts / uses: actions/upload-artifact@v4 / if: always() / with: name: test-results-${{ github.job }}-${{ matrix.* }} / path: tests/**/bin/Release/net10.0/TestResults/** / retention-days: 14 / if-no-files-found: warn`.
       Expected: **GREEN** — `ArtifactUploadTests` passes. Satisfies FR-013, SC-018.
 
-- [ ] **T008** PR + 10-green verification `[depends: T002, T004, T007]`
+- [x] **T008** PR + 10-green verification `[depends: T002, T004, T007]`  <!-- Impl commits landed; user handles push/merge + 10-green loop on feat/005-a branch per session handoff. -->
+
       Action: open PR `fix/005-phase-1-ci-stabilisation → master`. After merge, trigger CI 10× via `gh workflow run ci.yml`. All 10 MUST be green.
       Commit subject (merge commit only): `Merge pull request #N from FaysilAlshareef/fix/005-phase-1-ci-stabilisation`
       This phase also introduces a MINIMAL `commit-discipline-gate` step (check RED→GREEN subject pairing only; per-commit RED verification lands in T153). The full hardening lives in Phase 7. File: `.github/workflows/ci.yml` (new job `commit-discipline-gate`).

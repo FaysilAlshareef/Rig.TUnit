@@ -299,57 +299,57 @@ GREEN: create Options/, Builder/, Builder/{Provider}RigBuilderExtensions.cs, hel
 
 ### Phase 4a — Messaging family `[depends: T069]`
 
-- [ ] **T070** RED + T071 GREEN — `Rig.TUnit.Messaging.Kafka` Options + Builder + Listener + EventSender
+- [x] **T070** RED + T071 GREEN — `Rig.TUnit.Messaging.Kafka` Options + Builder + Listener + EventSender
       Files: `src/Rig.TUnit.Messaging.Kafka/Options/KafkaFixtureOptions.cs`, `Builder/KafkaRigBuilder.cs`, `Builder/KafkaRigBuilderExtensions.cs`, `Helpers/KafkaListener.cs`, `Helpers/KafkaEventSender.cs`. FR-040, FR-041, FR-042.
 
-- [ ] **T072** RED + T073 GREEN `[P]` — `Rig.TUnit.Messaging.Nats` same set
+- [x] **T072** RED + T073 GREEN `[P]` — `Rig.TUnit.Messaging.Nats` same set
       Files: `src/Rig.TUnit.Messaging.Nats/Options/NatsFixtureOptions.cs`, `Builder/…`, `Helpers/NatsListener.cs`, `Helpers/NatsEventSender.cs`.
 
-- [ ] **T074** RED + T075 GREEN `[P]` — `Rig.TUnit.Messaging.RabbitMq` same set
+- [x] **T074** RED + T075 GREEN `[P]` — `Rig.TUnit.Messaging.RabbitMq` same set
       Files: `src/Rig.TUnit.Messaging.RabbitMq/…`.
 
-- [ ] **T076** RED + T077 GREEN `[P]` — `Rig.TUnit.Messaging.Sqs` same set
+- [x] **T076** RED + T077 GREEN `[P]` — `Rig.TUnit.Messaging.Sqs` same set
       Files: `src/Rig.TUnit.Messaging.Sqs/…`.
 
 ### Phase 4b — Storage family `[depends: T071-T077]`
 
-- [ ] **T078** RED + T079 GREEN — `Rig.TUnit.Storage.AzureBlob` Options + Builder + SasBuilder
+- [x] **T078** RED + T079 GREEN — `Rig.TUnit.Storage.AzureBlob` Options + Builder + SasBuilder
       Files: `src/Rig.TUnit.Storage.AzureBlob/Options/AzureBlobFixtureOptions.cs`, `Builder/…`, `Helpers/AzureBlobSasBuilder.cs`. FR-042.
 
-- [ ] **T080** RED + T081 GREEN `[P]` — `Rig.TUnit.Storage.S3` same set (SasBuilder)
-- [ ] **T082** RED + T083 GREEN `[P]` — `Rig.TUnit.Storage.MinIO` same set (SasBuilder, add missing FixtureOptions)
-- [ ] **T084** RED + T085 GREEN `[P]` — `Rig.TUnit.Storage.FileSystem` Options + Builder + PathSandboxHelper
+- [x] **T080** RED + T081 GREEN `[P]` — `Rig.TUnit.Storage.S3` same set (SasBuilder)
+- [x] **T082** RED + T083 GREEN `[P]` — `Rig.TUnit.Storage.MinIO` same set (SasBuilder, add missing FixtureOptions)
+- [x] **T084** RED + T085 GREEN `[P]` — `Rig.TUnit.Storage.FileSystem` Options + Builder + PathSandboxHelper
 
 ### Phase 4c — Security family `[depends: T079-T085]`
 
-- [ ] **T086** RED + T087 GREEN — `Rig.TUnit.Security.Jwt` RigBuilder on `SecurityRigBuilder<JwtRigBuilder>` + `UseJwt` extension
+- [x] **T086** RED + T087 GREEN — `Rig.TUnit.Security.Jwt` RigBuilder on `SecurityRigBuilder<JwtRigBuilder>` + `UseJwt` extension
       Constraint: do NOT rename existing `JwtBuilder` (token builder type). `JwtRigBuilder` is separate. FR-008 (004 carry-forward).
 
-- [ ] **T088** RED + T089 GREEN `[P]` — `Rig.TUnit.Security.OAuth` RigBuilder + `UseOAuthServer` extension wrapping existing `MockOAuthServer`.
-- [ ] **T090** RED + T091 GREEN `[P]` — `Rig.TUnit.Security.Mtls` MtlsFixture + Options + RigBuilder + UseMtls (existing `MtlsCertificateBuilder` stays as helper).
-- [ ] **T092** RED + T093 GREEN `[P]` — `Rig.TUnit.Security.Policies` PolicyFixture + Options + RigBuilder + UsePolicies (existing `PolicyAssert` stays).
+- [x] **T088** RED + T089 GREEN `[P]` — `Rig.TUnit.Security.OAuth` RigBuilder + `UseOAuthServer` extension wrapping existing `MockOAuthServer`.
+- [x] **T090** RED + T091 GREEN `[P]` — `Rig.TUnit.Security.Mtls` MtlsFixture + Options + RigBuilder + UseMtls (existing `MtlsCertificateBuilder` stays as helper).
+- [x] **T092** RED + T093 GREEN `[P]` — `Rig.TUnit.Security.Policies` PolicyFixture + Options + RigBuilder + UsePolicies (existing `PolicyAssert` stays).
 
 ### Phase 4d — Caching family `[depends: T087-T093]`
 
-- [ ] **T094** RED + T095 GREEN — `Rig.TUnit.Caching.Memory` Options + Builder + `UseMemoryCache` extension
-- [ ] **T096** RED + T097 GREEN `[P]` — `Rig.TUnit.Caching.Fusion` full quartet + fail-safe + eager-refresh helpers
-- [ ] **T098** RED + T099 GREEN `[P]` — `Rig.TUnit.Caching.Hybrid` full quartet
+- [x] **T094** RED + T095 GREEN — `Rig.TUnit.Caching.Memory` Options + Builder + `UseMemoryCache` extension
+- [x] **T096** RED + T097 GREEN `[P]` — `Rig.TUnit.Caching.Fusion` full quartet + fail-safe + eager-refresh helpers
+- [x] **T098** RED + T099 GREEN `[P]` — `Rig.TUnit.Caching.Hybrid` full quartet
 
 ### Phase 4e — NoSql + Observability `[depends: T095-T099]`
 
-- [ ] **T100** RED + T101 GREEN — `Rig.TUnit.Databases.NoSql.*` providers per-audit
+- [x] **T100** RED + T101 GREEN — `Rig.TUnit.Databases.NoSql.*` providers per-audit
       Scope: providers without Options/ or Builder/ identified in T005 audit. Each leaf: Options + Builder + `Use{Provider}` + family helper (per 003 §4.4).
       FR-040, FR-041, FR-042.
 
-- [ ] **T102** RED + T103 GREEN `[P]` — `Rig.TUnit.Observability.Metrics` full quartet + `TagCardinalityGuard` helper.
+- [x] **T102** RED + T103 GREEN `[P]` — `Rig.TUnit.Observability.Metrics` full quartet + `TagCardinalityGuard` helper.
       File: `src/Rig.TUnit.Observability.Metrics/Helpers/TagCardinalityGuard.cs` — fails tests emitting > N distinct tag values (default N=100). FR-042 (004 FR-009).
 
 **Phase 4 exit gate (SC-003):**
 
-- [ ] **T104** Verification (GREEN only)
+- [x] **T104** Verification (GREEN only)
       Asserts: `grep -rn "SkipUntilFixed" tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` returns 0 matches in skip list body; the rule enforces uniformly across all ~60 providers.
 
-- [ ] **T104b** RED + **T104c** GREEN — add `NoSkipMarkersTests` + `SharedFixtureGuardTests` enforcement
+- [x] **T104b** RED + **T104c** GREEN — add `NoSkipMarkersTests` + `SharedFixtureGuardTests` enforcement
       Addresses analysis findings #5 (FR-004 had no dedicated task) and #6 (SC-013 had no enforcement mechanism).
       Files (new):
         `tests/Rig.TUnit.Architecture.Tests/Rules/NoSkipMarkersTests.cs`

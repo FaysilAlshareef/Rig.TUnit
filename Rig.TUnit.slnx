@@ -122,6 +122,7 @@
     <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Integration/Rig.TUnit.Storage.S3.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Parallelism.Tests.Integration/Rig.TUnit.Parallelism.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Ci.Tests.Unit/Rig.TUnit.Ci.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Ci.Tests.Integration/Rig.TUnit.Ci.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Metrics.Tests.Integration/Rig.TUnit.Observability.Metrics.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Mtls.Tests.Unit/Rig.TUnit.Security.Mtls.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Policies.Tests.Integration/Rig.TUnit.Security.Policies.Tests.Integration.csproj" />

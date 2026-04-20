@@ -60,5 +60,10 @@
     <PackageReference Include="Microsoft.ApplicationInsights" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
     <PackageReference Include="Mediator.Abstractions" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Ci\Rig.TUnit.Ci.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Concurrency\Rig.TUnit.Concurrency.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.HealthChecks\Rig.TUnit.HealthChecks.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Parallelism\Rig.TUnit.Parallelism.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Resilience\Rig.TUnit.Resilience.csproj" />
   </ItemGroup>
 </Project>

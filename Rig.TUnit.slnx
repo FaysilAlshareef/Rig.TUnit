@@ -72,6 +72,8 @@
     <Project Path="tests/Rig.TUnit.Mediator.Tests.Integration/Rig.TUnit.Mediator.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Mediator.Tests.Contract/Rig.TUnit.Mediator.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Grpc.Tests.Unit/Rig.TUnit.Grpc.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Grpc.Tests.Integration/Rig.TUnit.Grpc.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Grpc.Tests.Contract/Rig.TUnit.Grpc.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.WebAPI.Tests.Unit/Rig.TUnit.WebAPI.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Benchmarks/Rig.TUnit.Benchmarks.csproj" />
     <Project Path="tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj" />

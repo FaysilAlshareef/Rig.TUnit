@@ -223,7 +223,7 @@ public static class ExampleRigBuilderExtensions
 
 ## 6. `Extensions/ExampleBuilderExtensions.cs` (SQL only)
 
-SQL providers additionally wrap EF Core so callers can write `options.UseExampleInMemory(...)` for quickstart scenarios. Non-SQL providers skip this folder entirely. Look at [`SqliteBuilderExtensions`](../Rig.TUnit.Databases.Sql.Sqlite/Extensions/SqliteBuilderExtensions.cs) for a minimal example.
+SQL providers additionally wrap EF Core so callers can write `options.UseExampleInMemory(...)` for quickstart scenarios. Non-SQL providers skip this folder entirely. Look at [`PostgresBuilderExtensions`](../Rig.TUnit.Databases.Sql.Postgresql/Extensions/PostgresBuilderExtensions.cs) for a minimal example.
 
 ---
 

@@ -566,18 +566,18 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
       Change: remove the last residual `[Category("SkipUntilFixed")]` markers (if any slipped past Phase 6c); confirm the list is empty.
       Expected: **GREEN** — T157 guard test passes; rule enforces uniformly on every src README. Satisfies FR-066, FR-069, SC-005.
 
-- [ ] **T159** RED + T160 GREEN `[P]` — `markdown-link-check` CI step
+- [x] **T159** RED + T160 GREEN `[P]` — `markdown-link-check` CI step
       File: `.github/workflows/ci.yml` (add job `markdown-link-check` using `gaurav-nelson/github-action-markdown-link-check@v1`; configure retry-on-flake allow-list for known-flaky domains e.g. kurrent.io).
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/MarkdownLinkCheckJobTests.cs` asserts the job is present. FR-067.
 
-- [ ] **T161** RED + T162 GREEN `[P]` — `snippet-extraction` CI job (path-filtered per C-004)
+- [x] **T161** RED + T162 GREEN `[P]` — `snippet-extraction` CI job (path-filtered per C-004)
       File: `.github/workflows/ci.yml` (add job `snippet-extraction` with `paths: [src/**/*.cs, src/**/README.md, docs/templates/PROVIDER_README_TEMPLATE.md]`).
       Content: extract every affected README's `## Quick start` fenced-code `csharp` block into `./snippet-scratch/<readme-path-hash>.cs`; wire a scratch csproj; `dotnet build`; non-zero exit fails job.
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/SnippetExtractionJobTests.cs`. FR-068.
 
 **Phase 6 exit gate (SC-005, SC-008, SC-009, SC-010):**
 
-- [ ] **T163** Verification (GREEN only)
+- [x] **T163** Verification (GREEN only)
       Asserts: `grep -rn "SkipUntilFixed" tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs` → 0; all 63 READMEs pass tightened gate; root governance files present; `docs/*` all present; every `markdown-link-check` run GREEN; `snippet-extraction` GREEN on a src-touching test PR.
 
 ---
@@ -586,15 +586,15 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
 
 **Goal:** every rule, coverage, benchmark, and commit-discipline check enforced on every PR.
 
-- [ ] **T164** RED + T165 GREEN — dedicated `architecture-tests` CI job
+- [x] **T164** RED + T165 GREEN — dedicated `architecture-tests` CI job
       File: `.github/workflows/ci.yml` (new job runs `dotnet test tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj -c Release --no-build`; no `--filter Category!=SkipUntilFixed` because every marker is gone).
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/ArchitectureTestsJobTests.cs`. FR-070.
 
-- [ ] **T166** RED + T167 GREEN — `benchmark-regression` CI job `[depends: T068]`
+- [x] **T166** RED + T167 GREEN — `benchmark-regression` CI job `[depends: T068]`
       File: `.github/workflows/ci.yml` (new job runs `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --exporters json --artifacts ./benchmark-results`; Python/bash compare step against `benchmarks/baseline-005.json` with 20 % threshold; paths filter `[src/**/*.cs, tests/Rig.TUnit.Benchmarks/**, Directory.Packages.props]`).
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/BenchmarkRegressionJobTests.cs`. FR-071, SC-017.
 
-- [ ] **T168** RED + T169 GREEN — harden `commit-discipline-gate` (full subject-pair walk) `[depends: T008]`
+- [x] **T168** RED + T169 GREEN — harden `commit-discipline-gate` (full subject-pair walk) `[depends: T008]`
       File: `.github/workflows/ci.yml` (strengthen existing Phase-1-minimal job):
         walk `git log master..HEAD --pretty=format:"%H %s"`;
         for each `feat(005): T<nnn> — GREEN …` commit, assert the immediately-preceding commit is `test(005): T<nnn> — RED …` with the same `T<nnn>`;
@@ -602,7 +602,7 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
         fail PR if any `src/`-touching commit lacks a preceding matching RED.
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/CommitDisciplineGateTests.cs`. FR-002, SC-011, SC-016.
 
-- [ ] **T170** RED + T171 GREEN — `red-commit-verification` CI step `[depends: T169]`
+- [x] **T170** RED + T171 GREEN — `red-commit-verification` CI step `[depends: T169]`
       File: `.github/workflows/ci.yml` (add step inside `commit-discipline-gate`, Bash script per [research.md R10](research.md)):
         for each RED commit, `git worktree add` at that SHA;
         extract touched test projects from diff;
@@ -610,17 +610,17 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
         assert non-zero exit (the RED genuinely failed).
       Test: `tests/Rig.TUnit.Architecture.Tests/Rules/RedCommitVerificationStepTests.cs`. FR-003.
 
-- [ ] **T172** RED + T173 GREEN `[P, optional]` — convert `build-unit-arch` pwsh loop
+- [x] **T172** RED + T173 GREEN `[P, optional]` — convert `build-unit-arch` pwsh loop
       File: `.github/workflows/ci.yml` (if MTP now supports `--filter Category!=Integration` on the MTP runner, replace the pwsh loop with `dotnet test Rig.TUnit.slnx --filter Category!=Integration`; else port loop to Bash).
       Verify during implementation. FR-073.
 
-- [ ] **T174** GREEN only — full-gate-set CONTRIBUTING.md
+- [x] **T174** GREEN only — full-gate-set CONTRIBUTING.md
       File: `CONTRIBUTING.md` (extend from T121 with every gate: coverage threshold + contract suite + benchmark regression + commit-discipline + architecture-tests + test-category-completeness + markdown link-checker + snippet-extraction).
       Commit: `docs(005): T174 — GREEN CONTRIBUTING full gate set (FR-074)`. FR-074, SC-019.
 
 **Phase 7 exit gate (SC-011, SC-016, SC-017, SC-019):**
 
-- [ ] **T175** Verification (GREEN only)
+- [x] **T175** Verification (GREEN only)
       Asserts: CI has `architecture-tests + benchmark-regression + commit-discipline-gate + red-commit-verification + coverage-summary + snippet-extraction + markdown-link-check` jobs all non-bypassable on PR; `benchmarks/baseline-005.json` is the active reference; `CONTRIBUTING.md` documents every gate.
 
 ---

@@ -93,6 +93,7 @@
     <Project Path="tests/Rig.TUnit.Observability.Tests.Contract/Rig.TUnit.Observability.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tracing.Tests.Integration/Rig.TUnit.Observability.Tracing.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Logging.Tests.Integration/Rig.TUnit.Observability.Logging.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Observability.Logging.Tests.Unit/Rig.TUnit.Observability.Logging.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Logging.Analyzers.Tests.Unit/Rig.TUnit.Observability.Logging.Analyzers.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Seq.Tests.Integration/Rig.TUnit.Observability.Seq.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Jwt.Tests.Integration/Rig.TUnit.Security.Jwt.Tests.Integration.csproj" />

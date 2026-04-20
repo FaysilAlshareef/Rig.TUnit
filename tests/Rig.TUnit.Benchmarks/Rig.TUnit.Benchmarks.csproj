@@ -73,5 +73,8 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Logging\Rig.TUnit.Observability.Logging.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Seq\Rig.TUnit.Observability.Seq.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Observability.Tracing\Rig.TUnit.Observability.Tracing.csproj" />
   </ItemGroup>
 </Project>

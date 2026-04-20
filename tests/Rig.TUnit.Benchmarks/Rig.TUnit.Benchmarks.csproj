@@ -65,5 +65,13 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.HealthChecks\Rig.TUnit.HealthChecks.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Parallelism\Rig.TUnit.Parallelism.csproj" />
     <ProjectReference Include="..\..\src\Rig.TUnit.Resilience\Rig.TUnit.Resilience.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Memory\Rig.TUnit.Caching.Memory.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.Sqlite\Rig.TUnit.Databases.Sql.Sqlite.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.Sql.SqlServer\Rig.TUnit.Databases.Sql.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Databases.NoSql.Redis\Rig.TUnit.Databases.NoSql.Redis.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
 </Project>

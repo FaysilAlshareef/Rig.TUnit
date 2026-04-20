@@ -190,19 +190,19 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3b — P1 Platform utilities `[depends: T021, T023, T025, T027, T029]`
 
-- [ ] **T030** RED + T031 GREEN — `Rig.TUnit.Ci` missing Integration + Benchmark
+- [x] **T030** RED + T031 GREEN — `Rig.TUnit.Ci` missing Integration + Benchmark
       Files: `tests/Rig.TUnit.Ci.Tests.Integration/`, `tests/Rig.TUnit.Benchmarks/CiBenchmarks.cs`. FR-032.
 
-- [ ] **T032** RED + T033 GREEN `[P]` — `Rig.TUnit.Concurrency` missing Unit + Contract + Benchmark
+- [x] **T032** RED + T033 GREEN `[P]` — `Rig.TUnit.Concurrency` missing Unit + Contract + Benchmark
       Files: `tests/Rig.TUnit.Concurrency.Tests.Unit/`, `tests/Rig.TUnit.Concurrency.Tests.Contract/`, `tests/Rig.TUnit.Benchmarks/ConcurrencyBenchmarks.cs`. FR-032.
 
-- [ ] **T034** RED + T035 GREEN `[P]` — `Rig.TUnit.HealthChecks` missing Unit + Benchmark
+- [x] **T034** RED + T035 GREEN `[P]` — `Rig.TUnit.HealthChecks` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.HealthChecks.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/HealthChecksBenchmarks.cs`. FR-032.
 
-- [ ] **T036** RED + T037 GREEN `[P]` — `Rig.TUnit.Parallelism` missing Unit + Benchmark
+- [x] **T036** RED + T037 GREEN `[P]` — `Rig.TUnit.Parallelism` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Parallelism.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/ParallelismBenchmarks.cs`. FR-032.
 
-- [ ] **T038** RED + T039 GREEN `[P]` — `Rig.TUnit.Resilience` missing Unit + Benchmark
+- [x] **T038** RED + T039 GREEN `[P]` — `Rig.TUnit.Resilience` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Resilience.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/ResilienceBenchmarks.cs`. FR-032.
 
 ### Phase 3c — P1 Legacy providers `[depends: T031-T039]`

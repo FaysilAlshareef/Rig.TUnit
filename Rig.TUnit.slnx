@@ -66,6 +66,8 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Rig.TUnit.Core.Tests.Unit/Rig.TUnit.Core.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Core.Tests.Integration/Rig.TUnit.Core.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Core.Tests.Contract/Rig.TUnit.Core.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Mediator.Tests.Unit/Rig.TUnit.Mediator.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Grpc.Tests.Unit/Rig.TUnit.Grpc.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.WebAPI.Tests.Unit/Rig.TUnit.WebAPI.Tests.Unit.csproj" />

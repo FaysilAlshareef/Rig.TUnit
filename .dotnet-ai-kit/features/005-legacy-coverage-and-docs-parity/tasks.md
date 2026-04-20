@@ -144,7 +144,7 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3a — P0 foundation (blocks Phase 3b onwards)
 
-- [ ] **T020** RED — `Rig.TUnit.Core` missing Integration + Contract
+- [x] **T020** RED — `Rig.TUnit.Core` missing Integration + Contract
       Files (new):
         `tests/Rig.TUnit.Core.Tests.Integration/Rig.TUnit.Core.Tests.Integration.csproj`
         `tests/Rig.TUnit.Core.Tests.Integration/RigBuilderIntegrationTests.cs`
@@ -152,12 +152,12 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
         `tests/Rig.TUnit.Core.Tests.Contract/CoreRigContract.cs`
       Expected: **RED** — `Assert.Fail("RED: baseline not implemented")` in each.
 
-- [ ] **T021** GREEN — `Rig.TUnit.Core` Integration + Contract populated `[depends: T020]`
+- [x] **T021** GREEN — `Rig.TUnit.Core` Integration + Contract populated `[depends: T020]`
       Files: fill Integration tests (RigBuilder end-to-end, IsolationKey derivation, ConnectionSource matrix); populate Contract base class; register projects in `Rig.TUnit.slnx`; remove `Rig.TUnit.Core` from `TestCompletenessTests` skip list (lines 22-53).
       Coverage: measure locally via `dotnet run -- --coverage --coverage-output-format cobertura`; if < 90/85, add FR-038 coverage-lifting tests (`CoreFixtureOptionsTests.cs` if Options exists + `CoreRigBuilder_ExerciseTests.cs`).
       Expected: **GREEN** — all four Core test categories GREEN; coverage passes threshold. Satisfies FR-031.
 
-- [ ] **T022** RED `[P]` — `Rig.TUnit.Mediator` missing Integration + Contract + Benchmark
+- [x] **T022** RED `[P]` — `Rig.TUnit.Mediator` missing Integration + Contract + Benchmark
       Files (new):
         `tests/Rig.TUnit.Mediator.Tests.Integration/Rig.TUnit.Mediator.Tests.Integration.csproj`
         `tests/Rig.TUnit.Mediator.Tests.Integration/MediatorPipelineTests.cs`
@@ -166,27 +166,27 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
         `tests/Rig.TUnit.Benchmarks/MediatorPipelineBenchmarks.cs` (new file in existing project)
       Expected: **RED** — all tests fail deterministically.
 
-- [ ] **T023** GREEN — `Rig.TUnit.Mediator` populated `[depends: T022]`
+- [x] **T023** GREEN — `Rig.TUnit.Mediator` populated `[depends: T022]`
       Files: populate; slnx; benchmark class `[MemoryDiagnoser]` + cold-path + representative pipeline dispatch; skip-list removal.
       Expected: **GREEN** — 4 categories green. Satisfies FR-031.
 
-- [ ] **T024** RED `[P]` — `Rig.TUnit.Grpc` missing Integration + Contract + Benchmark
+- [x] **T024** RED `[P]` — `Rig.TUnit.Grpc` missing Integration + Contract + Benchmark
       Files (new, mirror T022): `tests/Rig.TUnit.Grpc.Tests.Integration/`, `tests/Rig.TUnit.Grpc.Tests.Contract/`, `tests/Rig.TUnit.Benchmarks/GrpcBenchmarks.cs`.
       Expected: **RED**.
 
-- [ ] **T025** GREEN — `Rig.TUnit.Grpc` populated `[depends: T024]`. Expected **GREEN**. FR-031.
+- [x] **T025** GREEN — `Rig.TUnit.Grpc` populated `[depends: T024]`. Expected **GREEN**. FR-031.
 
-- [ ] **T026** RED `[P]` — `Rig.TUnit.WebAPI` missing Integration + Contract + Benchmark
+- [x] **T026** RED `[P]` — `Rig.TUnit.WebAPI` missing Integration + Contract + Benchmark
       Files: `tests/Rig.TUnit.WebAPI.Tests.Integration/`, `tests/Rig.TUnit.WebAPI.Tests.Contract/`, `tests/Rig.TUnit.Benchmarks/WebApiBenchmarks.cs`.
       Expected: **RED**.
 
-- [ ] **T027** GREEN — `Rig.TUnit.WebAPI` populated `[depends: T026]`. FR-031.
+- [x] **T027** GREEN — `Rig.TUnit.WebAPI` populated `[depends: T026]`. FR-031.
 
-- [ ] **T028** RED `[P]` — `Rig.TUnit.Http` missing Integration + Contract + Benchmark
+- [x] **T028** RED `[P]` — `Rig.TUnit.Http` missing Integration + Contract + Benchmark
       Files: `tests/Rig.TUnit.Http.Tests.Integration/`, `tests/Rig.TUnit.Http.Tests.Contract/`, `tests/Rig.TUnit.Benchmarks/HttpMockBenchmarks.cs`.
       Expected: **RED**.
 
-- [ ] **T029** GREEN — `Rig.TUnit.Http` populated `[depends: T028]`. FR-031.
+- [x] **T029** GREEN — `Rig.TUnit.Http` populated `[depends: T028]`. FR-031.
 
 ### Phase 3b — P1 Platform utilities `[depends: T021, T023, T025, T027, T029]`
 

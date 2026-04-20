@@ -70,3 +70,28 @@ Satisfies FR-010, SC-001.
 20 fixtures inventoried — 7 safe (IsolationKey-based consumers), 12 unsafe (Phase 3 T066 conversion), 1 stopgap (Kafka listener subset). No RED/GREEN partner per analysis #7 (A-prefix audit-namespace tasks exempt from FR-001).
 
 Satisfies FR-011, SC-013.
+
+## T006 — RED: ArtifactUploadTests (YamlDotNet-based YAML assertion)
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK (RED confirmed locally)
+
+- modified: `Directory.Packages.props` — added `YamlDotNet 16.3.0` pin (MIT)
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj` — added YamlDotNet reference
+- created: `tests/Rig.TUnit.Architecture.Tests/Rules/ArtifactUploadTests.cs`
+
+**RED evidence**: `dotnet test --treenode-filter /*/*/ArtifactUploadTests/*` → `Failed: 1`. Offender list enumerated 10 jobs — every one missing `actions/upload-artifact@v4`.
+
+## T007 — GREEN: add upload-artifact step to every CI job (+ Phase-1 commit-discipline-gate)
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK
+
+- modified: `.github/workflows/ci.yml`
+  - 10 jobs gain `Upload test artifacts` step (actions/upload-artifact@v4, `if: always()`, `retention-days: 14`, matrix-aware `name`, glob `path: tests/**/bin/Release/net10.0/TestResults/**`).
+  - new `commit-discipline-gate` job runs on `pull_request` — walks commits, asserts every GREEN subject has a matching RED predecessor.
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ArtifactUploadTests.cs` — added `commit-discipline-gate` to `ExemptJobs` (meta-job, no test output).
+
+**GREEN evidence**: full architecture test suite → `total: 23, failed: 0, succeeded: 23`.
+
+Satisfies FR-013, SC-018 (paired with T006). Partial FR-002 (Phase-1 minimal subject-pair check; full hardening lands T168–T171).

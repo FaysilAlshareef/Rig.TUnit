@@ -39,6 +39,14 @@ jobs:
               Write-Error "Failed projects: $($failed -join ', ')"
               exit 1
           }
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── SQL matrix ─────────────────────────────────────────────────────────────
   integration-sql:
@@ -66,6 +74,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── NoSQL matrix ───────────────────────────────────────────────────────────
   integration-nosql:
@@ -91,6 +107,14 @@ jobs:
       - name: Run integration
         if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
         run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Caching matrix ─────────────────────────────────────────────────────────
   integration-caching:
@@ -111,6 +135,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Messaging matrix ───────────────────────────────────────────────────────
   integration-messaging:
@@ -131,6 +163,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Microservices matrix ───────────────────────────────────────────────────
   integration-microservices:
@@ -151,6 +191,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.component }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Security matrix ────────────────────────────────────────────────────────
   integration-security:
@@ -171,6 +219,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.area }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Observability matrix ───────────────────────────────────────────────────
   integration-observability:
@@ -191,6 +247,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Storage matrix ─────────────────────────────────────────────────────────
   integration-storage:
@@ -211,6 +275,14 @@ jobs:
           dotnet build tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
 
   # ─── Core / infrastructure matrix ──────────────────────────────────────────
   integration-core:
@@ -231,3 +303,55 @@ jobs:
           dotnet build tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ github.job }}-${{ matrix.area }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn
+
+  # ─── Phase 1 minimal commit-discipline gate (T008) ─────────────────────────
+  # Checks that every `feat(005): T<nnn> — GREEN …` commit on the PR is preceded
+  # by a matching `test(005): T<nnn> — RED …` commit with the same T<nnn> id.
+  # Full hardening (red-commit-verification, subject-pair walk, retroactive
+  # exemption list) lands in Phase 7 T168–T171.
+  commit-discipline-gate:
+    name: Commit discipline gate (Phase 1 minimal)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Check RED → GREEN subject pairing
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          failed=0
+          # Walk every commit on the PR in chronological order.
+          mapfile -t commits < <(git log --reverse --pretty=format:"%H|%s" "${base}".."${head}")
+          declare -A seen_red
+          for line in "${commits[@]}"; do
+            sha="${line%%|*}"
+            subject="${line#*|}"
+            # Match RED commits: `test(005): T<nnn> — RED …` (also accept standard hyphen).
+            if [[ "$subject" =~ ^test\(005\):\ +(T[0-9]+)\ +[—-]\ +RED ]]; then
+              tid="${BASH_REMATCH[1]}"
+              seen_red[$tid]=1
+            # Match GREEN commits: `feat(005): T<nnn> — GREEN …`.
+            elif [[ "$subject" =~ ^feat\(005\):\ +(T[0-9]+)\ +[—-]\ +GREEN ]]; then
+              tid="${BASH_REMATCH[1]}"
+              if [[ -z "${seen_red[$tid]:-}" ]]; then
+                echo "::error::Commit $sha ($subject) has no matching RED commit before it for $tid"
+                failed=1
+              fi
+            fi
+          done
+          if [[ $failed -ne 0 ]]; then
+            exit 1
+          fi
+          echo "Commit discipline gate passed."

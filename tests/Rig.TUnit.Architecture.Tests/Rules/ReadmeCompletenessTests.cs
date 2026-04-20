@@ -171,15 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T152 — Observability (7)
-        ("Rig.TUnit.Observability", "T152"),
-        ("Rig.TUnit.Observability.AppInsights", "T152"),
-        ("Rig.TUnit.Observability.Logging", "T152"),
-        ("Rig.TUnit.Observability.Logging.Analyzers", "T152"),
-        ("Rig.TUnit.Observability.Metrics", "T152"),
-        ("Rig.TUnit.Observability.Seq", "T152"),
-        ("Rig.TUnit.Observability.Tracing", "T152"),
-
         // T154 — Storage leaves (4; Storage base is in T138)
         ("Rig.TUnit.Storage.AzureBlob", "T154"),
         ("Rig.TUnit.Storage.FileSystem", "T154"),

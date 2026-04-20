@@ -355,6 +355,43 @@ jobs:
             "-title:Rig.TUnit coverage (${{ github.sha }})"
       - name: Publish markdown summary
         run: cat ./coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.85)
+        # Phase 2: non-blocking — captures baseline only.
+        # T069b (end of Phase 3) flips continue-on-error to false once every provider is at ≥ 90/85.
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PYEOF'
+          import sys
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          line_floor = 0.90
+          branch_floor = 0.85
+          merged = Path('./coverage-report/Cobertura.xml')
+          if not merged.exists():
+              print(f'::warning::Merged cobertura not found at {merged} — skipping threshold check', file=sys.stderr)
+              sys.exit(0)
+
+          tree = ET.parse(merged)
+          offenders = []
+          for pkg in tree.getroot().iter('package'):
+              name = pkg.get('name') or '<unnamed>'
+              line_rate = float(pkg.get('line-rate') or 0)
+              branch_rate = float(pkg.get('branch-rate') or 0)
+              if line_rate < line_floor or branch_rate < branch_floor:
+                  offenders.append(
+                      f'{name}: line-rate={line_rate:.3f} (need ≥ {line_floor}), '
+                      f'branch-rate={branch_rate:.3f} (need ≥ {branch_floor})')
+
+          if offenders:
+              print('::warning::Coverage below threshold for:')
+              for line in offenders:
+                  print(f'::warning::  {line}')
+              sys.exit(1)
+          print('All packages meet the coverage floor.')
+          PYEOF
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         if: always()

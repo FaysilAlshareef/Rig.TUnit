@@ -171,14 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T140 — SQL (6)
-        ("Rig.TUnit.Databases.Sql", "T140"),
-        ("Rig.TUnit.Databases.Sql.MySql", "T140"),
-        ("Rig.TUnit.Databases.Sql.Oracle", "T140"),
-        ("Rig.TUnit.Databases.Sql.Postgresql", "T140"),
-        ("Rig.TUnit.Databases.Sql.SqlServer", "T140"),
-        ("Rig.TUnit.Databases.Sql.Sqlite", "T140"),
-
         // T142 — NoSQL (8)
         ("Rig.TUnit.Databases.NoSql", "T142"),
         ("Rig.TUnit.Databases.NoSql.Cassandra", "T142"),

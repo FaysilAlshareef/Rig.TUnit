@@ -1,13 +1,25 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Concurrency.Assertions;
 
 namespace Rig.TUnit.Benchmarks;
 
 /// <summary>
-/// Feature 005 T032 RED sentinel — T033 replaces with real concurrency benchmarks.
+/// Measures per-call overhead of the concurrency helpers' hot paths.
 /// </summary>
 [MemoryDiagnoser]
 public class ConcurrencyBenchmarks
 {
+    private SequenceIdempotencyChecker _checker = null!;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _checker = new SequenceIdempotencyChecker();
+    }
+
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T033 populates this benchmark.");
+    public bool SequenceIdempotencyChecker_TryApply()
+    {
+        return _checker.TryApply("agg", Random.Shared.NextInt64());
+    }
 }

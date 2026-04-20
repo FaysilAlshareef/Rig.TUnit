@@ -1,0 +1,13 @@
+{
+  "_comment": "Benchmark baseline captured at Phase 3 close. Populated from the first successful CI run of the 'benchmark-regression' job on feat/005-a-legacy-coverage-and-tests after Phase 3e lands. Each Phase 3 benchmark file's mean/stdDev is recorded here; Phase 7 T167 compares future runs within a 20% regression budget.",
+  "schemaVersion": 1,
+  "meta": {
+    "capturedAt": null,
+    "captureBranch": "feat/005-a-legacy-coverage-and-tests",
+    "captureCommitSha": null,
+    "ciRunId": null,
+    "regressionBudgetPercent": 20,
+    "note": "populate via 'dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --exporters json --artifacts ./benchmark-results' then merge per-benchmark JSON. See T068 handoff in undo-log.md."
+  },
+  "benchmarks": {}
+}

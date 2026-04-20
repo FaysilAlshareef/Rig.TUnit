@@ -253,7 +253,7 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3 — Shared-fixture conversion sub-thread
 
-- [ ] **T066** RED + T067 GREEN — convert unsafe `Shared*Fixture.cs` to per-test isolation
+- [x] **T066** RED + T067 GREEN — convert unsafe `Shared*Fixture.cs` to per-test isolation
       Scope: iterate A005's audit; for each "unsafe-needs-conversion" entry, write a test asserting per-test isolation (unique artefact per test; parallel execution with no cross-talk); convert to ephemeral DB / schema / keyspace / bucket prefix via provider's `*PerTestHelper.cs` (add helper where missing).
       Files (sample, full list in T005): `tests/Rig.TUnit.Storage.S3.Tests.Integration/SharedS3Fixture.cs`, `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/SharedKafkaFixture.cs`, etc. Per-file mini RED+GREEN; may be bundled ≤ 3 files per PR for review cadence.
       Exemption comments: `Rig.TUnit.Databases.NoSql.Redis` reuses `Caching.Redis` — add `// Intentional reuse per 004 edge case` and audit-document-reference.
@@ -261,7 +261,7 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3 — Baseline capture
 
-- [ ] **T068** Baseline capture (single GREEN) `[depends: T021-T067]`
+- [x] **T068** Baseline capture (single GREEN) `[depends: T021-T067]`
       Action: run `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --exporters json --artifacts ./benchmark-results`; merge per-provider JSON into `benchmarks/baseline-005.json` per [data-model.md Entity 5](data-model.md).
       File: `benchmarks/baseline-005.json` (new).
       Commit: `ci(005): T068 — GREEN benchmark baseline 005 captured (FR-037)`.
@@ -269,7 +269,7 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 **Phase 3 exit gate (SC-002, SC-006, SC-007, SC-013):**
 
-- [ ] **T069** Verification (GREEN only)
+- [x] **T069** Verification (GREEN only)
       Asserts:
         `grep -rn "SkipUntilFixed" tests/Rig.TUnit.Architecture.Tests/Rules/TestCompletenessTests.cs` returns 0 matches in the skip list body.
         Merged cobertura reports `line ≥ 0.90 / branch ≥ 0.85` for every non-N/A provider.
@@ -277,7 +277,7 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
         `grep -rn "Shared.*Fixture" tests/` returns matches ONLY with `// Intentional reuse …` comments.
       Commit: `ci(005): T069 — GREEN Phase 3 exit gate verified`. No new code; a passing CI run on the feat branch is the proof.
 
-- [ ] **T069b** GREEN only — flip coverage threshold to blocking `[depends: T069]`
+- [x] **T069b** GREEN only — flip coverage threshold to blocking `[depends: T069]`
       File: `.github/workflows/ci.yml` — in `coverage-summary` job, flip threshold step `continue-on-error: true` → `continue-on-error: false`.
       Rationale (analysis #4): Phase 2 captured the baseline with packages at 77–87% (empirical floor from 004). Phase 3 filled every gap; all packages now at ≥ 90/85. Flipping only after every provider passes means no in-flight Phase 3 PR can be blocked by its own pre-completion coverage.
       Commit: `ci(005): T069b — GREEN flip coverage threshold to blocking (FR-022)`.

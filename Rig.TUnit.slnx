@@ -105,6 +105,7 @@
     <Project Path="tests/Rig.TUnit.Concurrency.Tests.Unit/Rig.TUnit.Concurrency.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Concurrency.Tests.Contract/Rig.TUnit.Concurrency.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.HealthChecks.Tests.Integration/Rig.TUnit.HealthChecks.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.HealthChecks.Tests.Unit/Rig.TUnit.HealthChecks.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.Outbox.Tests.Integration/Rig.TUnit.Microservices.Outbox.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.Inbox.Tests.Integration/Rig.TUnit.Microservices.Inbox.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.EventSourcing.Tests.Integration/Rig.TUnit.Microservices.EventSourcing.Tests.Integration.csproj" />

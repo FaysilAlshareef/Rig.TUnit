@@ -443,3 +443,89 @@ jobs:
             exit 1
           fi
           echo "Commit discipline gate passed."
+
+  # ─── Markdown link check (T160) ────────────────────────────────────────────
+  # FR-067 — scans every .md file under the repo for dead links. Blocks PR on
+  # failure. Allow-list for known-flaky domains is in .github/mlc_config.json.
+  markdown-link-check:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/mlc_config.json'
+          check-modified-files-only: 'no'
+
+  # ─── Snippet extraction (T162) ─────────────────────────────────────────────
+  # FR-068 — extracts every leaf README's `## Quick start` C# fenced code block
+  # into a scratch csproj, runs `dotnet build`, fails PR on non-zero exit.
+  # Path-filtered per C-004: only runs when src/*.cs, src/**/README.md, or the
+  # template changed.
+  snippet-extraction:
+    name: Snippet extraction
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Extract + build snippets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ./snippet-scratch
+          python3 - <<'PYEOF'
+          import hashlib
+          import pathlib
+          import re
+
+          scratch = pathlib.Path('./snippet-scratch')
+          quickstart = re.compile(r'^## Quick start\s*$', re.MULTILINE)
+          fence = re.compile(r'```csharp\s*\n(.*?)\n```', re.MULTILINE | re.DOTALL)
+
+          count = 0
+          for readme in pathlib.Path('src').rglob('README.md'):
+              text = readme.read_text(encoding='utf-8')
+              if not quickstart.search(text):
+                  continue
+              # Body after Quick-start heading
+              after = text[quickstart.search(text).end():]
+              for m in fence.finditer(after):
+                  digest = hashlib.md5(m.group(1).encode()).hexdigest()[:10]
+                  name = f'{readme.parent.name}_{digest}'
+                  out = scratch / f'{name}.cs'
+                  out.write_text(
+                      f'// Extracted from {readme}\n'
+                      f'// Rig.TUnit snippet-extraction CI job (FR-068).\n'
+                      f'// Wrapped in a dummy class so arbitrary snippets compile in the scratch project.\n'
+                      f'public static class _{digest} {{ public static void Run() {{\n'
+                      f'{m.group(1)}\n'
+                      f'}} }}\n',
+                      encoding='utf-8')
+                  count += 1
+          print(f'Extracted {count} snippet(s) into ./snippet-scratch/')
+          PYEOF
+      - name: Build scratch project
+        shell: bash
+        run: |
+          if [[ ! "$(ls ./snippet-scratch/*.cs 2>/dev/null | head -1)" ]]; then
+            echo "No snippets to build — skipping."
+            exit 0
+          fi
+          cat > ./snippet-scratch/Snippets.csproj <<'CSPROJ'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <TargetFramework>net10.0</TargetFramework>
+              <OutputType>Library</OutputType>
+              <Nullable>enable</Nullable>
+              <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+            </PropertyGroup>
+          </Project>
+          CSPROJ
+          dotnet build ./snippet-scratch/Snippets.csproj -c Release

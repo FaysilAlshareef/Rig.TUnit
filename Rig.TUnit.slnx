@@ -116,6 +116,9 @@
     <Project Path="tests/Rig.TUnit.Microservices.Inbox.Tests.Integration/Rig.TUnit.Microservices.Inbox.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.EventSourcing.Tests.Integration/Rig.TUnit.Microservices.EventSourcing.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Microservices.Snapshots.Tests.Integration/Rig.TUnit.Microservices.Snapshots.Tests.Integration.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.Inbox.Tests.Unit/Rig.TUnit.Microservices.Inbox.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.Outbox.Tests.Unit/Rig.TUnit.Microservices.Outbox.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Microservices.Snapshots.Tests.Unit/Rig.TUnit.Microservices.Snapshots.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Redis.Tests.Integration/Rig.TUnit.Caching.Redis.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Redis.Tests.Unit/Rig.TUnit.Caching.Redis.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration/Rig.TUnit.Databases.NoSql.Redis.Tests.Integration.csproj" />

@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Parallelism.Helpers;
 
 namespace Rig.TUnit.Benchmarks;
 
@@ -6,5 +7,11 @@ namespace Rig.TUnit.Benchmarks;
 public class ParallelismBenchmarks
 {
     [Benchmark]
-    public int Placeholder() => throw new InvalidOperationException("RED: baseline not implemented — T037 populates this benchmark.");
+    public int PortAllocator_Allocate() => PortAllocator.Allocate();
+
+    [Benchmark]
+    public async Task ExclusiveResourceCoordinator_AcquireRelease()
+    {
+        using var _ = await ExclusiveResourceCoordinator.AcquireAsync("bench-shared");
+    }
 }

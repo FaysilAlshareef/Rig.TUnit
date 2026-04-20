@@ -457,14 +457,14 @@ GREEN: finish harness population; original *Tests.cs now tests-only
       Commit: `chore(005): T123b — add Markdig pin for README structural parser (C-003)`
       Expected: **GREEN only** (no RED — this is a `chore`-prefixed dependency add per spec clarification on GREEN-only exemptions, analysis #13).
 
-- [ ] **T123c** RED — rewrite `ReadmeCompletenessTests` with Markdig-based structural gate `[depends: T123b]`
+- [x] **T123c** RED — rewrite `ReadmeCompletenessTests` with Markdig-based structural gate `[depends: T123b]`
       **Moved from T157 to Phase 6a per analysis findings #2 + #3** — the rewrite lands BEFORE Phase 6c family batches so each Phase 6c RED commit genuinely fails the tightened gate (previously Phase 6c RED commits were secretly-green against the legacy `> 100 chars` gate).
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
       Change: replace `> 100 chars` check with `Markdig`-parsed assertion of all 14 section headings per [Documentation-Audit §3.1](../../../planning/post-004-remediation/Documentation-Audit.md) or explicit `## §N — N/A: <rationale>` placeholder. Add Section 6 Options-table reflection-match + Section 12 benchmark-link existence.
       The existing `SkipUntilFixed` markers STAY on this commit (retirement happens per-family in Phase 6c GREEN commits + final cleanup in T157 at Phase 6d).
       Expected: **RED** — current READMEs (pre-6c rewrites) fail the tightened gate. Run `dotnet test tests/Rig.TUnit.Architecture.Tests/ --filter "FullyQualifiedName~ReadmeCompletenessTests"` → non-zero exit for every non-skipped provider.
 
-- [ ] **T123d** GREEN — keep suite passing via interim `SkipUntilFixed` expansion `[depends: T123c]`
+- [x] **T123d** GREEN — keep suite passing via interim `SkipUntilFixed` expansion `[depends: T123c]`
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
       Change: expand `SkipUntilFixed` markers to cover every provider that will be populated in Phase 6c. This is NOT a new skip introduction (FR-004) — it's a **rescope** of the existing skip list from "providers with < 100 chars README" to "providers whose 14-section README is not yet filled". Document the expansion in the same commit with an in-code comment: `// Skip list expanded for Phase 6c rollout; each family GREEN commit MUST remove its entries; final empty at T157.`
       Expected: **GREEN** — test suite passes overall. Each Phase 6c family GREEN commit now removes its family's skip entries (not T158 at Phase 6d end).
@@ -510,7 +510,7 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
 
 **Revised per analysis #2/#3**: since T123c moved the Markdig gate to Phase 6a, each Phase 6c RED commit now *genuinely fails* the tightened gate (template-only READMEs have placeholder Options-table rows that fail the reflection check, and `// TODO` Quick-start placeholders fail Section 6's required content). Previously (pre-revision) Phase 6c RED commits were secretly-green against the legacy `> 100 chars` gate. Each per-family GREEN commit now also trims the matching providers from the skip list, so by the time Phase 6d T157 runs there are zero skips to empty.
 
-- [ ] **T137** RED + T138 GREEN — 12 missing READMEs for base / meta packages
+- [x] **T137** RED + T138 GREEN — 12 missing READMEs for base / meta packages
       Files:
         `src/Rig.TUnit/README.md`
         `src/Rig.TUnit.All/README.md`
@@ -526,42 +526,42 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
         `src/Rig.TUnit.WebAPI/README.md`
       Meta-package variant per Documentation-Audit §3.2 (sections 9/10/12 may be `## §N — N/A`). FR-065.
 
-- [ ] **T139** RED + T140 GREEN `[P]` — SQL family (6 READMEs)
+- [x] **T139** RED + T140 GREEN `[P]` — SQL family (6 READMEs)
       Files: `src/Rig.TUnit.Databases.Sql/README.md` (base) + `Databases.Sql.{MySql,Oracle,Postgresql,SqlServer,Sqlite}/README.md`. Capture EF-provider compat matrix, AUTO_INCREMENT / PL-SQL / schema quirks, Pomelo EF10 pin.
 
-- [ ] **T141** RED + T142 GREEN `[P]` — NoSQL family (8 READMEs)
+- [x] **T141** RED + T142 GREEN `[P]` — NoSQL family (8 READMEs)
       Files: `Databases.NoSql/` (base) + `.{Cassandra,Cosmos,Dynamo,ElasticSearch,KurrentDb,Mongo,Redis}/README.md`. RU charges, keyspace-per-test, stream semantics, GSI via LocalStack.
 
-- [ ] **T143** RED + T144 GREEN `[P]` — Caching family (5)
+- [x] **T143** RED + T144 GREEN `[P]` — Caching family (5)
       Files: `Caching/` (base) + `.{Fusion,Hybrid,Memory,Redis}/README.md`. Cache-vs-KV Redis split rationale, backplane, fail-safe / eager-refresh.
 
-- [ ] **T145** RED + T146 GREEN `[P]` — Messaging family (6)
+- [x] **T145** RED + T146 GREEN `[P]` — Messaging family (6)
       Files: `Messaging/` (base) + `.{Kafka,Nats,RabbitMq,ServiceBus,Sqs}/README.md`. Listener/sender lifecycle, W3C traceparent, dead-letter, ordering.
 
-- [ ] **T147** RED + T148 GREEN `[P]` — Microservices family (7)
+- [x] **T147** RED + T148 GREEN `[P]` — Microservices family (7)
       Files: `Microservices.{EventSourcing,Inbox,Outbox,Snapshots}` + recover `Contracts`, `Saga` if not covered by T137. Exactly-once, CAS contention, snapshot scrubbing.
 
-- [ ] **T149** RED + T150 GREEN `[P]` — Security family (5)
+- [x] **T149** RED + T150 GREEN `[P]` — Security family (5)
       Files: `Security/` (base) + `.{Jwt,Mtls,OAuth,Policies}/README.md`. Kid rotation, negative builders, JWKS lifecycle.
 
-- [ ] **T151** RED + T152 GREEN `[P]` — Observability family (7)
+- [x] **T151** RED + T152 GREEN `[P]` — Observability family (7)
       Files: `Observability/` (base) + `.{AppInsights,Logging,Logging.Analyzers,Metrics,Seq,Tracing}/README.md`. `TagCardinalityGuard`, `ActivitySource` lifecycle, snapshot capture.
 
-- [ ] **T153** RED + T154 GREEN `[P]` — Storage family (5)
+- [x] **T153** RED + T154 GREEN `[P]` — Storage family (5)
       Files: `Storage.{AzureBlob,FileSystem,MinIO,S3}/README.md` (base already covered by T137). SAS builders, path sandbox.
 
-- [ ] **T155** RED + T156 GREEN `[P]` — Cross-cutting (~7)
+- [x] **T155** RED + T156 GREEN `[P]` — Cross-cutting (~7)
       Files: `Rig.TUnit.{Concurrency,Docker,HealthChecks,Http,Resilience}/README.md`, `Microservices` meta if not covered.
 
 ### Phase 6d — Gate tightening + verification `[depends: T137-T156]`
 
-- [ ] **T157** RED — residual skip markers assertion
+- [x] **T157** RED — residual skip markers assertion
       **Repurposed per analysis #2/#3**: the Markdig rewrite moved to T123c (Phase 6a). T157 now enforces the final-emptiness invariant.
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
       Change: add a guard `[Test]` `ReadmeCompletenessTests_SkipList_MustBeEmpty` that enumerates the rule's own skip list via reflection and asserts length = 0.
       Expected: **RED** — skip list still holds entries for any family whose Phase 6c GREEN commit forgot to trim its entries. Running `dotnet test … --filter FullyQualifiedName~SkipList_MustBeEmpty` returns non-zero until every family is cleaned.
 
-- [ ] **T158** GREEN — final skip-list cleanup `[depends: T157]`
+- [x] **T158** GREEN — final skip-list cleanup `[depends: T157]`
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ReadmeCompletenessTests.cs`
       Change: remove the last residual `[Category("SkipUntilFixed")]` markers (if any slipped past Phase 6c); confirm the list is empty.
       Expected: **GREEN** — T157 guard test passes; rule enforces uniformly on every src README. Satisfies FR-066, FR-069, SC-005.
@@ -633,12 +633,28 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
 - [ ] **T177** Merge 005-b `[depends: T163]`
       Action: open PR `feat/005-b-docs-parity → master`. Same gate set. Merge.
 
-- [ ] **T178** Final audit + tag (no code)
+- [~] **T178** Final audit + tag (no code) — **audit done, tag deferred to post-merge**
       Asserts:
         `grep -rn "SkipUntilFixed" tests/` returns 0.
         Final test count > 1264 (post-004 baseline) — `dotnet test Rig.TUnit.slnx` summary.
         `/dotnet-ai-kit:review` returns PASS (or documented advisories).
       Commit: `chore(005): tag v005` (annotated tag).
+
+      2026-04-20 audit pass:
+        - `grep -rnE '\[Category\(.*SkipUntilFixed.*\)\]' tests/**/*.cs` → 0 active markers
+          (20 `SkipUntilFixed` occurrences under `tests/` are in the architecture-rule data
+          structures themselves: NoSkipMarkersTests, ProviderCompletenessTests,
+          ReadmeCompletenessTests, TestCompletenessTests, TestFileOrganizationTests.
+          No `[Category("SkipUntilFixed")]` attribute applied to any test method anywhere.)
+        - `tests/Rig.TUnit.Architecture.Tests` 33/33 pass (was 30/30 pre-Phase-6c;
+          added T123c/T123d + SkipList_MustBeEmpty guard).
+        - All 63 canonical provider READMEs pass the Markdig structural gate
+          (`SkipUntilFixed` array is empty; `ReadmeCompletenessTests_SkipList_MustBeEmpty`
+          guard GREEN).
+        - Feature branch `feat/005-a-legacy-coverage-and-tests` at 150 commits,
+          clean working tree.
+      The `chore(005): tag v005` annotated tag is deferred until T176 + T177 merge to
+      master — tagging before merge would annotate a transient branch SHA.
 
 ---
 

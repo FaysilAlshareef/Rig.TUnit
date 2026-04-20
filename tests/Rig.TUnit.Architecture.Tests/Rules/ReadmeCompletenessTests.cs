@@ -251,6 +251,26 @@ public sealed class ReadmeCompletenessTests
             .Because("SkipUntilFixed entries must reference real src/ folders — remove stale paths");
     }
 
+    /// <summary>
+    /// Phase 6d T157/T158 — invariant guard: <see cref="SkipUntilFixed"/> MUST be empty.
+    /// Every Phase 6c family GREEN commit trims its entries; this test asserts the final
+    /// state has zero residuals. If any family's GREEN commit forgot to trim its entries,
+    /// this test fails with the specific folder names still in the list.
+    /// </summary>
+    [Test]
+    public async Task ReadmeCompletenessTests_SkipList_MustBeEmpty()
+    {
+        var residual = SkipUntilFixed.Select(e => e.FolderName).ToArray();
+
+        await Assert.That(residual)
+            .IsEmpty()
+            .Because(
+                "FR-066 / FR-069 / SC-005: every package listed in CanonicalReadmePackages "
+                + "must ship a canonical 14-section README that passes the Markdig structural "
+                + "gate with no skip marker. Phase 6c rolls out family-by-family; T157 guards "
+                + "the final empty state after T156 lands.");
+    }
+
     private static IReadOnlyList<string> ValidateStructure(string markdown)
     {
         var problems = new List<string>();

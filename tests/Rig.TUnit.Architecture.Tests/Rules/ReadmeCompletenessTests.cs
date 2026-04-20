@@ -171,13 +171,6 @@ public sealed class ReadmeCompletenessTests
     /// </summary>
     private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
     [
-        // T150 — Security (5)
-        ("Rig.TUnit.Security", "T150"),
-        ("Rig.TUnit.Security.Jwt", "T150"),
-        ("Rig.TUnit.Security.Mtls", "T150"),
-        ("Rig.TUnit.Security.OAuth", "T150"),
-        ("Rig.TUnit.Security.Policies", "T150"),
-
         // T152 — Observability (7)
         ("Rig.TUnit.Observability", "T152"),
         ("Rig.TUnit.Observability.AppInsights", "T152"),

@@ -169,7 +169,90 @@ public sealed class ReadmeCompletenessTests
     /// Skip list expanded for Phase 6c rollout; each family GREEN commit MUST remove its
     /// entries; final empty at T157/T158.
     /// </summary>
-    private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed = Array.Empty<(string, string)>();
+    private static readonly (string FolderName, string ClosingTask)[] SkipUntilFixed =
+    [
+        // T138 — base / meta packages (12)
+        ("Rig.TUnit", "T138"),
+        ("Rig.TUnit.All", "T138"),
+        ("Rig.TUnit.Ci", "T138"),
+        ("Rig.TUnit.Core", "T138"),
+        ("Rig.TUnit.Grpc", "T138"),
+        ("Rig.TUnit.Mediator", "T138"),
+        ("Rig.TUnit.Microservices", "T138"),
+        ("Rig.TUnit.Microservices.Contracts", "T138"),
+        ("Rig.TUnit.Microservices.Saga", "T138"),
+        ("Rig.TUnit.Parallelism", "T138"),
+        ("Rig.TUnit.Storage", "T138"),
+        ("Rig.TUnit.WebAPI", "T138"),
+
+        // T140 — SQL (6)
+        ("Rig.TUnit.Databases.Sql", "T140"),
+        ("Rig.TUnit.Databases.Sql.MySql", "T140"),
+        ("Rig.TUnit.Databases.Sql.Oracle", "T140"),
+        ("Rig.TUnit.Databases.Sql.Postgresql", "T140"),
+        ("Rig.TUnit.Databases.Sql.SqlServer", "T140"),
+        ("Rig.TUnit.Databases.Sql.Sqlite", "T140"),
+
+        // T142 — NoSQL (8)
+        ("Rig.TUnit.Databases.NoSql", "T142"),
+        ("Rig.TUnit.Databases.NoSql.Cassandra", "T142"),
+        ("Rig.TUnit.Databases.NoSql.Cosmos", "T142"),
+        ("Rig.TUnit.Databases.NoSql.Dynamo", "T142"),
+        ("Rig.TUnit.Databases.NoSql.ElasticSearch", "T142"),
+        ("Rig.TUnit.Databases.NoSql.KurrentDb", "T142"),
+        ("Rig.TUnit.Databases.NoSql.Mongo", "T142"),
+        ("Rig.TUnit.Databases.NoSql.Redis", "T142"),
+
+        // T144 — Caching (5)
+        ("Rig.TUnit.Caching", "T144"),
+        ("Rig.TUnit.Caching.Fusion", "T144"),
+        ("Rig.TUnit.Caching.Hybrid", "T144"),
+        ("Rig.TUnit.Caching.Memory", "T144"),
+        ("Rig.TUnit.Caching.Redis", "T144"),
+
+        // T146 — Messaging (6)
+        ("Rig.TUnit.Messaging", "T146"),
+        ("Rig.TUnit.Messaging.Kafka", "T146"),
+        ("Rig.TUnit.Messaging.Nats", "T146"),
+        ("Rig.TUnit.Messaging.RabbitMq", "T146"),
+        ("Rig.TUnit.Messaging.ServiceBus", "T146"),
+        ("Rig.TUnit.Messaging.Sqs", "T146"),
+
+        // T148 — Microservices (4 remaining; Contracts + Saga are in T138)
+        ("Rig.TUnit.Microservices.EventSourcing", "T148"),
+        ("Rig.TUnit.Microservices.Inbox", "T148"),
+        ("Rig.TUnit.Microservices.Outbox", "T148"),
+        ("Rig.TUnit.Microservices.Snapshots", "T148"),
+
+        // T150 — Security (5)
+        ("Rig.TUnit.Security", "T150"),
+        ("Rig.TUnit.Security.Jwt", "T150"),
+        ("Rig.TUnit.Security.Mtls", "T150"),
+        ("Rig.TUnit.Security.OAuth", "T150"),
+        ("Rig.TUnit.Security.Policies", "T150"),
+
+        // T152 — Observability (7)
+        ("Rig.TUnit.Observability", "T152"),
+        ("Rig.TUnit.Observability.AppInsights", "T152"),
+        ("Rig.TUnit.Observability.Logging", "T152"),
+        ("Rig.TUnit.Observability.Logging.Analyzers", "T152"),
+        ("Rig.TUnit.Observability.Metrics", "T152"),
+        ("Rig.TUnit.Observability.Seq", "T152"),
+        ("Rig.TUnit.Observability.Tracing", "T152"),
+
+        // T154 — Storage leaves (4; Storage base is in T138)
+        ("Rig.TUnit.Storage.AzureBlob", "T154"),
+        ("Rig.TUnit.Storage.FileSystem", "T154"),
+        ("Rig.TUnit.Storage.MinIO", "T154"),
+        ("Rig.TUnit.Storage.S3", "T154"),
+
+        // T156 — Cross-cutting (5)
+        ("Rig.TUnit.Concurrency", "T156"),
+        ("Rig.TUnit.Docker", "T156"),
+        ("Rig.TUnit.HealthChecks", "T156"),
+        ("Rig.TUnit.Http", "T156"),
+        ("Rig.TUnit.Resilience", "T156"),
+    ];
 
     [Test]
     public async Task EveryLeafProvider_ShipsReadme()

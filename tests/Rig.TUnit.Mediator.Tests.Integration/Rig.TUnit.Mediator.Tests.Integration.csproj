@@ -2,8 +2,8 @@
   <ItemGroup>
     <PackageReference Include="TUnit" />
     <PackageReference Include="Mediator.Abstractions" />
-    <PackageReference Include="Mediator.SourceGenerator" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />

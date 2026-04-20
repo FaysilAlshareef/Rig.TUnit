@@ -58,5 +58,7 @@
     <ProjectReference Include="..\..\src\Rig.TUnit.Microservices.Contracts\Rig.TUnit.Microservices.Contracts.csproj" />
 
     <PackageReference Include="Microsoft.ApplicationInsights" />
+    <ProjectReference Include="..\..\src\Rig.TUnit.Mediator\Rig.TUnit.Mediator.csproj" />
+    <PackageReference Include="Mediator.Abstractions" />
   </ItemGroup>
 </Project>

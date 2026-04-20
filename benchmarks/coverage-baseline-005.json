@@ -1,0 +1,14 @@
+{
+  "_comment": "Coverage baseline captured at Phase 2 close. Populated from the merged coverage-report artefact of the first successful CI run on feat/005-a-legacy-coverage-and-tests after T013+T015 landed. Each Phase 3 provider fill-in task bumps its entry toward 0.90/0.85; T069b flips the threshold blocking once every entry clears the floor.",
+  "schemaVersion": 1,
+  "meta": {
+    "capturedAt": null,
+    "captureBranch": "feat/005-a-legacy-coverage-and-tests",
+    "captureCommitSha": null,
+    "ciRunId": null,
+    "lineFloor": 0.90,
+    "branchFloor": 0.85,
+    "note": "populate via `gh run download <runId> -n coverage-report` then `python3 scripts/coverage-baseline.py` (see T016 handoff in undo-log.md)"
+  },
+  "providers": {}
+}

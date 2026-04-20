@@ -95,3 +95,45 @@ Satisfies FR-011, SC-013.
 **GREEN evidence**: full architecture test suite → `total: 23, failed: 0, succeeded: 23`.
 
 Satisfies FR-013, SC-018 (paired with T006). Partial FR-002 (Phase-1 minimal subject-pair check; full hardening lands T168–T171).
+
+## T010-T011 — coverage flag assertion + implementation
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK
+
+- created: `tests/Rig.TUnit.Architecture.Tests/Rules/CoverageCollectionTests.cs`
+- modified: `.github/workflows/ci.yml` — all 9 integration-* `dotnet test` steps now pass `-- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml`
+
+Satisfies FR-020.
+
+## T012-T013 — coverage-summary job assertion + implementation
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK
+
+- created: `tests/Rig.TUnit.Architecture.Tests/Rules/CoverageSummaryJobTests.cs`
+- modified: `.github/workflows/ci.yml` — new `coverage-summary` job (download artefacts, ReportGenerator Html+Cobertura+MarkdownSummaryGithub, $GITHUB_STEP_SUMMARY, 30-day upload)
+- modified: `tests/Rig.TUnit.Architecture.Tests/Rules/ArtifactUploadTests.cs` — added `coverage-summary` to `ExemptJobs` (intentional 30-day retention).
+
+Satisfies FR-021, SC-018.
+
+## T014-T015 — threshold step assertion + implementation (non-blocking)
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK
+
+- created: `tests/Rig.TUnit.Architecture.Tests/Rules/CoverageThresholdTests.cs`
+- modified: `.github/workflows/ci.yml` — `coverage-summary` gains a Python threshold step (`line-rate ≥ 0.90`, `branch-rate ≥ 0.85`) with `continue-on-error: true`.
+
+Partial FR-022 (non-blocking). T069b at Phase 3 close flips `continue-on-error` to `false`.
+
+## T016 — coverage baseline schema (user-handoff for first CI run data)
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK (schema stub; awaits CI artefact download)
+
+- created: `benchmarks/coverage-baseline-005.json`
+
+**Handoff**: after T013/T015 run on CI, download the `coverage-report` artefact, extract per-package `line-rate` / `branch-rate` from `Cobertura.xml`, and write them into `providers: { <name>: { line_rate, branch_rate } }`.
+
+Satisfies FR-023.

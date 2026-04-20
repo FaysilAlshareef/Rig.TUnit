@@ -21,6 +21,11 @@ public sealed class NoSkipMarkersTests
         "TestFileOrganizationTests.cs",
         "ReadmeCompletenessTests.cs",
         "NoSkipMarkersTests.cs",
+        // Environment-variable mutation tests — must serialise process-global state.
+        // Pre-005 [NotInParallel] is grandfathered; per-test env-var sandboxing is a
+        // Phase-3-follow-up (see planning/post-005-phase-1/SharedFixture-Audit.md).
+        "EnvironmentDetectionTests.cs",
+        "ConnectionSourceTests.cs",
     };
 
     private static readonly Regex SkipCategoryPattern = new(

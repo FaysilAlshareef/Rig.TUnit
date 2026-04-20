@@ -59,3 +59,14 @@ Satisfies FR-012, SC-014.
 **GREEN evidence**: compile-clean (`dotnet build` → 0 errors). CI Postgres job validates schema-isolation under parallel load; first run will also serve as the 10-green requirement for T008.
 
 Satisfies FR-010, SC-001.
+
+## A005 — Shared-fixture audit inventory (GREEN-only, audit namespace)
+**Timestamp**: 2026-04-20
+**Repo**: primary
+**Status**: OK
+
+- created: `planning/post-005-phase-1/SharedFixture-Audit.md`
+
+20 fixtures inventoried — 7 safe (IsolationKey-based consumers), 12 unsafe (Phase 3 T066 conversion), 1 stopgap (Kafka listener subset). No RED/GREEN partner per analysis #7 (A-prefix audit-namespace tasks exempt from FR-001).
+
+Satisfies FR-011, SC-013.

@@ -207,19 +207,19 @@ Commit B   feat(005): TNNN — GREEN implement {summary}
 
 ### Phase 3c — P1 Legacy providers `[depends: T031-T039]`
 
-- [ ] **T040** RED + T041 GREEN `[P]` — `Rig.TUnit.Caching.Memory` missing Unit + Benchmark
+- [x] **T040** RED + T041 GREEN `[P]` — `Rig.TUnit.Caching.Memory` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Caching.Memory.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/MemoryCacheBenchmarks.cs`. FR-033.
 
-- [ ] **T042** RED + T043 GREEN `[P]` — `Rig.TUnit.Caching.Redis` missing Unit + Benchmark
+- [x] **T042** RED + T043 GREEN `[P]` — `Rig.TUnit.Caching.Redis` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Caching.Redis.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/RedisCacheBenchmarks.cs`. FR-033.
 
-- [ ] **T044** RED + T045 GREEN `[P]` — `Rig.TUnit.Databases.Sql.Sqlite` missing Unit + Benchmark
+- [x] **T044** RED + T045 GREEN `[P]` — `Rig.TUnit.Databases.Sql.Sqlite` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/SqliteBenchmarks.cs`. FR-033.
 
-- [ ] **T046** RED + T047 GREEN `[P]` — `Rig.TUnit.Databases.Sql.SqlServer` missing Benchmark
+- [x] **T046** RED + T047 GREEN `[P]` — `Rig.TUnit.Databases.Sql.SqlServer` missing Benchmark
       Files: `tests/Rig.TUnit.Benchmarks/SqlServerBenchmarks.cs`. FR-033.
 
-- [ ] **T048** RED + T049 GREEN `[P]` — `Rig.TUnit.Databases.NoSql.Redis` missing Unit + Benchmark
+- [x] **T048** RED + T049 GREEN `[P]` — `Rig.TUnit.Databases.NoSql.Redis` missing Unit + Benchmark
       Files: `tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Unit/`, `tests/Rig.TUnit.Benchmarks/RedisKvBenchmarks.cs`. FR-033.
 
 ### Phase 3d — P1 Observability leaves `[depends: T041-T049]`

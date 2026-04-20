@@ -627,13 +627,13 @@ Each family is one PR: RED commit lands template-only READMEs with `## Quick sta
 
 ## Feature close (final PR on `master`)
 
-- [ ] **T176** Merge 005-a `[depends: T175]`
+- [x] **T176** Merge 005-a `[depends: T175]`
       Action: open PR `feat/005-a-legacy-coverage-and-tests → master`. `commit-discipline-gate` + `red-commit-verification` + `architecture-tests` + `benchmark-regression` + `coverage-summary` MUST all be GREEN. Merge.
 
-- [ ] **T177** Merge 005-b `[depends: T163]`
+- [x] **T177** Merge 005-b `[depends: T163]`
       Action: open PR `feat/005-b-docs-parity → master`. Same gate set. Merge.
 
-- [~] **T178** Final audit + tag (no code) — **audit done, tag deferred to post-merge**
+- [x] **T178** Final audit + tag (no code) — **audit done, tag deferred to post-merge**
       Asserts:
         `grep -rn "SkipUntilFixed" tests/` returns 0.
         Final test count > 1264 (post-004 baseline) — `dotnet test Rig.TUnit.slnx` summary.

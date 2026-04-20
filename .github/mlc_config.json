@@ -11,6 +11,9 @@
     },
     {
       "pattern": "mailto:"
+    },
+    {
+      "pattern": "\\.(cs|ts|js|py|md|json|yml|yaml|csproj|sln):[0-9]+$"
     }
   ],
   "replacementPatterns": [],

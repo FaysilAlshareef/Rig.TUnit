@@ -138,4 +138,4 @@ N/A — generic single-repo mode; no secondary-repo briefs.
 
 - Reviewer scans used: `async\s+void`, swallowed `catch`, `.Result`/`.Wait()`, `DateTime\.Now`, `\.ToList\(\)\s*\.Where`, `UseLazyLoadingProxies`, `Console\.Write`, `password=` + siblings, `SqlCommand\(\$` — all returned 0 matches in src.
 - Architecture rules that will catch regressions: `ProviderCompletenessTests`, `TestFileOrganizationTests`, `ReadmeCompletenessTests`, `CodeOrganizationTests`, `ForbiddenApiTests`, `DependencyDirectionTests`, `CoverageRuleTests`, `TestCompletenessTests`.
-- CI: [.github/workflows/ci.yml](.github/workflows/ci.yml) (233 lines) — Build+Unit+Arch job, plus segmented contract/integration/benchmark matrix.
+- CI: [.github/workflows/ci.yml](../../../.github/workflows/ci.yml) (233 lines) — Build+Unit+Arch job, plus segmented contract/integration/benchmark matrix.

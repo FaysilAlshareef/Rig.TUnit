@@ -1,0 +1,414 @@
+name: Full Coverage Scan
+
+# Runs only on ci/coverage-scan branch. Collects real coverage from every test
+# project (unit, contract, all integration matrices) and commits merged results
+# back to the branch so the report can be read from the committed files.
+
+on:
+  push:
+    branches: ['ci/coverage-scan']
+
+permissions:
+  contents: write
+
+jobs:
+
+  # ─── Unit + Contract + Architecture ────────────────────────────────────────
+  unit-and-contract:
+    name: Unit + Contract + Arch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore Rig.TUnit.slnx
+      - name: Build (full solution)
+        run: dotnet build Rig.TUnit.slnx --no-restore -c Release
+      - name: Run unit + contract + arch tests with coverage
+        shell: bash
+        run: |
+          set +e
+          while IFS= read -r proj; do
+            name=$(basename "$proj" .csproj)
+            echo "::group::$name"
+            dotnet test --project "$proj" --no-build -c Release \
+              -- --coverage --coverage-output-format cobertura \
+                 --coverage-output coverage.cobertura.xml
+            ec=$?
+            [ $ec -ne 0 ] && echo "::warning::$name exited $ec"
+            echo "::endgroup::"
+          done < <(find tests -name "*.csproj" | grep -Ev "Integration|Benchmarks|Contract" | sort)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-unit-contract
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── SQL integration matrix ─────────────────────────────────────────────────
+  integration-sql:
+    name: SQL — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [SqlServer, Sqlite, Postgresql, MySql, Oracle]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-sql-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── NoSQL integration matrix ───────────────────────────────────────────────
+  integration-nosql:
+    name: NoSQL — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb, Redis, Cosmos]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-nosql-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Caching integration matrix ─────────────────────────────────────────────
+  integration-caching:
+    name: Caching — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Memory, Redis, Hybrid, Fusion]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-caching-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Messaging integration matrix ───────────────────────────────────────────
+  integration-messaging:
+    name: Messaging — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Kafka, Nats, RabbitMq, ServiceBus, Sqs]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-messaging-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Microservices integration matrix ───────────────────────────────────────
+  integration-microservices:
+    name: Microservices — ${{ matrix.component }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [Contracts, EventSourcing, Inbox, Outbox, Saga, Snapshots]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-microservices-${{ matrix.component }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Security integration matrix ────────────────────────────────────────────
+  integration-security:
+    name: Security — ${{ matrix.area }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        area: [Jwt, Mtls, OAuth, Policies]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-security-${{ matrix.area }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Observability integration matrix ───────────────────────────────────────
+  integration-observability:
+    name: Observability — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [Logging, Metrics, Tracing, Seq, AppInsights]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-observability-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Storage integration matrix ─────────────────────────────────────────────
+  integration-storage:
+    name: Storage — ${{ matrix.provider }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        provider: [FileSystem, MinIO, S3, AzureBlob]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-storage-${{ matrix.provider }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Core / infrastructure matrix ───────────────────────────────────────────
+  # NOTE: includes 'Ci' which is absent from the main ci.yml matrix (a gap in
+  # the production workflow — these tests never run in normal CI).
+  integration-core-infra:
+    name: Core/Infra — ${{ matrix.area }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience, Ci]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-restore -c Release
+      - name: Run
+        run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-core-infra-${{ matrix.area }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Communication integration (MISSING from main ci.yml entirely) ──────────
+  # Core, Grpc, Http, WebAPI, Mediator integration tests are not in any matrix
+  # in ci.yml. This job surfaces their coverage for the first time.
+  integration-communication:
+    name: Communication — ${{ matrix.component }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - component: Core
+            proj: tests/Rig.TUnit.Core.Tests.Integration/Rig.TUnit.Core.Tests.Integration.csproj
+          - component: Grpc
+            proj: tests/Rig.TUnit.Grpc.Tests.Integration/Rig.TUnit.Grpc.Tests.Integration.csproj
+          - component: Http
+            proj: tests/Rig.TUnit.Http.Tests.Integration/Rig.TUnit.Http.Tests.Integration.csproj
+          - component: WebAPI
+            proj: tests/Rig.TUnit.WebAPI.Tests.Integration/Rig.TUnit.WebAPI.Tests.Integration.csproj
+          - component: Mediator
+            proj: tests/Rig.TUnit.Mediator.Tests.Integration/Rig.TUnit.Mediator.Tests.Integration.csproj
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore + Build
+        run: |
+          dotnet restore Rig.TUnit.slnx
+          dotnet build "${{ matrix.proj }}" --no-restore -c Release
+      - name: Run
+        run: dotnet test --project "${{ matrix.proj }}" --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-communication-${{ matrix.component }}
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 3
+          if-no-files-found: warn
+
+  # ─── Merge all coverage + commit results back to branch ─────────────────────
+  coverage-merge:
+    name: Merge coverage + commit results
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - unit-and-contract
+      - integration-sql
+      - integration-nosql
+      - integration-caching
+      - integration-messaging
+      - integration-microservices
+      - integration-security
+      - integration-observability
+      - integration-storage
+      - integration-core-infra
+      - integration-communication
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Download all test-results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: ./artefacts
+          merge-multiple: false
+      - name: Count collected cobertura files
+        run: |
+          count=$(find ./artefacts -name "coverage.cobertura.xml" | wc -l)
+          echo "Found $count cobertura files"
+          find ./artefacts -name "coverage.cobertura.xml" | sort
+      - name: Install ReportGenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      - name: Generate merged coverage report
+        run: |
+          reportgenerator \
+            "-reports:./artefacts/**/coverage.cobertura.xml" \
+            "-targetdir:./coverage-merged" \
+            "-reporttypes:Html;Cobertura;CsvSummary;MarkdownSummaryGithub" \
+            "-title:Rig.TUnit Full Coverage Scan"
+      - name: Publish summary to job page
+        run: cat ./coverage-merged/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      - name: Print per-package violations (line < 0.90 OR branch < 0.85)
+        shell: python3 {0}
+        run: |
+          import xml.etree.ElementTree as ET, sys
+          tree = ET.parse('./coverage-merged/Cobertura.xml')
+          root = tree.getroot()
+          lr = float(root.attrib.get('line-rate', 0))
+          br = float(root.attrib.get('branch-rate', 0))
+          print(f'OVERALL  line={lr:.3f} ({lr*100:.1f}%)  branch={br:.3f} ({br*100:.1f}%)')
+          print()
+          print(f'{"Package":<55} {"Line%":>6}  {"Branch%":>7}  Status')
+          print('-' * 80)
+          for pkg in root.iter('package'):
+              name = (pkg.attrib.get('name') or '<unnamed>')[-54:]
+              plr  = float(pkg.attrib.get('line-rate') or 0)
+              pbr  = float(pkg.attrib.get('branch-rate') or 0)
+              flag = 'FAIL' if plr < 0.90 or pbr < 0.85 else 'ok'
+              print(f'{name:<55} {plr*100:>5.1f}%  {pbr*100:>6.1f}%  {flag}')
+      - name: Commit results back to branch
+        run: |
+          mkdir -p coverage-scan-results
+          cp ./coverage-merged/Cobertura.xml    coverage-scan-results/merged.cobertura.xml
+          cp ./coverage-merged/Summary.csv      coverage-scan-results/summary.csv      2>/dev/null || true
+          cp ./coverage-merged/SummaryGithub.md coverage-scan-results/summary.md
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add coverage-scan-results/
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "ci: coverage scan results [skip ci]"
+            git push origin ci/coverage-scan
+          fi

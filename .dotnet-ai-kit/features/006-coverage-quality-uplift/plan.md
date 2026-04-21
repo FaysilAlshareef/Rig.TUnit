@@ -201,7 +201,7 @@ public sealed class {Provider}RigBuilderExerciseTests
 
 ### T012 — `Databases.Sql.Oracle`
 
-**Source under test**: `OracleRigBuilder`, `OracleBuilderExtensions` (note non-standard suffix — check actual class name)
+**Source under test**: `OracleRigBuilder`, `OracleRigBuilderExtensions`
 
 **Sample connection string**: `"User Id=system;Password=oracle;Data Source=localhost/XEPDB1;"`
 

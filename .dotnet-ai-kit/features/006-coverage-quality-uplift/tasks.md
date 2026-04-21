@@ -62,8 +62,8 @@
 
 - [ ] T012 [P] `Databases.Sql.Oracle` — 62.5 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Sql.Oracle.Tests.Unit/OracleBuilderTests.cs` (new or extend)
-      Tests: mirror T010 with `Oracle`; cover `OracleRigBuilder` (33.3 %) + `OracleBuilderExtensions` (0 %)
-      Source: `OracleRigBuilder`, `OracleBuilderExtensions`
+      Tests: mirror T010 with `Oracle`; cover `OracleRigBuilder` (33.3 %) + `OracleRigBuilderExtensions` (0 %)
+      Source: `OracleRigBuilder`, `OracleRigBuilderExtensions`
       Commits: `red(T012):` → `green(T012):`
 
 - [ ] T013 [P] `Databases.Sql.Sqlite` — 74.3 % → ≥ 90 %
@@ -109,10 +109,11 @@
 > Pattern: mock `IMemoryCache`/`IDatabase`/etc. via NSubstitute; use `System.Text.Json` or `InMemoryDatabase` for EF helpers.
 
 - [ ] T020 [P] `Caching` — 18.0 % → ≥ 90 %
+      ⚠️ Pre-step: create `tests/Rig.TUnit.Caching.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Caching.Tests.Unit/CacheAssertTests.cs` (new)
         `tests/Rig.TUnit.Caching.Tests.Unit/ClockControlTests.cs` (new)
-        `tests/Rig.TUnit.Caching.Fusion.Tests.Integration/BackplaneCaptureTests.cs` (extend for StampedeTester)
+        `tests/Rig.TUnit.Caching.Fusion.Tests.Integration/BackplaneCaptureTests.cs` (extend for StampedeTester — project confirmed in slnx)
       Tests:
         `CacheAssert_ContainsKey_WhenKeyPresent_DoesNotThrow` (mock IMemoryCache)
         `CacheAssert_ContainsKey_WhenKeyAbsent_ThrowsAssertionException`
@@ -130,9 +131,10 @@
       Commits: `red(T021):` → `green(T021):`
 
 - [ ] T022 [P] `Databases.NoSql` — 12.5 % → ≥ 90 %
+      ⚠️ Pre-step: create `tests/Rig.TUnit.Databases.NoSql.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Databases.NoSql.Tests.Unit/JsonDocumentAssertTests.cs` (new)
-        `tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration/ChangeFeedCaptureTests.cs` (extend — Cosmos emulator)
+        `tests/Rig.TUnit.Databases.NoSql.Cosmos.Tests.Integration/ChangeFeedCaptureTests.cs` (extend — Cosmos emulator confirmed in CI matrix via slnx line 181)
       Tests:
         `JsonDocumentAssert_HasProperty_WhenPresent_DoesNotThrow` (JsonDocument.Parse)
         `JsonDocumentAssert_HasProperty_WhenAbsent_ThrowsAssertionException`
@@ -154,6 +156,7 @@
       Commits: `red(T023):` → `green(T023):`
 
 - [ ] T024 [P] `Messaging` — 30.9 % → ≥ 90 %
+      ⚠️ Pre-step: create `tests/Rig.TUnit.Messaging.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       File: `tests/Rig.TUnit.Messaging.Tests.Unit/MessagingAssertTests.cs` (new)
       Tests:
         `MessageAssert_HasSubject_WhenCorrect_DoesNotThrow`
@@ -169,6 +172,7 @@
       Commits: `red(T024):` → `green(T024):`
 
 - [ ] T025 [P] `Security` — 25.9 % → ≥ 90 %
+      ⚠️ Pre-step: create `tests/Rig.TUnit.Security.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       File: `tests/Rig.TUnit.Security.Tests.Unit/SecurityAssertTests.cs` (new)
       Tests:
         `SecurityAssert_ReturnsUnauthorized_WhenStatus401_DoesNotThrow` (mock HttpResponseMessage)
@@ -179,6 +183,7 @@
       Commits: `red(T025):` → `green(T025):`
 
 - [ ] T026 [P] `Storage` — 16.6 % → ≥ 90 %
+      ⚠️ Pre-step: create `tests/Rig.TUnit.Storage.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Storage.Tests.Unit/BlobAssertTests.cs` (new)
         `tests/Rig.TUnit.Storage.Tests.Unit/BlobValueObjectTests.cs` (new)
@@ -343,6 +348,7 @@
       File: `tests/Rig.TUnit.Benchmarks/InProcessEmitBenchmarkConfig.cs` line 18
       Change: `.WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core80)`
       →       `.WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core100)`
+      ⚠️ Note: file is currently at `Core80` — a prior edit was reverted. Apply fresh.
       Verify: `dotnet build tests/Rig.TUnit.Benchmarks` compiles clean
       Commit: `green(T040): Benchmark config change — no test needed; this IS the fix`
 
@@ -448,7 +454,7 @@
 
 | Phase | Tasks | Status |
 |-------|-------|--------|
-| Phase 1 — CI Foundation | T001–T003 | ⬜ Not started |
+| Phase 1 — CI Foundation | T001–T003 | 🟡 In progress (T001 ✅ T002 ✅ T003 pending CI run) |
 | Phase 2 — Pattern A Builders | T010–T016 | ⬜ Not started |
 | Phase 3 — Pattern B Assertions | T020–T026 | ⬜ Not started |
 | Phase 4 — Pattern C Helpers | T030–T039e | ⬜ Not started |

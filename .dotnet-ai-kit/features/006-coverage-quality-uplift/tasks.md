@@ -344,13 +344,12 @@
 
 > Independent — may run in parallel with Phases 2–4.
 
-- [ ] T040 Fix `CoreRuntime.Core80` → `CoreRuntime.Core100`
+- [x] T040 Fix `CoreRuntime.Core80` → `CoreRuntime.Core90`
       File: `tests/Rig.TUnit.Benchmarks/InProcessEmitBenchmarkConfig.cs` line 18
       Change: `.WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core80)`
-      →       `.WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core100)`
-      ⚠️ Note: file is currently at `Core80` — a prior edit was reverted. Apply fresh.
-      Verify: `dotnet build tests/Rig.TUnit.Benchmarks` compiles clean
-      Commit: `green(T040): Benchmark config change — no test needed; this IS the fix`
+      →       `.WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core90)`
+      Note: BDN 0.14.0 only defines up to Core90 — Core100 does not exist in the installed version.
+      Verified: `dotnet build` passes clean.
 
 - [ ] T041 [depends: T040] Populate `benchmarks/baseline-006.json`
       Command:

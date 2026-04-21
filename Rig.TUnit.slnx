@@ -89,6 +89,7 @@
     <Project Path="tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Tests.Contract/Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Tests.Contract/Rig.TUnit.Caching.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Caching.Tests.Unit/Rig.TUnit.Caching.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.Tests.Contract/Rig.TUnit.Messaging.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tests.Contract/Rig.TUnit.Observability.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tracing.Tests.Integration/Rig.TUnit.Observability.Tracing.Tests.Integration.csproj" />

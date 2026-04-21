@@ -42,7 +42,7 @@
 > Reference: `tests/Rig.TUnit.Databases.Sql.Postgresql.Tests.Unit/UsePostgresRigBuilderExtensionsTests.cs`
 > Pattern: `services.AddRigTUnit(rig => captured = rig)` → `RigConnect.FromValue(cs)` → assert fluent chain + provider extension.
 
-- [ ] T010 [P] `Databases.Sql.SqlServer` — 51.4 % → ≥ 90 %
+- [x] T010 [P] `Databases.Sql.SqlServer` — 51.4 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Sql.SqlServer.Tests.Unit/SqlServerBuilderTests.cs` (new)
       Tests:
         `UseSqlServer_NullRig_ThrowsArgumentNullException`
@@ -54,25 +54,25 @@
       Source: `SqlServerRigBuilder`, `SqlServerRigBuilderExtensions` (already exist)
       Commits: `red(T010):` (tests, failing) → `green(T010):` (tests only — production code already existed)
 
-- [ ] T011 [P] `Databases.Sql.MySql` — 72.9 % → ≥ 90 %
+- [x] T011 [P] `Databases.Sql.MySql` — 72.9 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Sql.MySql.Tests.Unit/MySqlBuilderTests.cs` (new or extend)
       Tests: mirror T010 with `MySql` substitution; cover missing branches in `MySqlRigBuilder`
       Source: `MySqlRigBuilder`, `MySqlRigBuilderExtensions`
       Commits: `red(T011):` → `green(T011):`
 
-- [ ] T012 [P] `Databases.Sql.Oracle` — 62.5 % → ≥ 90 %
+- [x] T012 [P] `Databases.Sql.Oracle` — 62.5 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Sql.Oracle.Tests.Unit/OracleBuilderTests.cs` (new or extend)
       Tests: mirror T010 with `Oracle`; cover `OracleRigBuilder` (33.3 %) + `OracleRigBuilderExtensions` (0 %)
       Source: `OracleRigBuilder`, `OracleRigBuilderExtensions`
       Commits: `red(T012):` → `green(T012):`
 
-- [ ] T013 [P] `Databases.Sql.Sqlite` — 74.3 % → ≥ 90 %
+- [x] T013 [P] `Databases.Sql.Sqlite` — 74.3 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit/SqliteBuilderTests.cs` (new or extend)
       Tests: mirror T010 with `Sqlite`; use `"Data Source=:memory:"` (no container needed)
       Source: `SqliteRigBuilder`, `SqliteRigBuilderExtensions`
       Commits: `red(T013):` → `green(T013):`
 
-- [ ] T014 [P] `Databases.NoSql.Redis` — 23.5 % → ≥ 90 %
+- [x] T014 [P] `Databases.NoSql.Redis` — 23.5 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.NoSql.Redis.Tests.Unit/RedisKvBuilderTests.cs` (new)
       Tests:
         Builder null-guard tests (5) — `RedisKvRigBuilder`, `RedisKvRigBuilderExtensions`
@@ -81,7 +81,7 @@
       Source: `RedisKvRigBuilder`, `RedisKvRigBuilderExtensions`, `KeyScanHelper`
       Commits: `red(T014):` → `green(T014):`
 
-- [ ] T015 [P] `Caching.Redis` — 38.0 % → ≥ 90 %
+- [x] T015 [P] `Caching.Redis` — 38.0 % → ≥ 90 %
       Files:
         `tests/Rig.TUnit.Caching.Redis.Tests.Unit/RedisCacheBuilderTests.cs` (new — builder tests)
         `tests/Rig.TUnit.Caching.Fusion.Tests.Integration/BackplaneCaptureTests.cs` (extend — backplane tests need Redis)
@@ -92,7 +92,7 @@
       Source: `RedisCacheRigBuilder`, `RedisCacheRigBuilderExtensions`, `RedisBackplaneCapture`
       Commits: `red(T015):` → `green(T015):`
 
-- [ ] T016 [P] `Caching.Memory` — 63.1 % → ≥ 90 %
+- [x] T016 [P] `Caching.Memory` — 63.1 % → ≥ 90 %
       File: `tests/Rig.TUnit.Caching.Memory.Tests.Unit/MemoryCacheBuilderTests.cs` (new)
       Tests:
         Builder null-guard tests (5) — `MemoryCacheRigBuilder`, `MemoryCacheRigBuilderExtensions`
@@ -108,7 +108,7 @@
 > Prerequisite: Phase 1 merged. May run in parallel with Phase 2.
 > Pattern: mock `IMemoryCache`/`IDatabase`/etc. via NSubstitute; use `System.Text.Json` or `InMemoryDatabase` for EF helpers.
 
-- [ ] T020 [P] `Caching` — 18.0 % → ≥ 90 %
+- [x] T020 [P] `Caching` — 18.0 % → ≥ 90 %
       ⚠️ Pre-step: create `tests/Rig.TUnit.Caching.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Caching.Tests.Unit/CacheAssertTests.cs` (new)
@@ -122,7 +122,7 @@
         `StampedeTester_Concurrent_NoRaceCondition` (integration, Redis available)
       Commits: `red(T020):` → `green(T020):`
 
-- [ ] T021 [P] `Databases` — 46.9 % → ≥ 90 %
+- [x] T021 [P] `Databases` — 46.9 % → ≥ 90 %
       File: `tests/Rig.TUnit.Databases.Tests.Unit/DatabaseAssertTests.cs` (new)
       Tests:
         `DatabaseAssert_TableExists_WhenEntityRegistered_ReturnsTrue` (InMemoryDatabase)
@@ -130,7 +130,7 @@
         `MigrationAssert_HasPendingMigrations_WhenUnmigrated_ReturnsTrue`
       Commits: `red(T021):` → `green(T021):`
 
-- [ ] T022 [P] `Databases.NoSql` — 12.5 % → ≥ 90 %
+- [x] T022 [P] `Databases.NoSql` — 12.5 % → ≥ 90 %
       ⚠️ Pre-step: create `tests/Rig.TUnit.Databases.NoSql.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Databases.NoSql.Tests.Unit/JsonDocumentAssertTests.cs` (new)
@@ -142,7 +142,7 @@
         `ChangeFeedCapture_Capture_RecordsDocument` (integration, Cosmos emulator)
       Commits: `red(T022):` → `green(T022):`
 
-- [ ] T023 [P] `Databases.Sql` — 43.5 % → ≥ 90 %
+- [x] T023 [P] `Databases.Sql` — 43.5 % → ≥ 90 %
       Files:
         `tests/Rig.TUnit.Databases.Sql.Tests.Unit/RawSqlAssertTests.cs` (new — Sqlite in-memory)
         `tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/DeadlockSimulatorTests.cs` (extend)
@@ -155,7 +155,7 @@
         `TransactionScope_Rollback_RevertsChanges` (Sqlite integration)
       Commits: `red(T023):` → `green(T023):`
 
-- [ ] T024 [P] `Messaging` — 30.9 % → ≥ 90 %
+- [x] T024 [P] `Messaging` — 30.9 % → ≥ 90 %
       ⚠️ Pre-step: create `tests/Rig.TUnit.Messaging.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       File: `tests/Rig.TUnit.Messaging.Tests.Unit/MessagingAssertTests.cs` (new)
       Tests:
@@ -171,7 +171,7 @@
       All via `List<CapturedMessage<T>>` — no broker container.
       Commits: `red(T024):` → `green(T024):`
 
-- [ ] T025 [P] `Security` — 25.9 % → ≥ 90 %
+- [x] T025 [P] `Security` — 25.9 % → ≥ 90 %
       ⚠️ Pre-step: create `tests/Rig.TUnit.Security.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       File: `tests/Rig.TUnit.Security.Tests.Unit/SecurityAssertTests.cs` (new)
       Tests:
@@ -182,7 +182,7 @@
         `SecurityAssertionException_IsExceptionSubtype`
       Commits: `red(T025):` → `green(T025):`
 
-- [ ] T026 [P] `Storage` — 16.6 % → ≥ 90 %
+- [x] T026 [P] `Storage` — 16.6 % → ≥ 90 %
       ⚠️ Pre-step: create `tests/Rig.TUnit.Storage.Tests.Unit/` project + register in `Rig.TUnit.slnx`
       Files:
         `tests/Rig.TUnit.Storage.Tests.Unit/BlobAssertTests.cs` (new)
@@ -212,7 +212,7 @@
       Note: Project is now in CI matrix after T001.
       Commits: `red(T030):` → `green(T030):`
 
-- [ ] T031 [P] `Observability.Seq` — 25.5 % → ≥ 90 %
+- [x] T031 [P] `Observability.Seq` — 25.5 % → ≥ 90 %
       Files:
         `tests/Rig.TUnit.Observability.Seq.Tests.Unit/SeqAssertTests.cs` (new)
         `tests/Rig.TUnit.Observability.Seq.Tests.Integration/SeqFixtureTests.cs` (extend)
@@ -274,7 +274,7 @@
         `BulkheadAssert_IsRejecting_WhenBelowCapacity_ThrowsAssertionException`
       Commits: `red(T036):` → `green(T036):`
 
-- [ ] T037 [P] `Microservices.Saga` — 77.8 % → ≥ 90 %
+- [x] T037 [P] `Microservices.Saga` — 77.8 % → ≥ 90 %
       Files:
         `tests/Rig.TUnit.Microservices.Saga.Tests.Unit/SagaAssertTests.cs` (new)
         `tests/Rig.TUnit.Microservices.Saga.Tests.Integration/SagaHarnessTests.cs` (extend)
@@ -286,7 +286,7 @@
         `SagaHarness_Execute_WithCompensation_RecordsCompensationSteps` (integration)
       Commits: `red(T037):` → `green(T037):`
 
-- [ ] T038 [P] `Microservices.Outbox` — 82.7 % → ≥ 90 %
+- [x] T038 [P] `Microservices.Outbox` — 82.7 % → ≥ 90 %
       File: `tests/Rig.TUnit.Microservices.Outbox.Tests.Unit/OutboxAssertTests.cs` (new or extend)
       Tests:
         `OutboxEntryAssertion_HasEntry_WhenPresent_DoesNotThrow` (uncovered branches)
@@ -296,7 +296,7 @@
         `OutboxAssertionException_Message_ContainsEntryType`
       Commits: `red(T038):` → `green(T038):`
 
-- [ ] T039 [P] `Observability.AppInsights` — 71.7 % → ≥ 90 %
+- [x] T039 [P] `Observability.AppInsights` — 71.7 % → ≥ 90 %
       Files:
         `tests/Rig.TUnit.Observability.AppInsights.Tests.Unit/AppInsightsAssertTests.cs` (new)
         `tests/Rig.TUnit.Observability.AppInsights.Tests.Unit/AppInsightsRigBuilderTests.cs` (new)
@@ -333,7 +333,7 @@
         `PolicyAssert_Overload_WithClaimsPrincipal_Passes` (uncovered overload)
       Commits: `red(T039d):` → `green(T039d):`
 
-- [ ] T039e [P] `Messaging.Tests.Contract` — 78.4 % → ≥ 90 %
+- [x] T039e [P] `Messaging.Tests.Contract` — 78.4 % → ≥ 90 %
       File: `tests/Rig.TUnit.Messaging.Tests.Contract/` (extend existing contract base)
       Tests: Add contract scenarios covering uncovered branches in the contract base class.
       Commits: `red(T039e):` → `green(T039e):`

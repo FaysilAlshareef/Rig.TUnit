@@ -38,4 +38,15 @@ public sealed class AppInsightsRigBuilderTests
         new ServiceCollection().AddRigTUnit(rig => captured = rig);
         await Assert.That(() => new AppInsightsRigBuilder(captured!, null!)).ThrowsExactly<ArgumentNullException>();
     }
+
+    [Test]
+    public async Task AppInsightsRigBuilder_InstrumentationKey_ReturnsValueFromSource()
+    {
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("00000000-0000-0000-0000-000000000001");
+        var builder = new AppInsightsRigBuilder(captured!, source);
+
+        await Assert.That(builder.InstrumentationKey).IsEqualTo("00000000-0000-0000-0000-000000000001");
+    }
 }

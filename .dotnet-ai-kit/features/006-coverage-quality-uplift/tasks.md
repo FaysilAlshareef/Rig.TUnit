@@ -30,9 +30,9 @@
       Add comment above `continue-on-error: true`: `# Disabled 2026-04-20; re-enabled by feat/006 T090`
       Commit: `green(T002): CI change — no production code affected`
 
-- [ ] T003 [depends: T001, T002] Verify all 6 new integration projects PASS in CI run
+- [x] T003 [depends: T001, T002] Verify all 6 new integration projects PASS in CI run
       Action: Push Phase 1 PR, watch `Integration — Core` matrix, record run ID in PR description
-      Exit gate: Core ✅ Ci ✅ Grpc ✅ Http ✅ WebAPI ✅ Mediator ✅ (add per-entry `continue-on-error` for Grpc/Http if flaky; create T001a)
+      Result: Run 24719807423 — Core ✅ Ci ✅ Grpc ✅ Http ✅ WebAPI ✅ Mediator ✅ (all pass, no flakiness)
 
 ---
 

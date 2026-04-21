@@ -21,7 +21,7 @@ jobs:
           BASE_SHA="${{ github.event.pull_request.base.sha }}"
           HEAD_SHA="${{ github.event.pull_request.head.sha }}"
           echo "Validating commits in range $BASE_SHA..$HEAD_SHA"
-          VALID='^(test|feat|refactor|fix|chore|docs|style|perf|build|ci|revert)(\(.+\))?:'
+          VALID='^(test|feat|refactor|fix|chore|docs|style|perf|build|ci|revert|red|green)(\(.+\))?:'
           FAIL=0
           while IFS= read -r sha; do
             SUBJECT=$(git log -1 --format=%s "$sha")
@@ -35,7 +35,7 @@ jobs:
           done < <(git rev-list "$BASE_SHA..$HEAD_SHA")
           if [[ $FAIL -ne 0 ]]; then
             echo ""
-            echo "All commits must start with: test, feat, refactor, fix, chore, docs, style, perf, build, ci, or revert."
+            echo "All commits must start with: test, feat, refactor, fix, chore, docs, style, perf, build, ci, revert, red, or green."
             exit 1
           fi
           echo "All commit messages valid."

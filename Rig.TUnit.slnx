@@ -92,6 +92,7 @@
     <Project Path="tests/Rig.TUnit.Caching.Tests.Contract/Rig.TUnit.Caching.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Tests.Unit/Rig.TUnit.Caching.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.Tests.Contract/Rig.TUnit.Messaging.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Tests.Unit/Rig.TUnit.Messaging.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tests.Contract/Rig.TUnit.Observability.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tracing.Tests.Integration/Rig.TUnit.Observability.Tracing.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Logging.Tests.Integration/Rig.TUnit.Observability.Logging.Tests.Integration.csproj" />

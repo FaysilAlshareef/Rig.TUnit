@@ -135,6 +135,7 @@
     <Project Path="tests/Rig.TUnit.Caching.Hybrid.Tests.Integration/Rig.TUnit.Caching.Hybrid.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Fusion.Tests.Integration/Rig.TUnit.Caching.Fusion.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.Tests.Contract/Rig.TUnit.Storage.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.Tests.Unit/Rig.TUnit.Storage.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.AzureBlob.Tests.Integration/Rig.TUnit.Storage.AzureBlob.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Integration/Rig.TUnit.Storage.S3.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Parallelism.Tests.Integration/Rig.TUnit.Parallelism.Tests.Integration.csproj" />

@@ -38,4 +38,15 @@ public sealed class JwtRigBuilderTests
         new ServiceCollection().AddRigTUnit(rig => captured = rig);
         await Assert.That(() => new JwtRigBuilder(captured!, null!)).ThrowsExactly<ArgumentNullException>();
     }
+
+    [Test]
+    public async Task JwtRigBuilder_Issuer_ReturnsIssuerFromSource()
+    {
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("my-issuer");
+        var builder = new JwtRigBuilder(captured!, source);
+
+        await Assert.That(builder.Issuer).IsEqualTo("my-issuer");
+    }
 }

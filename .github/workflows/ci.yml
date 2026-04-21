@@ -291,7 +291,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience]
+        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience, Core, Ci, Grpc, Http, WebAPI, Mediator]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
@@ -360,6 +360,7 @@ jobs:
         # 2026-04-20 (post-Phase-6c): reverted to warn-only while per-provider
         # test backfill is in flight. Ratchet back up package-by-package in a
         # follow-up feature. FR-022 / T015 allow a non-blocking reporting window.
+        # Disabled 2026-04-20; re-enabled by feat/006 T090
         continue-on-error: true
         shell: bash
         run: |

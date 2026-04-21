@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Rig.TUnit.Core.Builder;
 using Rig.TUnit.Databases.Sql.Builder;
@@ -38,4 +39,24 @@ public sealed class MySqlRigBuilderTests
         new ServiceCollection().AddRigTUnit(rig => captured = rig);
         await Assert.That(() => new MySqlRigBuilder(captured!, null!)).ThrowsExactly<ArgumentNullException>();
     }
+
+    [Test]
+    public async Task MySqlRigBuilder_ReplaceDbContext_WhenResolved_ThrowsNotSupportedException()
+    {
+        var services = new ServiceCollection();
+        RigBuilder? captured = null;
+        services.AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("Server=localhost;Database=x;Uid=u;Pwd=p;");
+
+        var builder = new MySqlRigBuilder(captured!, source);
+        builder.ReplaceDbContext<SampleDbContext>();
+
+        await using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+
+        await Assert.That(() => scope.ServiceProvider.GetRequiredService<SampleDbContext>())
+            .Throws<NotSupportedException>();
+    }
+
+    private sealed class SampleDbContext(DbContextOptions<SampleDbContext> options) : DbContext(options);
 }

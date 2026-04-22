@@ -32,6 +32,7 @@ project.lock.json
 ## Test results
 TestResults/
 BenchmarkDotNet.Artifacts/
+benchmarks/*-tmp/
 
 ## OS
 .DS_Store

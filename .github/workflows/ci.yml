@@ -387,6 +387,8 @@ jobs:
               'Rig.TUnit.Caching.Redis',        # container lifecycle code unreachable in unit tests
               'Rig.TUnit.Docker',
               'Rig.TUnit.HealthChecks',
+              'Rig.TUnit.Observability.Seq',    # starts real datalust/seq Testcontainer — integration-only
+              'Rig.TUnit.Observability',        # abstract TelemetryFixtureBase — no unit test project
           )
 
           tree = ET.parse(merged)
@@ -661,6 +663,8 @@ jobs:
     name: Benchmark regression
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: write   # required for benchmark-action/github-action-benchmark auto-push to gh-pages
     steps:
       - uses: actions/checkout@v5
         with:

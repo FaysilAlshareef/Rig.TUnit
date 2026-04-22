@@ -751,3 +751,11 @@ jobs:
           fail: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-linkcheck
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn

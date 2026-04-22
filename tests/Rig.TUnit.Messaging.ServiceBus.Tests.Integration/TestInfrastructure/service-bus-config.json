@@ -8,10 +8,7 @@
             "Name": "test-topic",
             "Subscriptions": [
               {
-                "Name": "test-subscription",
-                "Properties": {
-                  "RequiresSession": true
-                }
+                "Name": "test-subscription"
               }
             ]
           }

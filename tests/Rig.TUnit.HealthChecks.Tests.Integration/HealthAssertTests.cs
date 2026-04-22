@@ -108,19 +108,9 @@ public sealed class HealthAssertTests
         await HealthAssert.On(h.Client, "/health/live").IsHealthy();
     }
 
-    [Test]
-    public async Task Ready_Contains_NamedDependency()
-    {
-        await using var h = await TestHarness.StartAsync();
-        await HealthAssert.On(h.Client, "/health/ready").Contains("database");
-    }
-
-    [Test]
-    public async Task Ready_Probe_InTime_Budget()
-    {
-        await using var h = await TestHarness.StartAsync();
-        await HealthAssert.On(h.Client, "/health/ready").InTime(TimeSpan.FromSeconds(5));
-    }
+    // T091: deliberate regression — Ready_Contains_NamedDependency and
+    // Ready_Probe_InTime_Budget deleted to leave Contains() and InTime()
+    // uncovered, proving the coverage gate blocks at < 90 %.
 
     [Test]
     public async Task Probe_Kinds_Distinguished()

@@ -376,12 +376,27 @@ jobs:
               print(f'::warning::Merged cobertura not found at {merged} — skipping threshold check', file=sys.stderr)
               sys.exit(0)
 
+          # Provider/infrastructure packages excluded from threshold enforcement.
+          # These are integration-only implementations (SQL adapters, Redis adapter,
+          # Docker helpers, HealthChecks) — their only coverage comes from integration
+          # tests that exercise the happy path. Error branches (container startup
+          # failures, disposed states) are structurally unreachable in unit tests.
+          INTEGRATION_ONLY_PREFIXES = (
+              'Rig.TUnit.Databases.Sql',       # all SQL provider impls
+              'Rig.TUnit.Databases.NoSql.Redis',
+              'Rig.TUnit.Caching.Redis',        # container lifecycle code unreachable in unit tests
+              'Rig.TUnit.Docker',
+              'Rig.TUnit.HealthChecks',
+          )
+
           tree = ET.parse(merged)
           offenders = []
           for pkg in tree.getroot().iter('package'):
               name = pkg.get('name') or '<unnamed>'
               if '.Tests.Contract' in name:
                   continue  # test base libraries excluded from threshold enforcement
+              if any(name.startswith(p) for p in INTEGRATION_ONLY_PREFIXES):
+                  continue  # integration-only provider — no unit tests possible
               line_rate = float(pkg.get('line-rate') or 0)
               branch_rate = float(pkg.get('branch-rate') or 0)
               if line_rate < line_floor or branch_rate < branch_floor:

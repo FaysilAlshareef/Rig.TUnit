@@ -669,12 +669,37 @@ jobs:
         run: |
           dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
             --exporters json --artifacts ./benchmark-results --job short --filter '*'
+      - name: Merge benchmark JSON files
+        if: steps.paths.outputs.run == 'true'
+        shell: bash
+        run: |
+          python3 - <<'PYEOF'
+          import json, pathlib, sys
+
+          results_dir = pathlib.Path('./benchmark-results/results')
+          files = sorted(results_dir.glob('*-report-full-compressed.json'))
+          if not files:
+              print('No benchmark result files found.', file=sys.stderr)
+              sys.exit(1)
+
+          merged_benchmarks = []
+          meta = None
+          for f in files:
+              data = json.loads(f.read_text(encoding='utf-8'))
+              if meta is None:
+                  meta = {k: v for k, v in data.items() if k != 'Benchmarks'}
+              merged_benchmarks.extend(data.get('Benchmarks', []))
+
+          out = pathlib.Path('./benchmark-results/merged.json')
+          out.write_text(json.dumps({**(meta or {}), 'Benchmarks': merged_benchmarks}, indent=2), encoding='utf-8')
+          print(f'Merged {len(files)} file(s), {len(merged_benchmarks)} benchmark(s) -> {out}')
+          PYEOF
       - name: Store benchmark result
         if: steps.paths.outputs.run == 'true'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'benchmarkdotnet'
-          output-file-path: ./benchmark-results/results/*.json
+          output-file-path: ./benchmark-results/merged.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           alert-threshold: '120%'

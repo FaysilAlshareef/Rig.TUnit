@@ -145,20 +145,56 @@ public sealed class ServiceBusListenerTests
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var receiver = client.CreateReceiver(Topic, Subscription);
 
-        // Act — send, receive, abandon once
+        // Use an event-driven processor with TaskCompletionSource so the test
+        // does not poll the shared subscription. Messages from other parallel
+        // tests are abandoned without being consumed (CorrelationId ≠ testId).
+        var firstDeliveredTcs = new TaskCompletionSource<ServiceBusReceivedMessage>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+        var redeliveredTcs = new TaskCompletionSource<ServiceBusReceivedMessage>(
+            TaskCreationOptions.RunContinuationsAsynchronously);
+
+        await using var processor = client.CreateProcessor(Topic, Subscription,
+            new ServiceBusProcessorOptions { MaxConcurrentCalls = 1, AutoCompleteMessages = false });
+
+        processor.ProcessMessageAsync += async args =>
+        {
+            if (args.Message.CorrelationId != testId)
+            {
+                await args.AbandonMessageAsync(args.Message, cancellationToken: ct);
+                return;
+            }
+            if (!firstDeliveredTcs.Task.IsCompleted)
+            {
+                firstDeliveredTcs.TrySetResult(args.Message);
+                await args.AbandonMessageAsync(args.Message, cancellationToken: ct);
+            }
+            else
+            {
+                redeliveredTcs.TrySetResult(args.Message);
+                await args.CompleteMessageAsync(args.Message, ct);
+            }
+        };
+        processor.ProcessErrorAsync += args =>
+        {
+            firstDeliveredTcs.TrySetException(args.Exception);
+            redeliveredTcs.TrySetException(args.Exception);
+            return Task.CompletedTask;
+        };
+
+        // Act — start listening, send message, await first delivery then redelivery
+        await processor.StartProcessingAsync(ct);
         await sender.SendAsync($"retry-{testId}", correlationId: testId, ct: ct);
-        var first = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(15), ct);
-        await Assert.That(first).IsNotNull();
-        var firstDeliveryCount = first!.DeliveryCount;
-        await receiver.AbandonMessageAsync(first, cancellationToken: ct);
 
-        // Assert — message is redelivered with incremented delivery count
-        var second = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(15), ct);
-        await Assert.That(second).IsNotNull();
-        await Assert.That(second!.MessageId).IsEqualTo(first.MessageId);
-        await Assert.That(second.DeliveryCount).IsGreaterThan(firstDeliveryCount);
-        await receiver.CompleteMessageAsync(second, ct);
+        using var waitTimeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        waitTimeout.CancelAfter(TimeSpan.FromSeconds(30));
+
+        var first = await firstDeliveredTcs.Task.WaitAsync(waitTimeout.Token);
+        var second = await redeliveredTcs.Task.WaitAsync(waitTimeout.Token);
+        await processor.StopProcessingAsync(ct);
+
+        // Assert — redelivered message has the same ID and a higher delivery count
+        await Assert.That(second.MessageId).IsEqualTo(first.MessageId);
+        await Assert.That(second.DeliveryCount).IsGreaterThan(first.DeliveryCount);
     }
 }

@@ -7,6 +7,11 @@
     <PackageReference Include="Azure.Messaging.ServiceBus" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="TestInfrastructure/service-bus-config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Messaging.ServiceBus\Rig.TUnit.Messaging.ServiceBus.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Messaging.Tests.Contract\Rig.TUnit.Messaging.Tests.Contract.csproj" />
     <ProjectReference Include="..\Rig.TUnit.Parallelism.Tests.Contract\Rig.TUnit.Parallelism.Tests.Contract.csproj" />

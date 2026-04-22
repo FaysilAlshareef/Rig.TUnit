@@ -2,7 +2,7 @@
 
 **A TUnit-first integration-testing rig ecosystem for .NET.**
 
-[![CI](https://github.com/Ecom-LTD/Rig.TUnit/actions/workflows/ci.yml/badge.svg)](https://github.com/Ecom-LTD/Rig.TUnit/actions/workflows/ci.yml)
+[![CI](https://github.com/FaysilAlshareef/Rig.TUnit/actions/workflows/ci.yml/badge.svg)](https://github.com/FaysilAlshareef/Rig.TUnit/actions/workflows/ci.yml)
 [![NuGet](https://img.shields.io/nuget/v/Rig.TUnit.svg?label=NuGet)](https://www.nuget.org/packages/Rig.TUnit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

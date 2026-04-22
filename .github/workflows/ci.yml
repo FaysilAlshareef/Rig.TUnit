@@ -31,7 +31,7 @@ jobs:
           $failed = @()
           foreach ($p in $projects) {
               Write-Host "::group::$($p.Name)"
-              dotnet test --project $p.FullName --no-build -c Release
+              dotnet test --project $p.FullName --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
               if ($LASTEXITCODE -ne 0) { $failed += $p.Name }
               Write-Host "::endgroup::"
           }
@@ -668,7 +668,7 @@ jobs:
         if: steps.paths.outputs.run == 'true'
         run: |
           dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
-            --exporters json --artifacts ./benchmark-results --job short
+            --exporters json --artifacts ./benchmark-results --job short --filter '*'
       - name: Store benchmark result
         if: steps.paths.outputs.run == 'true'
         uses: benchmark-action/github-action-benchmark@v1
@@ -747,7 +747,7 @@ jobs:
       - name: Check links in README.md
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress README.md
+          args: --verbose --no-progress --exclude 'https://www\.nuget\.org/packages/Rig\.TUnit' README.md
           fail: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

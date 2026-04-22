@@ -7,9 +7,13 @@
           {
             "Name": "test-topic",
             "Subscriptions": [
-              {
-                "Name": "test-subscription"
-              }
+              { "Name": "test-subscription" },
+              { "Name": "deliver-subscription" },
+              { "Name": "headers-subscription" },
+              { "Name": "ack-subscription" },
+              { "Name": "nack-subscription" },
+              { "Name": "dlq-subscription" },
+              { "Name": "retry-subscription" }
             ]
           }
         ]

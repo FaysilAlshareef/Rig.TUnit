@@ -3,11 +3,20 @@ using Rig.TUnit.Messaging.ServiceBus.Helpers;
 
 namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration;
 
-[Retry(3)]
 public sealed class ServiceBusListenerTests
 {
     private const string Topic = "test-topic";
-    private const string Subscription = "test-subscription";
+
+    // Every test owns its own subscription so that parallel processor-based
+    // and raw-receiver tests cannot steal each other's messages.
+    // All subscriptions are pre-provisioned in TestInfrastructure/service-bus-config.json.
+    private const string Subscription      = "test-subscription";   // contract tests
+    private const string DeliverSubscription = "deliver-subscription";
+    private const string HeadersSubscription = "headers-subscription";
+    private const string AckSubscription   = "ack-subscription";
+    private const string NackSubscription  = "nack-subscription";
+    private const string DlqSubscription   = "dlq-subscription";
+    private const string RetrySubscription = "retry-subscription";
 
     [Test]
     public async Task ServiceBusEventSender_Send_DeliversMessageToQueue(CancellationToken ct)
@@ -17,7 +26,7 @@ public sealed class ServiceBusListenerTests
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusListener(client, Topic, Subscription);
+        await using var listener = new ServiceBusListener(client, Topic, DeliverSubscription);
 
         // Act
         await listener.StartAsync(ct);
@@ -42,7 +51,7 @@ public sealed class ServiceBusListenerTests
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusListener(client, Topic, Subscription);
+        await using var listener = new ServiceBusListener(client, Topic, HeadersSubscription);
         var extra = new Dictionary<string, string> { ["x-test-id"] = testId };
 
         // Act
@@ -72,7 +81,7 @@ public sealed class ServiceBusListenerTests
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusListener(client, Topic, Subscription);
+        await using var listener = new ServiceBusListener(client, Topic, AckSubscription);
 
         // Act
         await listener.StartAsync(ct);
@@ -92,12 +101,13 @@ public sealed class ServiceBusListenerTests
     [Test]
     public async Task ServiceBusListener_Nack_AbandonsMessage(CancellationToken ct)
     {
-        // Arrange
+        // Arrange — NackSubscription is exclusively owned by this test so no other
+        // receiver or processor can intercept its messages during parallel test runs.
         var testId = Guid.NewGuid().ToString("N");
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var receiver = client.CreateReceiver(Topic, Subscription);
+        await using var receiver = client.CreateReceiver(Topic, NackSubscription);
 
         // Act — send, receive with peek-lock, then abandon via raw SDK
         await sender.SendAsync($"nack-{testId}", correlationId: testId, ct: ct);
@@ -116,13 +126,13 @@ public sealed class ServiceBusListenerTests
     [Test]
     public async Task ServiceBusListener_DeadLetter_MovesMessageToDeadLetterQueue(CancellationToken ct)
     {
-        // Arrange
+        // Arrange — DlqSubscription is exclusively owned by this test.
         var testId = Guid.NewGuid().ToString("N");
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var receiver = client.CreateReceiver(Topic, Subscription);
-        await using var dlqReceiver = client.CreateReceiver(Topic, Subscription,
+        await using var receiver = client.CreateReceiver(Topic, DlqSubscription);
+        await using var dlqReceiver = client.CreateReceiver(Topic, DlqSubscription,
             new ServiceBusReceiverOptions { SubQueue = SubQueue.DeadLetter });
 
         // Act — send, receive, then dead-letter via raw SDK
@@ -131,70 +141,38 @@ public sealed class ServiceBusListenerTests
         await Assert.That(msg).IsNotNull();
         await receiver.DeadLetterMessageAsync(msg!, deadLetterReason: "TestReason", cancellationToken: ct);
 
-        // Assert — message appears in the dead letter sub-queue
-        var dlqMsg = await dlqReceiver.ReceiveMessageAsync(TimeSpan.FromSeconds(15), ct);
+        // Assert — our exact message appears in the dead-letter sub-queue.
+        // PeekMessageAsync reads without acquiring a peek-lock, so there is nothing
+        // to settle and no MessageLockLost on slow/virtualised Docker runtimes.
+        // DeadLetterMessageAsync completed above, so the message is available immediately.
+        var dlqMsg = await dlqReceiver.PeekMessageAsync(cancellationToken: ct);
         await Assert.That(dlqMsg).IsNotNull();
-        await dlqReceiver.CompleteMessageAsync(dlqMsg!, ct);
+        await Assert.That(dlqMsg!.MessageId).IsEqualTo(msg!.MessageId);
     }
 
     [Test]
     public async Task ServiceBusListener_Retry_RedeliversAfterDelay(CancellationToken ct)
     {
-        // Arrange
+        // Arrange — RetrySubscription is exclusively owned by this test so no other
+        // receiver or processor can intercept its messages during parallel test runs.
         var testId = Guid.NewGuid().ToString("N");
         var fx = await SharedServiceBusFixture.GetAsync();
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
+        await using var receiver = client.CreateReceiver(Topic, RetrySubscription);
 
-        // Use an event-driven processor with TaskCompletionSource so the test
-        // does not poll the shared subscription. Messages from other parallel
-        // tests are abandoned without being consumed (CorrelationId ≠ testId).
-        var firstDeliveredTcs = new TaskCompletionSource<ServiceBusReceivedMessage>(
-            TaskCreationOptions.RunContinuationsAsynchronously);
-        var redeliveredTcs = new TaskCompletionSource<ServiceBusReceivedMessage>(
-            TaskCreationOptions.RunContinuationsAsynchronously);
-
-        await using var processor = client.CreateProcessor(Topic, Subscription,
-            new ServiceBusProcessorOptions { MaxConcurrentCalls = 1, AutoCompleteMessages = false });
-
-        processor.ProcessMessageAsync += async args =>
-        {
-            if (args.Message.CorrelationId != testId)
-            {
-                await args.AbandonMessageAsync(args.Message, cancellationToken: ct);
-                return;
-            }
-            if (!firstDeliveredTcs.Task.IsCompleted)
-            {
-                firstDeliveredTcs.TrySetResult(args.Message);
-                await args.AbandonMessageAsync(args.Message, cancellationToken: ct);
-            }
-            else
-            {
-                redeliveredTcs.TrySetResult(args.Message);
-                await args.CompleteMessageAsync(args.Message, ct);
-            }
-        };
-        processor.ProcessErrorAsync += args =>
-        {
-            firstDeliveredTcs.TrySetException(args.Exception);
-            redeliveredTcs.TrySetException(args.Exception);
-            return Task.CompletedTask;
-        };
-
-        // Act — start listening, send message, await first delivery then redelivery
-        await processor.StartProcessingAsync(ct);
+        // Act — send, receive, abandon once
         await sender.SendAsync($"retry-{testId}", correlationId: testId, ct: ct);
+        var first = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(15), ct);
+        await Assert.That(first).IsNotNull();
+        var firstDeliveryCount = first!.DeliveryCount;
+        await receiver.AbandonMessageAsync(first, cancellationToken: ct);
 
-        using var waitTimeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        waitTimeout.CancelAfter(TimeSpan.FromSeconds(30));
-
-        var first = await firstDeliveredTcs.Task.WaitAsync(waitTimeout.Token);
-        var second = await redeliveredTcs.Task.WaitAsync(waitTimeout.Token);
-        await processor.StopProcessingAsync(ct);
-
-        // Assert — redelivered message has the same ID and a higher delivery count
-        await Assert.That(second.MessageId).IsEqualTo(first.MessageId);
-        await Assert.That(second.DeliveryCount).IsGreaterThan(first.DeliveryCount);
+        // Assert — same message redelivered with incremented delivery count
+        var second = await receiver.ReceiveMessageAsync(TimeSpan.FromSeconds(15), ct);
+        await Assert.That(second).IsNotNull();
+        await Assert.That(second!.MessageId).IsEqualTo(first.MessageId);
+        await Assert.That(second.DeliveryCount).IsGreaterThan(firstDeliveryCount);
+        await receiver.CompleteMessageAsync(second, ct);
     }
 }

@@ -178,23 +178,43 @@ var key = IsolationKey.FromName("shared-read-model");
 
 ## Running tests
 
-Run all unit tests:
+> **TUnit uses [Microsoft.Testing.Platform](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)**
+> (MTP). Unlike xUnit/NUnit, `--filter "Category!=Integration"` and
+> `dotnet run` do **not** work. Tests must be run project-by-project with
+> `dotnet test`, and MTP-specific flags are passed after `--`.
+
+Run a single unit-test project:
 
 ```bash
-dotnet test --filter "Category!=Integration" --logger "console;verbosity=minimal"
+dotnet test tests/Rig.TUnit.Core.Tests.Unit -c Release
+```
+
+Run all unit tests (bash — Linux/macOS):
+
+```bash
+find tests -name "*.csproj" \
+  | grep -Ev "Integration|Benchmarks|Contract" \
+  | xargs -I{} dotnet test {} -c Release
+```
+
+Run all unit tests (PowerShell — Windows):
+
+```powershell
+Get-ChildItem tests -Recurse -Filter "*.csproj" |
+  Where-Object { $_.Name -notmatch "Integration|Benchmarks|Contract" } |
+  ForEach-Object { dotnet test $_.FullName -c Release }
 ```
 
 Run integration tests (requires Docker):
 
 ```bash
-dotnet test tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration \
-  --logger "console;verbosity=normal"
+dotnet test tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration -c Release
 ```
 
-Run a specific test project with TUnit output:
+Filter by test name (TUnit MTP syntax — pass flags after `--`):
 
 ```bash
-dotnet run --project tests/Rig.TUnit.Core.Tests.Unit
+dotnet test tests/Rig.TUnit.Core.Tests.Unit -- --filter "IsolationKey"
 ```
 
 ### Development setup
@@ -259,7 +279,7 @@ The `.githooks/commit-msg` hook enforces valid prefixes on every commit:
 
 1. Fork the repository and create a feature branch: `feat/NNN-short-name`
 2. Follow the TDD red-green cycle (see above)
-3. Ensure `dotnet test` passes and coverage stays ≥ 90%
+3. Ensure unit tests pass (`dotnet test {YourProject} -c Release`) and coverage stays ≥ 90%
 4. Open a pull request — CI will run the full suite automatically
 
 For significant changes, open an issue first to discuss the approach.

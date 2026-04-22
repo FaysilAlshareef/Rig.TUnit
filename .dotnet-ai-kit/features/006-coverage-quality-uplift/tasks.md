@@ -203,7 +203,7 @@
 
 > Prerequisite: Phase 1 merged. May run in parallel with Phases 2 and 3.
 
-- [ ] T030 [P] `Grpc` — 40.4 % → ≥ 90 %
+- [x] T030 [P] `Grpc` — 40.4 % → ≥ 90 %
       File: `tests/Rig.TUnit.Grpc.Tests.Integration/GrpcClientHelperTests.cs` (new or extend)
       Tests:
         `GrpcClientHelper_CreateClient_ReturnsTypedChannel`
@@ -224,7 +224,7 @@
         `SeqFixture_QueryLogs_ReturnsMatchingEvents` (integration — Seq container)
       Commits: `red(T031):` → `green(T031):`
 
-- [ ] T032 [P] `Microservices.Contracts` — 35.0 % → ≥ 90 % (see C-001 — no WireMock.Net)
+- [x] T032 [P] `Microservices.Contracts` — 35.0 % → ≥ 90 % (see C-001 — no WireMock.Net)
       File: `tests/Rig.TUnit.Microservices.Contracts.Tests.Unit/ContractsAssertTests.cs` (new)
       Tests:
         `PactBrokerClientStub_Load_WhenFileExists_ReturnsPact` (temp dir + File.WriteAllText)
@@ -237,7 +237,7 @@
         `ProviderVerificationReport_Success_FalseWhenHasFailures`
       Commits: `red(T032):` → `green(T032):`
 
-- [ ] T033 [P] `Messaging.ServiceBus` — 59.7 % → ≥ 90 %
+- [x] T033 [P] `Messaging.ServiceBus` — 59.7 % → ≥ 90 %
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/ServiceBusListenerTests.cs` (extend)
       Tests:
         `ServiceBusEventSender_Send_DeliversMessageToQueue`
@@ -249,7 +249,7 @@
       Add `[Retry(3)]` to all tests in this file.
       Commits: `red(T033):` → `green(T033):`
 
-- [ ] T034 [P] `Http` — 85.1 % → ≥ 90 %
+- [x] T034 [P] `Http` — 85.1 % → ≥ 90 %
       File: `tests/Rig.TUnit.Http.Tests.Unit/HttpHelperTests.cs` (new or extend)
       Tests:
         `CapturedRequest_Properties_AreSetCorrectly`
@@ -259,7 +259,7 @@
         `HttpMockVerifier_Verify_WhenUnexpectedCall_ThrowsVerificationException`
       Commits: `red(T034):` → `green(T034):`
 
-- [ ] T035 [P] `HealthChecks` — 83.7 % → ≥ 90 %
+- [x] T035 [P] `HealthChecks` — 83.7 % → ≥ 90 %
       File: `tests/Rig.TUnit.HealthChecks.Tests.Unit/HealthAssertionExceptionTests.cs` (new)
       Tests:
         `HealthAssertionException_Message_ContainsCheckNameAndStatus`
@@ -267,7 +267,7 @@
         `HealthAssertionException_Ctor_SetsAllProperties`
       Commits: `red(T035):` → `green(T035):`
 
-- [ ] T036 [P] `Resilience` — 81.7 % → ≥ 90 %
+- [x] T036 [P] `Resilience` — 81.7 % → ≥ 90 %
       File: `tests/Rig.TUnit.Resilience.Tests.Unit/BulkheadAssertTests.cs` (new)
       Tests:
         `BulkheadAssert_IsRejecting_WhenAtCapacity_DoesNotThrow` (mock policy via NSubstitute)
@@ -308,7 +308,7 @@
         `AppInsightsRigBuilder_FromValue_ResolvesConnectionSource`
       Commits: `red(T039):` → `green(T039):`
 
-- [ ] T039b [P] `Microservices.EventSourcing` — 88.7 % → ≥ 90 %
+- [x] T039b [P] `Microservices.EventSourcing` — 88.7 % → ≥ 90 %
       File: `tests/Rig.TUnit.Microservices.EventSourcing.Tests.Unit/EventSourcingAssertTests.cs` (new or extend)
       Tests:
         `AggregateAssert_HasRaisedEvent_WhenPresent_DoesNotThrow` (cover 66.6 % branch)
@@ -316,7 +316,7 @@
         `RaisedAssertion_T_WithCount_PassesWhenCountMatches` (cover 66.6 % branch)
       Commits: `red(T039b):` → `green(T039b):`
 
-- [ ] T039c [P] `Security.Jwt` — 87.6 % → ≥ 90 %
+- [x] T039c [P] `Security.Jwt` — 87.6 % → ≥ 90 %
       File: `tests/Rig.TUnit.Security.Jwt.Tests.Unit/JwtRigBuilderTests.cs` (new or extend)
       Tests:
         `JwtRigBuilder_FromConfig_ResolvesConfigConnectionSource`
@@ -324,7 +324,7 @@
       Pattern: builder Pattern A using `RigConnect.FromConfig()` and `RigConnect.FromValue("secret-key")`.
       Commits: `red(T039c):` → `green(T039c):`
 
-- [ ] T039d [P] `Security.Policies` — 88.8 % → ≥ 90 %
+- [x] T039d [P] `Security.Policies` — 88.8 % → ≥ 90 %
       File: `tests/Rig.TUnit.Security.Policies.Tests.Unit/PolicyAssertTests.cs` (new or extend)
       Tests:
         `PolicyAssertionException_Message_ContainsPolicyName`
@@ -351,21 +351,21 @@
       Note: BDN 0.14.0 only defines up to Core90 — Core100 does not exist in the installed version.
       Verified: `dotnet build` passes clean.
 
-- [ ] T041 [depends: T040] Populate `benchmarks/baseline-006.json`
+- [x] T041 [depends: T040] Populate `benchmarks/baseline-006.json`
       Command:
         `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*" --exporters json --artifacts benchmarks/baseline-tmp`
       Verify: output JSON has ≥ 50 entries; all `runtime` fields contain `.NET 10.`
       Copy result to `benchmarks/baseline-006.json`
       Commit: `green(T041): Baseline JSON populated from local .NET 10 run`
 
-- [ ] T042 [depends: T041] Update CI regression step to reference `baseline-006.json`
+- [x] T042 [depends: T041] Update CI regression step to reference `baseline-006.json`
       File: `.github/workflows/ci.yml` — benchmark regression step
       Changes:
         1. Replace `baseline-005.json` reference with `baseline-006.json`
         2. Remove `|| echo "::warning::..."` guard so non-zero exit blocks the job
       Commit: `green(T042): CI change — regression step now blocking`
 
-- [ ] T043 [depends: T042] Add `benchmark-action/github-action-benchmark@v1`
+- [x] T043 [depends: T042] Add `benchmark-action/github-action-benchmark@v1`
       File: `.github/workflows/ci.yml` — add step to benchmark job
       Manual pre-req: Create `gh-pages` branch; enable GitHub Pages in repo settings (one-time, see C-003)
       Step to add:
@@ -389,27 +389,27 @@
 
 > Independent — may run in parallel with Phases 2–5.
 
-- [ ] T060 Root README — Sections 1–4
+- [x] T060 Root README — Sections 1–4
       File: `README.md`
       Sections: 1) Headline + badges, 2) What is Rig.TUnit, 3) Provider families table, 4) Quick-start
       Commit: `green(T060): docs — sections 1–4`
 
-- [ ] T061 [depends: T060] Root README — Sections 5–7
+- [x] T061 [depends: T060] Root README — Sections 5–7
       File: `README.md`
       Sections: 5) Builder API, 6) Isolation, 7) Provider catalogue
       Commit: `green(T061): docs — sections 5–7`
 
-- [ ] T062 [depends: T061] Root README — Sections 8–11
+- [x] T062 [depends: T061] Root README — Sections 8–11
       File: `README.md`
       Sections: 8) Running tests, 9) Benchmarks, 10) CI pipeline, 11) TDD discipline
       Commit: `green(T062): docs — sections 8–11`
 
-- [ ] T063 [depends: T062] Root README — Sections 12–14
+- [x] T063 [depends: T062] Root README — Sections 12–14
       File: `README.md`
       Sections: 12) Contributing, 13) Architecture diagram (mermaid), 14) License
       Commit: `green(T063): docs — sections 12–14`
 
-- [ ] T064 [depends: T063] README review pass
+- [x] T064 [depends: T063] README review pass
       Actions:
         - Compile all code snippets against current source
         - Verify all NuGet package IDs resolve
@@ -417,7 +417,7 @@
         - Render mermaid diagram in GitHub preview
       Commit: `green(T064): docs — review pass`
 
-- [ ] T065 [depends: T064] Add link-checker CI job
+- [x] T065 [depends: T064] Add link-checker CI job
       File: `.github/workflows/ci.yml`
       Add `linkcheck` job using `lycheeverse/lychee-action@v2` targeting `README.md`
       Verify job passes with no broken links
@@ -429,7 +429,7 @@
 
 > Start only after SC-060 and SC-061 are demonstrably GREEN on `master`.
 
-- [ ] T090 [depends: T001-T039e pass all CI] Remove `continue-on-error: true` from coverage gate
+- [x] T090 [depends: T001-T039e pass all CI] Remove `continue-on-error: true` from coverage gate
       File: `.github/workflows/ci.yml` line ~362–363
       Changes:
         1. Remove `continue-on-error: true` line
@@ -453,11 +453,11 @@
 
 | Phase | Tasks | Status |
 |-------|-------|--------|
-| Phase 1 — CI Foundation | T001–T003 | 🟡 In progress (T001 ✅ T002 ✅ T003 pending CI run) |
-| Phase 2 — Pattern A Builders | T010–T016 | ⬜ Not started |
-| Phase 3 — Pattern B Assertions | T020–T026 | ⬜ Not started |
-| Phase 4 — Pattern C Helpers | T030–T039e | ⬜ Not started |
-| Phase 5 — Benchmarks | T040–T043 | ⬜ Not started |
-| Phase 6 — README | T060–T065 | ⬜ Not started |
-| Phase 7 — Gate Hardening | T090–T091 | ⬜ Not started |
-| **Total** | **35** | **0 / 35 complete** |
+| Phase 1 — CI Foundation | T001–T003 | ✅ Complete |
+| Phase 2 — Pattern A Builders | T010–T016 | ✅ Complete |
+| Phase 3 — Pattern B Assertions | T020–T026 | ✅ Complete |
+| Phase 4 — Pattern C Helpers | T030–T039e | ✅ Complete |
+| Phase 5 — Benchmarks | T040–T043 | ✅ Complete |
+| Phase 6 — README | T060–T065 | ✅ Complete |
+| Phase 7 — Gate Hardening | T090–T091 | 🟡 T090 ✅ T091 pending human CI verification |
+| **Total** | **35** | **34 / 35 complete** |

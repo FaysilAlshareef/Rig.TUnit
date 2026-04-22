@@ -361,7 +361,6 @@ jobs:
         # test backfill is in flight. Ratchet back up package-by-package in a
         # follow-up feature. FR-022 / T015 allow a non-blocking reporting window.
         # Disabled 2026-04-20; re-enabled by feat/006 T090
-        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -389,13 +388,10 @@ jobs:
                       f'branch-rate={branch_rate:.3f} (need ≥ {branch_floor})')
 
           if offenders:
-              print('::warning::Coverage below threshold (reporting-only) for:')
+              print('::error::Coverage below threshold for:', file=sys.stderr)
               for line in offenders:
-                  print(f'::warning::  {line}')
-              # Report-only mode: do NOT fail the job. Coverage is surfaced via the
-              # markdown summary + artefact; a future feature ratchets the floor
-              # up package-by-package.
-              sys.exit(0)
+                  print(f'::error::  {line}', file=sys.stderr)
+              sys.exit(1)
           print('All packages meet the coverage floor.')
           PYEOF
       - name: Upload test artifacts
@@ -641,7 +637,7 @@ jobs:
         run: dotnet test --project tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj -c Release --no-build
 
   # ─── Benchmark regression (T166/T167) ──────────────────────────────────────
-  # FR-071 — runs BenchmarkDotNet and compares against baseline-005.json with
+  # FR-071 — runs BenchmarkDotNet and compares against baseline-006.json with
   # a 20% regression budget. Path-filtered — only runs on src-code / benchmarks
   # / pin changes.
   benchmark-regression:
@@ -672,7 +668,18 @@ jobs:
         if: steps.paths.outputs.run == 'true'
         run: |
           dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
-            --exporters json --artifacts ./benchmark-results --job short || echo "::warning::Benchmark run returned non-zero"
+            --exporters json --artifacts ./benchmark-results --job short
+      - name: Store benchmark result
+        if: steps.paths.outputs.run == 'true'
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkdotnet'
+          output-file-path: ./benchmark-results/results/*.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '120%'
+          comment-on-alert: true
+          fail-on-alert: true
       - name: Upload benchmark artefacts
         if: always() && steps.paths.outputs.run == 'true'
         uses: actions/upload-artifact@v4
@@ -727,3 +734,20 @@ jobs:
             echo "::endgroup::"
           done
           echo "Red-commit verification complete."
+
+  # ─── Link-checker (T065) ────────────────────────────────────────────────────
+  # FR-022 — lychee-action checks all external and internal links in README.md
+  # on pull requests. Blocks merging if broken links are found.
+  linkcheck:
+    name: Link checker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check links in README.md
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress README.md
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

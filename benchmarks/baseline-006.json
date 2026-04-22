@@ -1,0 +1,314 @@
+﻿{
+    "_comment":  "Benchmark baseline captured at Phase 5 close (feature 006). Populated from local .NET 10.0.5 run of InProcessEmitBenchmarkConfig classes. Used as reference; CI regression enforced by benchmark-action trend graph.",
+    "schemaVersion":  1,
+    "meta":  {
+                 "capturedAt":  "2026-04-22T10:06:20Z",
+                 "captureBranch":  "feat/006-coverage-quality-uplift",
+                 "captureCommitSha":  null,
+                 "ciRunId":  null,
+                 "regressionBudgetPercent":  20,
+                 "note":  "Populated from 21 InProcessEmitBenchmarkConfig classes (60 benchmarks). Full slow-class run excluded (non-Dry config classes take too long locally)."
+             },
+    "benchmarks":  {
+                       "Rig.TUnit.Benchmarks.AppInsightsBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                        "mean":  467000,
+                                                                                                        "stdDev":  0,
+                                                                                                        "allocated":  4416
+                                                                                                    },
+                       "Rig.TUnit.Benchmarks.AppInsightsBenchmarks.Channel_CaptureEvents":  {
+                                                                                                "mean":  2252000,
+                                                                                                "stdDev":  0,
+                                                                                                "allocated":  66536
+                                                                                            },
+                       "Rig.TUnit.Benchmarks.AzureBlobBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                      "mean":  611500,
+                                                                                                      "stdDev":  0,
+                                                                                                      "allocated":  96
+                                                                                                  },
+                       "Rig.TUnit.Benchmarks.AzureBlobBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                       "mean":  621400,
+                                                                                                       "stdDev":  0,
+                                                                                                       "allocated":  432
+                                                                                                   },
+                       "Rig.TUnit.Benchmarks.AzureBlobBenchmarks.SasBuilder_BuildQueryString":  {
+                                                                                                    "mean":  2722800,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  6240
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.CosmosBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                   "mean":  611600,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  392
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.CosmosBenchmarks.RuCapture_RecordAndSum":  {
+                                                                                            "mean":  3215900,
+                                                                                            "stdDev":  0,
+                                                                                            "allocated":  11576
+                                                                                        },
+                       "Rig.TUnit.Benchmarks.CosmosBenchmarks.PartitionChecker_MaxShare":  {
+                                                                                               "mean":  1025000,
+                                                                                               "stdDev":  0,
+                                                                                               "allocated":  5712
+                                                                                           },
+                       "Rig.TUnit.Benchmarks.DockerBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                   "mean":  599400,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  96
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.DockerBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                    "mean":  566800,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  96
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.EventSourcingBenchmarks.AggregateAssert_RaisedCount":  {
+                                                                                                        "mean":  2462300,
+                                                                                                        "stdDev":  0,
+                                                                                                        "allocated":  392
+                                                                                                    },
+                       "Rig.TUnit.Benchmarks.EventSourcingBenchmarks.Schema_Analyze":  {
+                                                                                           "mean":  39222600,
+                                                                                           "stdDev":  0,
+                                                                                           "allocated":  8264
+                                                                                       },
+                       "Rig.TUnit.Benchmarks.FileSystemBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                       "mean":  545400,
+                                                                                                       "stdDev":  0,
+                                                                                                       "allocated":  3120
+                                                                                                   },
+                       "Rig.TUnit.Benchmarks.FileSystemBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                        "mean":  510100,
+                                                                                                        "stdDev":  0,
+                                                                                                        "allocated":  96
+                                                                                                    },
+                       "Rig.TUnit.Benchmarks.FileSystemBenchmarks.PathSandboxHelper_Resolve":  {
+                                                                                                   "mean":  887300,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  688
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.FileSystemBenchmarks.PathSandboxHelper_IsInside":  {
+                                                                                                    "mean":  405900,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  5800
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.FusionCacheBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                        "mean":  523300,
+                                                                                                        "stdDev":  0,
+                                                                                                        "allocated":  96
+                                                                                                    },
+                       "Rig.TUnit.Benchmarks.FusionCacheBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                         "mean":  572300,
+                                                                                                         "stdDev":  0,
+                                                                                                         "allocated":  96
+                                                                                                     },
+                       "Rig.TUnit.Benchmarks.FusionCacheBenchmarks.FailSafeHelper_IsApplicable":  {
+                                                                                                      "mean":  7652500,
+                                                                                                      "stdDev":  0,
+                                                                                                      "allocated":  2080
+                                                                                                  },
+                       "Rig.TUnit.Benchmarks.FusionCacheBenchmarks.EagerRefreshHelper_ShouldRefresh":  {
+                                                                                                           "mean":  800200,
+                                                                                                           "stdDev":  0,
+                                                                                                           "allocated":  64
+                                                                                                       },
+                       "Rig.TUnit.Benchmarks.HybridCacheBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                        "mean":  827700,
+                                                                                                        "stdDev":  0,
+                                                                                                        "allocated":  2736
+                                                                                                    },
+                       "Rig.TUnit.Benchmarks.HybridCacheBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                         "mean":  598700,
+                                                                                                         "stdDev":  0,
+                                                                                                         "allocated":  96
+                                                                                                     },
+                       "Rig.TUnit.Benchmarks.JwtBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                "mean":  679900,
+                                                                                                "stdDev":  0,
+                                                                                                "allocated":  104
+                                                                                            },
+                       "Rig.TUnit.Benchmarks.JwtBenchmarks.Builder_SignHs256":  {
+                                                                                    "mean":  59107700,
+                                                                                    "stdDev":  0,
+                                                                                    "allocated":  19144
+                                                                                },
+                       "Rig.TUnit.Benchmarks.KafkaMessagingBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                           "mean":  742900,
+                                                                                                           "stdDev":  0,
+                                                                                                           "allocated":  96
+                                                                                                       },
+                       "Rig.TUnit.Benchmarks.KafkaMessagingBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                            "mean":  658500,
+                                                                                                            "stdDev":  0,
+                                                                                                            "allocated":  3456
+                                                                                                        },
+                       "Rig.TUnit.Benchmarks.KafkaMessagingBenchmarks.Listener_Construct":  {
+                                                                                                "mean":  925200,
+                                                                                                "stdDev":  0,
+                                                                                                "allocated":  976
+                                                                                            },
+                       "Rig.TUnit.Benchmarks.KafkaMessagingBenchmarks.Sender_Construct":  {
+                                                                                              "mean":  522000,
+                                                                                              "stdDev":  0,
+                                                                                              "allocated":  104
+                                                                                          },
+                       "Rig.TUnit.Benchmarks.MetricsBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                    "mean":  516300,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  96
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.MetricsBenchmarks.Guard_WithinBudget_Allocates":  {
+                                                                                                   "mean":  653600,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  64
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.MetricsBenchmarks.Capture_EmitCounter":  {
+                                                                                          "mean":  7682500,
+                                                                                          "stdDev":  0,
+                                                                                          "allocated":  8232
+                                                                                      },
+                       "Rig.TUnit.Benchmarks.MinIOBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                  "mean":  770000,
+                                                                                                  "stdDev":  0,
+                                                                                                  "allocated":  112
+                                                                                              },
+                       "Rig.TUnit.Benchmarks.MinIOBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                   "mean":  743100,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  112
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.MinIOBenchmarks.SasBuilder_BuildPresignRequest":  {
+                                                                                                   "mean":  1498200,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  4048
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.MtlsBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                 "mean":  757100,
+                                                                                                 "stdDev":  0,
+                                                                                                 "allocated":  112
+                                                                                             },
+                       "Rig.TUnit.Benchmarks.MtlsBenchmarks.CertificateAuthority_Create":  {
+                                                                                               "mean":  131665500,
+                                                                                               "stdDev":  0,
+                                                                                               "allocated":  24304
+                                                                                           },
+                       "Rig.TUnit.Benchmarks.MtlsBenchmarks.Leaf_CreateFromCa":  {
+                                                                                     "mean":  204374200,
+                                                                                     "stdDev":  0,
+                                                                                     "allocated":  44472
+                                                                                 },
+                       "Rig.TUnit.Benchmarks.MySqlBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                  "mean":  782200,
+                                                                                                  "stdDev":  0,
+                                                                                                  "allocated":  4104
+                                                                                              },
+                       "Rig.TUnit.Benchmarks.MySqlBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                   "mean":  745600,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  120
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.NatsMessagingBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                          "mean":  488200,
+                                                                                                          "stdDev":  0,
+                                                                                                          "allocated":  96
+                                                                                                      },
+                       "Rig.TUnit.Benchmarks.NatsMessagingBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                           "mean":  526200,
+                                                                                                           "stdDev":  0,
+                                                                                                           "allocated":  96
+                                                                                                       },
+                       "Rig.TUnit.Benchmarks.NatsMessagingBenchmarks.Listener_Construct":  {
+                                                                                               "mean":  789300,
+                                                                                               "stdDev":  0,
+                                                                                               "allocated":  968
+                                                                                           },
+                       "Rig.TUnit.Benchmarks.NatsMessagingBenchmarks.Sender_Construct":  {
+                                                                                             "mean":  614400,
+                                                                                             "stdDev":  0,
+                                                                                             "allocated":  104
+                                                                                         },
+                       "Rig.TUnit.Benchmarks.OAuthBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                  "mean":  1094900,
+                                                                                                  "stdDev":  0,
+                                                                                                  "allocated":  152
+                                                                                              },
+                       "Rig.TUnit.Benchmarks.OAuthBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                   "mean":  507000,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  152
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.OracleBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                   "mean":  590600,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  112
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.OracleBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                    "mean":  583700,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  112
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.PolicyBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                   "mean":  654600,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  96
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.PolicyBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                    "mean":  618000,
+                                                                                                    "stdDev":  0,
+                                                                                                    "allocated":  1392
+                                                                                                },
+                       "Rig.TUnit.Benchmarks.RabbitMqMessagingBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                              "mean":  721800,
+                                                                                                              "stdDev":  0,
+                                                                                                              "allocated":  112
+                                                                                                          },
+                       "Rig.TUnit.Benchmarks.RabbitMqMessagingBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                               "mean":  668500,
+                                                                                                               "stdDev":  0,
+                                                                                                               "allocated":  112
+                                                                                                           },
+                       "Rig.TUnit.Benchmarks.RabbitMqMessagingBenchmarks.Listener_Construct":  {
+                                                                                                   "mean":  993400,
+                                                                                                   "stdDev":  0,
+                                                                                                   "allocated":  2592
+                                                                                               },
+                       "Rig.TUnit.Benchmarks.RabbitMqMessagingBenchmarks.Sender_Construct":  {
+                                                                                                 "mean":  546800,
+                                                                                                 "stdDev":  0,
+                                                                                                 "allocated":  112
+                                                                                             },
+                       "Rig.TUnit.Benchmarks.S3Benchmarks.Options_ConstructWithDefaults":  {
+                                                                                               "mean":  587500,
+                                                                                               "stdDev":  0,
+                                                                                               "allocated":  96
+                                                                                           },
+                       "Rig.TUnit.Benchmarks.S3Benchmarks.Options_ConstructWithOverrides":  {
+                                                                                                "mean":  487500,
+                                                                                                "stdDev":  0,
+                                                                                                "allocated":  96
+                                                                                            },
+                       "Rig.TUnit.Benchmarks.S3Benchmarks.SasBuilder_BuildPresignRequest":  {
+                                                                                                "mean":  757700,
+                                                                                                "stdDev":  0,
+                                                                                                "allocated":  112
+                                                                                            },
+                       "Rig.TUnit.Benchmarks.SqsMessagingBenchmarks.Options_ConstructWithDefaults":  {
+                                                                                                         "mean":  617700,
+                                                                                                         "stdDev":  0,
+                                                                                                         "allocated":  120
+                                                                                                     },
+                       "Rig.TUnit.Benchmarks.SqsMessagingBenchmarks.Options_ConstructWithOverrides":  {
+                                                                                                          "mean":  668700,
+                                                                                                          "stdDev":  0,
+                                                                                                          "allocated":  120
+                                                                                                      },
+                       "Rig.TUnit.Benchmarks.SqsMessagingBenchmarks.Listener_Construct":  {
+                                                                                              "mean":  338242400,
+                                                                                              "stdDev":  0,
+                                                                                              "allocated":  960
+                                                                                          },
+                       "Rig.TUnit.Benchmarks.SqsMessagingBenchmarks.Sender_Construct":  {
+                                                                                            "mean":  658400,
+                                                                                            "stdDev":  0,
+                                                                                            "allocated":  96
+                                                                                        }
+                   }
+}

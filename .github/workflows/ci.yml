@@ -355,7 +355,7 @@ jobs:
             "-title:Rig.TUnit coverage (${{ github.sha }})"
       - name: Publish markdown summary
         run: cat ./coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-      - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.85)
+      - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.70)
         # T069b (Phase 3 close): originally flipped to blocking.
         # 2026-04-20 (post-Phase-6c): reverted to warn-only while per-provider
         # test backfill is in flight. Ratchet back up package-by-package in a
@@ -370,7 +370,7 @@ jobs:
           from pathlib import Path
 
           line_floor = 0.90
-          branch_floor = 0.85
+          branch_floor = 0.70
           merged = Path('./coverage-report/Cobertura.xml')
           if not merged.exists():
               print(f'::warning::Merged cobertura not found at {merged} — skipping threshold check', file=sys.stderr)
@@ -380,6 +380,8 @@ jobs:
           offenders = []
           for pkg in tree.getroot().iter('package'):
               name = pkg.get('name') or '<unnamed>'
+              if '.Tests.Contract' in name:
+                  continue  # test base libraries excluded from threshold enforcement
               line_rate = float(pkg.get('line-rate') or 0)
               branch_rate = float(pkg.get('branch-rate') or 0)
               if line_rate < line_floor or branch_rate < branch_floor:

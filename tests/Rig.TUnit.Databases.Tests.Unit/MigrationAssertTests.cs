@@ -46,6 +46,15 @@ public sealed class MigrationAssertTests
     }
 
     [Test]
+    public async Task NoPendingModelChanges_NullProbe_ThrowsArgumentNullException()
+    {
+        var rig = Substitute.For<IDbRig>();
+
+        await Assert.That(() => MigrationAssert.NoPendingModelChanges(rig, null!))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
     public async Task NoPendingModelChanges_ValidArgs_DelegatesToProbe()
     {
         var rig = Substitute.For<IDbRig>();
@@ -63,6 +72,15 @@ public sealed class MigrationAssertTests
         var probe = Substitute.For<IMigrationProbe>();
 
         await Assert.That(() => MigrationAssert.Idempotent(null!, probe))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task Idempotent_NullProbe_ThrowsArgumentNullException()
+    {
+        var rig = Substitute.For<IDbRig>();
+
+        await Assert.That(() => MigrationAssert.Idempotent(rig, null!))
             .ThrowsExactly<ArgumentNullException>();
     }
 

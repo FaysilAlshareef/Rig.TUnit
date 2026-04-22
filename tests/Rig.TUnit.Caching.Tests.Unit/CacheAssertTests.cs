@@ -86,4 +86,48 @@ public sealed class CacheAssertTests
 
         await probe.Received(1).EagerRefreshAsync("key", Arg.Any<CancellationToken>());
     }
+
+    [Test]
+    public async Task Coherent_ValidArgs_DelegatesToProbe()
+    {
+        var probe = Substitute.For<ICacheProbe>();
+        probe.CoherentAsync("key", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        await CacheAssert.Coherent(probe, "key");
+
+        await probe.Received(1).CoherentAsync("key", Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task FailSafe_ValidArgs_DelegatesToProbe()
+    {
+        var probe = Substitute.For<ICacheProbe>();
+        probe.FailSafeAsync("key", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        await CacheAssert.FailSafe(probe, "key");
+
+        await probe.Received(1).FailSafeAsync("key", Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task NegativeCached_ValidArgs_DelegatesToProbe()
+    {
+        var probe = Substitute.For<ICacheProbe>();
+        probe.NegativeCachedAsync("key", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        await CacheAssert.NegativeCached(probe, "key");
+
+        await probe.Received(1).NegativeCachedAsync("key", Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task HitRate_ValidArgs_DelegatesToProbe()
+    {
+        var probe = Substitute.For<ICacheProbe>();
+        probe.HitRateAsync(0.95, Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+
+        await CacheAssert.HitRate(probe, 0.95);
+
+        await probe.Received(1).HitRateAsync(0.95, Arg.Any<CancellationToken>());
+    }
 }

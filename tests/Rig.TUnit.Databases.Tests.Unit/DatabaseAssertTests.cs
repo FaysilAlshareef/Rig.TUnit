@@ -46,6 +46,15 @@ public sealed class DatabaseAssertTests
     }
 
     [Test]
+    public async Task RowCount_NullProbe_ThrowsArgumentNullException()
+    {
+        var rig = Substitute.For<IDbRig>();
+
+        await Assert.That(() => DatabaseAssert.RowCount(rig, null!, "table", 5))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
     public async Task RowCount_ValidArgs_DelegatesToProbe()
     {
         var rig = Substitute.For<IDbRig>();
@@ -67,6 +76,15 @@ public sealed class DatabaseAssertTests
     }
 
     [Test]
+    public async Task ColumnType_NullProbe_ThrowsArgumentNullException()
+    {
+        var rig = Substitute.For<IDbRig>();
+
+        await Assert.That(() => DatabaseAssert.ColumnType(rig, null!, "table", "col", "TEXT"))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
     public async Task ColumnType_ValidArgs_DelegatesToProbe()
     {
         var rig = Substitute.For<IDbRig>();
@@ -84,6 +102,15 @@ public sealed class DatabaseAssertTests
         var probe = Substitute.For<ISchemaProbe>();
 
         await Assert.That(() => DatabaseAssert.IndexExists(null!, probe, "table", "idx"))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task IndexExists_NullProbe_ThrowsArgumentNullException()
+    {
+        var rig = Substitute.For<IDbRig>();
+
+        await Assert.That(() => DatabaseAssert.IndexExists(rig, null!, "table", "idx"))
             .ThrowsExactly<ArgumentNullException>();
     }
 

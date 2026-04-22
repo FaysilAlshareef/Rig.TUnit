@@ -14,6 +14,9 @@
     },
     {
       "pattern": "\\.(cs|ts|js|py|md|json|yml|yaml|csproj|sln):[0-9]+$"
+    },
+    {
+      "pattern": "https://github\\.com/dotnet/aspire/issues/12036"
     }
   ],
   "replacementPatterns": [],

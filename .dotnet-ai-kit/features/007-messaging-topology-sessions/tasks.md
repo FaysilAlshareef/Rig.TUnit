@@ -131,7 +131,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T010 — ServiceBusEventSender `SendContext` overload
 
-- [ ] **T010-RED** [depends: T014] Write `ServiceBusEventSenderSendContextTests`.
+- [x] **T010-RED** [depends: T014] Write `ServiceBusEventSenderSendContextTests`.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Unit/ServiceBusEventSenderSendContextTests.cs` (new)
       Tests:
       - `SendAsync_WithSessionKey_PopulatesServiceBusMessageSessionId`

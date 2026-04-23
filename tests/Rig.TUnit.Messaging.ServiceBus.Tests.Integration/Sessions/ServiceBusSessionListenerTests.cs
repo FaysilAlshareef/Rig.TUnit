@@ -1,6 +1,8 @@
 using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using Rig.TUnit.Messaging.Helpers;
 using Rig.TUnit.Messaging.ServiceBus.Helpers;
+using Rig.TUnit.Messaging.ServiceBus.Topology;
 using Rig.TUnit.Messaging.Assertions;
 
 namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration.Sessions;
@@ -8,8 +10,6 @@ namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration.Sessions;
 public sealed class ServiceBusSessionListenerTests
 {
     private const string Topic = "test-topic";
-    private const string CaptureSubscription = "session-capture-subscription";
-    private const string OrderSubscription = "session-order-subscription";
 
     [Test]
     public async Task SessionListener_10Sessions10Messages_CapturesSessionKeyOnEveryMessage(CancellationToken ct)
@@ -18,9 +18,15 @@ public sealed class ServiceBusSessionListenerTests
         const int sessionCount = 10;
         const int messagesPerSession = 10;
         var fx = await SharedServiceBusFixture.GetAsync();
+        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var helper = new ServiceBusAdministrationHelper(admin);
+        var subName = $"sess-cap-{Guid.NewGuid():N}";
+
+        await helper.CreateSubscriptionIfNotExistsAsync(Topic, subName, requiresSession: true, ct);
+
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusSessionListener(client, Topic, CaptureSubscription);
+        await using var listener = new ServiceBusSessionListener(client, Topic, subName);
 
         // Act
         await listener.StartAsync(ct);
@@ -50,6 +56,9 @@ public sealed class ServiceBusSessionListenerTests
         await Assert.That(listener.Captured.Count).IsGreaterThanOrEqualTo(totalExpected);
         var missingSessionKey = listener.Captured.Where(m => m.SessionKey is null).ToList();
         await Assert.That(missingSessionKey.Count).IsEqualTo(0);
+
+        // Cleanup
+        await admin.DeleteSubscriptionAsync(Topic, subName, ct);
     }
 
     [Test]
@@ -59,9 +68,15 @@ public sealed class ServiceBusSessionListenerTests
         const int sessionCount = 5;
         const int messagesPerSession = 20;
         var fx = await SharedServiceBusFixture.GetAsync();
+        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var helper = new ServiceBusAdministrationHelper(admin);
+        var subName = $"sess-ord-{Guid.NewGuid():N}";
+
+        await helper.CreateSubscriptionIfNotExistsAsync(Topic, subName, requiresSession: true, ct);
+
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusSessionListener(client, Topic, OrderSubscription);
+        await using var listener = new ServiceBusSessionListener(client, Topic, subName);
 
         // Act — interleave messages across sessions
         await listener.StartAsync(ct);
@@ -89,5 +104,8 @@ public sealed class ServiceBusSessionListenerTests
         // Assert — per-session ordering preserved
         await Assert.That(listener.Captured.Count).IsGreaterThanOrEqualTo(totalExpected);
         OrderingAssert.PerKeyMonotonic(listener, m => m.SessionId!, m => m.SequenceNumber);
+
+        // Cleanup
+        await admin.DeleteSubscriptionAsync(Topic, subName, ct);
     }
 }

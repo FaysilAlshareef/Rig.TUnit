@@ -1,13 +1,14 @@
 using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
 using Rig.TUnit.Messaging.Helpers;
 using Rig.TUnit.Messaging.ServiceBus.Helpers;
+using Rig.TUnit.Messaging.ServiceBus.Topology;
 
 namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration.Sessions;
 
 public sealed class PartitionedFanoutTests
 {
     private const string Topic = "test-topic";
-    private const string FanoutSubscription = "partitioned-fanout-subscription";
 
     [Test]
     public async Task SendAsync_MessagesWithDistinctPartitionKeys_AllReachSubscription(CancellationToken ct)
@@ -18,9 +19,15 @@ public sealed class PartitionedFanoutTests
         var partitionKeys = Enumerable.Range(0, keyCount).Select(i => $"pk-{i}").ToArray();
 
         var fx = await SharedServiceBusFixture.GetAsync();
+        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var helper = new ServiceBusAdministrationHelper(admin);
+        var subName = $"fanout-{Guid.NewGuid():N}";
+
+        await helper.CreateSubscriptionIfNotExistsAsync(Topic, subName, requiresSession: false, ct);
+
         await using var client = new ServiceBusClient(fx.ConnectionString);
         await using var sender = new ServiceBusEventSender(client, Topic);
-        await using var listener = new ServiceBusListener(client, Topic, FanoutSubscription);
+        await using var listener = new ServiceBusListener(client, Topic, subName);
 
         // Act
         await listener.StartAsync(ct);
@@ -53,5 +60,8 @@ public sealed class PartitionedFanoutTests
                 m.Body.StartsWith($"fanout-{pk}-", StringComparison.Ordinal)).ToList();
             await Assert.That(forKey.Count).IsGreaterThanOrEqualTo(messagesPerKey);
         }
+
+        // Cleanup
+        await admin.DeleteSubscriptionAsync(Topic, subName, ct);
     }
 }

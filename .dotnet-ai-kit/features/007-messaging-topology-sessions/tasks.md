@@ -171,7 +171,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Unit/Topology/ServiceBusBuilderCompileFenceTests.cs` (new) — reflection asserts `IServiceBusQueueConfig` declares no `.WithFifo` / `.WithQuorum` / `.WithPartitions`.
       Commit: `test(007): RED T012 — admin helper + topology builder + compile fence`
 
-- [ ] **T012-GREEN** [depends: T012-RED] Add provider-scoped topology interfaces + impls + admin helper per C-003 (see [data-model.md §ServiceBus](data-model.md) for shape).
+- [x] **T012-GREEN** [depends: T012-RED] Add provider-scoped topology interfaces + impls + admin helper per C-003 (see [data-model.md §ServiceBus](data-model.md) for shape).
       Files:
       - `src/Rig.TUnit.Messaging.ServiceBus/Topology/IServiceBusTopologyBuilder.cs` (new)
       - `src/Rig.TUnit.Messaging.ServiceBus/Topology/IServiceBusTopicConfig.cs` (new)
@@ -184,7 +184,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T013 — WithTopology hook + parity file append
 
-- [ ] **T013-RED** [depends: T012-GREEN] Write `ServiceBusRigBuilderWithTopologyTests`.
+- [x] **T013-RED** [depends: T012-GREEN] Write `ServiceBusRigBuilderWithTopologyTests`.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Topology/ServiceBusRigBuilderWithTopologyTests.cs` (new)
       Tests:
       - `WithTopology_CreatesTopicSubscriptionQueue_OnEmulator`
@@ -192,7 +192,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `WithTopology_ReturnsSameBuilderForChain`
       Commit: `test(007): RED T013 — ServiceBusRigBuilder.WithTopology hook`
 
-- [ ] **T013-GREEN** [depends: T013-RED] Add `ServiceBusRigBuilder.WithTopology(Action<IServiceBusTopologyBuilder>)` + append assembly to parity file.
+- [x] **T013-GREEN** [depends: T013-RED] Add `ServiceBusRigBuilder.WithTopology(Action<IServiceBusTopologyBuilder>)` + append assembly to parity file.
       Files:
       - `src/Rig.TUnit.Messaging.ServiceBus/Builder/ServiceBusRigBuilder.cs`
       - `tests/Rig.TUnit.Architecture.Tests/.parity-coverage.txt` (append `Rig.TUnit.Messaging.ServiceBus`)
@@ -201,7 +201,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T016 — seed file shrink (single GREEN)
 
-- [ ] **T016** [depends: T013-GREEN] Shrink `service-bus-config.json` to namespace only.
+- [x] **T016** [depends: T013-GREEN] Shrink `service-bus-config.json` to namespace only.
       Files:
       - `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/TestInfrastructure/service-bus-config.json`
       - `docs/providers/service-bus.md` — "Migration from JSON seed" note.

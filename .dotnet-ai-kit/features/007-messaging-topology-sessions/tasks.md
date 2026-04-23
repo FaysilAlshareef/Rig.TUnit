@@ -255,7 +255,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `DefaultPartitions_OutOfRange_FailsValidation`
       Commit: `test(007): RED T021 — KafkaFixtureOptions.DefaultPartitions`
 
-- [ ] **T021-GREEN** [depends: T021-RED] Add `[Range(1, 200)] public int DefaultPartitions { get; init; } = 1;`.
+- [x] **T021-GREEN** [depends: T021-RED] Add `[Range(1, 200)] public int DefaultPartitions { get; init; } = 1;`.
       Files:
       - `src/Rig.TUnit.Messaging.Kafka/Options/KafkaFixtureOptions.cs`
       - `docs/providers/kafka.md` — options table.

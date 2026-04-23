@@ -1,0 +1,55 @@
+using Azure.Messaging.ServiceBus;
+using Rig.TUnit.Messaging.Assertions;
+
+namespace Rig.TUnit.Messaging.ServiceBus.Helpers;
+
+/// <summary>
+/// Probes the dead-letter sub-queue of a Service Bus topic subscription.
+/// Implements <see cref="IDeadLetterProbe"/> for use with <see cref="DeadLetterAssert"/>.
+/// </summary>
+public sealed class ServiceBusDeadLetterProbe : IDeadLetterProbe, IAsyncDisposable
+{
+    private readonly ServiceBusReceiver _dlqReceiver;
+
+    public ServiceBusDeadLetterProbe(ServiceBusClient client, string topic, string subscription)
+    {
+        ArgumentNullException.ThrowIfNull(client);
+        ArgumentException.ThrowIfNullOrWhiteSpace(topic);
+        ArgumentException.ThrowIfNullOrWhiteSpace(subscription);
+
+        _dlqReceiver = client.CreateReceiver(topic, subscription,
+            new ServiceBusReceiverOptions { SubQueue = SubQueue.DeadLetter });
+    }
+
+    public async Task HasMessageAsync(string expectedReason, CancellationToken ct)
+    {
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        cts.CancelAfter(TimeSpan.FromSeconds(30));
+
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(300));
+        while (await timer.WaitForNextTickAsync(cts.Token).ConfigureAwait(false))
+        {
+            var msg = await _dlqReceiver.PeekMessageAsync(cancellationToken: cts.Token).ConfigureAwait(false);
+            if (msg is not null &&
+                msg.DeadLetterReason?.Contains(expectedReason, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return;
+            }
+        }
+
+        throw new InvalidOperationException(
+            $"DeadLetterAssert: no message with reason '{expectedReason}' found on DLQ within 30s.");
+    }
+
+    public async Task IsEmptyAsync(CancellationToken ct)
+    {
+        var msg = await _dlqReceiver.PeekMessageAsync(cancellationToken: ct).ConfigureAwait(false);
+        if (msg is not null)
+            throw new InvalidOperationException("DeadLetterAssert: expected DLQ to be empty but found a message.");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _dlqReceiver.DisposeAsync().ConfigureAwait(false);
+    }
+}

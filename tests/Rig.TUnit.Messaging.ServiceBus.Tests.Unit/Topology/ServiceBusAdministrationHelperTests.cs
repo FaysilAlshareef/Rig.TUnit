@@ -17,29 +17,33 @@ public sealed class ServiceBusAdministrationHelperTests
     }
 
     [Test]
-    public async Task CreateTopicIfNotExistsAsync_NullName_ThrowsArgumentException(CancellationToken ct)
+    public async Task CreateTopicIfNotExistsAsync_NullName_ThrowsException(CancellationToken ct)
     {
-        // Passes null — guard fires before any network call
-        var helper = new ServiceBusAdministrationHelper(null!);
-        await Assert.That(async () => await helper.CreateTopicIfNotExistsAsync(null!, ct))
-            .Throws<ArgumentException>();
+        // Constructor guard and method guard both throw — wrap both in the lambda
+        await Assert.That(async () =>
+        {
+            var helper = new ServiceBusAdministrationHelper(null!);
+            await helper.CreateTopicIfNotExistsAsync(null!, ct);
+        }).Throws<ArgumentNullException>();
     }
 
     [Test]
-    public async Task CreateSubscriptionIfNotExistsAsync_NullTopic_ThrowsArgumentException(CancellationToken ct)
+    public async Task CreateSubscriptionIfNotExistsAsync_NullTopic_ThrowsException(CancellationToken ct)
     {
-        var helper = new ServiceBusAdministrationHelper(null!);
         await Assert.That(async () =>
-            await helper.CreateSubscriptionIfNotExistsAsync(null!, "sub", ct))
-            .Throws<ArgumentException>();
+        {
+            var helper = new ServiceBusAdministrationHelper(null!);
+            await helper.CreateSubscriptionIfNotExistsAsync(null!, "sub", ct);
+        }).Throws<ArgumentNullException>();
     }
 
     [Test]
-    public async Task CreateSubscriptionIfNotExistsAsync_NullSubscription_ThrowsArgumentException(CancellationToken ct)
+    public async Task CreateSubscriptionIfNotExistsAsync_NullSubscription_ThrowsException(CancellationToken ct)
     {
-        var helper = new ServiceBusAdministrationHelper(null!);
         await Assert.That(async () =>
-            await helper.CreateSubscriptionIfNotExistsAsync("topic", null!, ct))
-            .Throws<ArgumentException>();
+        {
+            var helper = new ServiceBusAdministrationHelper(null!);
+            await helper.CreateSubscriptionIfNotExistsAsync("topic", null!, ct);
+        }).Throws<ArgumentNullException>();
     }
 }

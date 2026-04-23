@@ -122,7 +122,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T014 — version bump + emulator capability probe (single GREEN)
 
-- [ ] **T014** [depends: T015a-RED, T015b-RED, T015c-RED, T015d-RED] Bump `Azure.Messaging.ServiceBus` 7.18.2 → ≥ 7.20.1; add capability probe.
+- [x] **T014** [depends: T015a-RED, T015b-RED, T015c-RED, T015d-RED] Bump `Azure.Messaging.ServiceBus` 7.18.2 → ≥ 7.20.1; add capability probe.
       Files:
       - `Directory.Packages.props` (line 121: `Version="7.20.1"`)
       - `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Topology/ServiceBusEmulatorCapabilityProbeTests.cs` (new)

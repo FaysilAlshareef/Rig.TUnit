@@ -231,7 +231,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T020 — KafkaEventSender `SendContext` overload
 
-- [ ] **T020-RED** [depends: T025a-RED, T025b-RED] Write `KafkaEventSenderSendContextTests`.
+- [x] **T020-RED** [depends: T025a-RED, T025b-RED] Write `KafkaEventSenderSendContextTests`.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Unit/KafkaEventSenderSendContextTests.cs` (new)
       Tests:
       - `SendAsync_WithPartitionKey_SetsMessageKey`

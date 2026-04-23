@@ -240,7 +240,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `SendAsync_LegacyOverload_Unchanged` (regression)
       Commit: `test(007): RED T020 — Kafka partition-key decoupled from correlationId`
 
-- [ ] **T020-GREEN** [depends: T020-RED] Decouple `Message.Key` from `correlationId` at [`KafkaEventSender.cs:34`](../../../src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaEventSender.cs:34); add `SendAsync(SendContext, …)`.
+- [x] **T020-GREEN** [depends: T020-RED] Decouple `Message.Key` from `correlationId` at [`KafkaEventSender.cs:34`](../../../src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaEventSender.cs:34); add `SendAsync(SendContext, …)`.
       Files:
       - `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaEventSender.cs`
       - `docs/providers/kafka.md` — explicit `PartitionKey` section; inline XML on new overload.

@@ -346,7 +346,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `SendAsync_StandardQueue_IgnoresFifoFields`
       Commit: `test(007): RED T030 — SQS SendContext mapping + FIFO validation`
 
-- [ ] **T030-GREEN** [depends: T030-RED] Add `SqsEventSender.SendAsync(SendContext, …)`.
+- [x] **T030-GREEN** [depends: T030-RED] Add `SqsEventSender.SendAsync(SendContext, …)`.
       Files:
       - `src/Rig.TUnit.Messaging.Sqs/Helpers/SqsEventSender.cs`
       - `docs/providers/sqs.md` (create) — FIFO section + `IsolationKey` prefix guidance; inline XML.

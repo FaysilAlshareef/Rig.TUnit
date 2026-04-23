@@ -96,25 +96,25 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### Scenario RED leads (commit order: a → b → c → d)
 
-- [ ] **T015a-RED** [P] [depends: Phase 0] Scenario: session FIFO ordering.
+- [x] **T015a-RED** [P] [depends: Phase 0] Scenario: session FIFO ordering.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Sessions/SessionFifoOrderingTests.cs` (new)
       Assertion: 100 messages across 10 `SessionKey`s; `OrderingAssert.PerKeyMonotonic(listener, m => m.SessionKey!, m => /* sequence */)` passes.
       Docs: `docs/providers/service-bus.md` (create; add session-FIFO example).
       Commit: `test(007): RED T015a — session FIFO ordering`
 
-- [ ] **T015b-RED** [P] [depends: Phase 0] Scenario: partitioned topic fan-out.
+- [x] **T015b-RED** [P] [depends: Phase 0] Scenario: partitioned topic fan-out.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Sessions/PartitionedFanoutTests.cs` (new)
       Assertion: messages with distinct `PartitionKey`s reach every partition-aware receiver.
       Docs: `docs/providers/service-bus.md`.
       Commit: `test(007): RED T015b — partitioned topic fan-out`
 
-- [ ] **T015c-RED** [P] [depends: Phase 0] Scenario: DLQ on max delivery count.
+- [x] **T015c-RED** [P] [depends: Phase 0] Scenario: DLQ on max delivery count.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Sessions/DlqRedriveTests.cs` (new)
       Assertion: message abandoned `MaxDeliveryCount` times; `DeadLetterAssert` sees it on the DLQ.
       Docs: `docs/providers/service-bus.md`.
       Commit: `test(007): RED T015c — DLQ on max delivery count`
 
-- [ ] **T015d-RED** [P] [depends: Phase 0] Scenario: SQL filter subscription.
+- [x] **T015d-RED** [P] [depends: Phase 0] Scenario: SQL filter subscription.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Sessions/SqlFilterTests.cs` (new)
       Assertion: subscription with `SqlRuleFilter("Region='EU'")` receives only EU-tagged messages.
       Docs: `docs/providers/service-bus.md`.

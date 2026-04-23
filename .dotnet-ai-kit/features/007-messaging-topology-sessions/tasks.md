@@ -217,13 +217,13 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### Scenario RED leads
 
-- [ ] **T025a-RED** [P] [depends: Phase 0] Scenario: multi-partition per-key ordering.
+- [x] **T025a-RED** [P] [depends: Phase 0] Scenario: multi-partition per-key ordering.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/Partitions/MultiPartitionOrderingTests.cs` (new)
       Assertion: 6-partition topic, 5 keys × 20 messages, `OrderingAssert.PerKeyMonotonic` per key.
       Docs: `docs/providers/kafka.md`.
       Commit: `test(007): RED T025a — multi-partition per-key ordering`
 
-- [ ] **T025b-RED** [P] [depends: Phase 0] Scenario: compacted-topic retention.
+- [x] **T025b-RED** [P] [depends: Phase 0] Scenario: compacted-topic retention.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/Partitions/CompactedRetentionTests.cs` (new)
       Assertion: declare `cleanup.policy=compact`; send duplicate keys; older values compacted.
       Docs: `docs/providers/kafka.md`.

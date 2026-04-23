@@ -11,6 +11,8 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
     private readonly string _groupId;
     private readonly TimeProvider _clock;
     private readonly TimeSpan _joinTimeout;
+    private readonly int _partitions;
+    private readonly IReadOnlyDictionary<string, string>? _topicConfigs;
     private CancellationTokenSource? _cts;
     private Task? _loop;
     private IConsumer<string, string>? _consumer;
@@ -21,7 +23,9 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         string topic,
         string groupId,
         TimeProvider? clock = null,
-        TimeSpan? joinTimeout = null)
+        TimeSpan? joinTimeout = null,
+        int partitions = 1,
+        IReadOnlyDictionary<string, string>? topicConfigs = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bootstrapServers);
         ArgumentException.ThrowIfNullOrWhiteSpace(topic);
@@ -31,6 +35,8 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         _groupId = groupId;
         _clock = clock ?? TimeProvider.System;
         _joinTimeout = joinTimeout ?? TimeSpan.FromSeconds(30);
+        _partitions = partitions;
+        _topicConfigs = topicConfigs;
     }
 
     public override async Task StartAsync(CancellationToken ct)
@@ -76,9 +82,17 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrap }).Build();
         try
         {
-            await admin.CreateTopicsAsync(
-                [new TopicSpecification { Name = _topic, NumPartitions = 1, ReplicationFactor = 1 }])
-                .WaitAsync(ct).ConfigureAwait(false);
+            var spec = new TopicSpecification
+            {
+                Name = _topic,
+                NumPartitions = _partitions,
+                ReplicationFactor = 1,
+            };
+            if (_topicConfigs is not null)
+            {
+                spec.Configs = new Dictionary<string, string>(_topicConfigs);
+            }
+            await admin.CreateTopicsAsync([spec]).WaitAsync(ct).ConfigureAwait(false);
         }
         catch (CreateTopicsException ex) when (ex.Results.All(r => r.Error.Code == ErrorCode.TopicAlreadyExists))
         {

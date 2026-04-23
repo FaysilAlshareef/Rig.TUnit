@@ -269,7 +269,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `EnsureTopicExistsAsync_WithPartitionsAndConfigs_CreatesTopicWithExactShape` — verifies via `AdminClient.DescribeConfigsAsync`.
       Commit: `test(007): RED T022 — topic creation honours partitions + configs`
 
-- [ ] **T022-GREEN** [depends: T022-RED] Extend `EnsureTopicExistsAsync` at [`KafkaListener.cs:74`](../../../src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs:74) with partition count + configs dictionary.
+- [x] **T022-GREEN** [depends: T022-RED] Extend `EnsureTopicExistsAsync` at [`KafkaListener.cs:74`](../../../src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs:74) with partition count + configs dictionary.
       Files:
       - `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs`
       - `docs/providers/kafka.md` — topic-config plumbing table.

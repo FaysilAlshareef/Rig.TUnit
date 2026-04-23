@@ -1,0 +1,79 @@
+name: Benchmark
+
+# Runs BenchmarkDotNet after every merge to master, publishes the merged
+# results to gh-pages via benchmark-action/github-action-benchmark, and fails
+# the run when any benchmark regresses by ≥ 20 % vs the prior data point.
+#
+# Path-filtered: only fires when production source, the benchmark project,
+# or the package pin file changes — pure docs/CI/test commits skip it.
+#
+# Manual re-run: use the "Run workflow" button (workflow_dispatch).
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - 'src/**/*.cs'
+      - 'tests/Rig.TUnit.Benchmarks/**'
+      - 'Directory.Packages.props'
+      - '.github/workflows/benchmark.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # required for benchmark-action/github-action-benchmark to push to gh-pages
+
+jobs:
+  benchmark-regression:
+    name: Benchmark regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run benchmarks
+        run: |
+          dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
+            --exporters json --artifacts ./benchmark-results --job short --filter '*'
+      - name: Merge benchmark JSON files
+        shell: bash
+        run: |
+          python3 - <<'PYEOF'
+          import json, pathlib, sys
+
+          results_dir = pathlib.Path('./benchmark-results/results')
+          files = sorted(results_dir.glob('*-report-full-compressed.json'))
+          if not files:
+              print('No benchmark result files found.', file=sys.stderr)
+              sys.exit(1)
+
+          merged_benchmarks = []
+          meta = None
+          for f in files:
+              data = json.loads(f.read_text(encoding='utf-8'))
+              if meta is None:
+                  meta = {k: v for k, v in data.items() if k != 'Benchmarks'}
+              merged_benchmarks.extend(data.get('Benchmarks', []))
+
+          out = pathlib.Path('./benchmark-results/merged.json')
+          out.write_text(json.dumps({**(meta or {}), 'Benchmarks': merged_benchmarks}, indent=2), encoding='utf-8')
+          print(f'Merged {len(files)} file(s), {len(merged_benchmarks)} benchmark(s) -> {out}')
+          PYEOF
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'benchmarkdotnet'
+          output-file-path: ./benchmark-results/merged.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '120%'
+          comment-on-alert: true
+          fail-on-alert: true
+      - name: Upload benchmark artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: ./benchmark-results/**
+          retention-days: 14
+          if-no-files-found: warn

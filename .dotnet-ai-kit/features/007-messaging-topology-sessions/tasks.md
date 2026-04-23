@@ -354,7 +354,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T031 — Provider-scoped topology + WithTopology + parity append (flips T033a/b/c GREEN)
 
-- [ ] **T031-RED** [depends: T030-GREEN] Write SQS topology tests + compile fence.
+- [x] **T031-RED** [depends: T030-GREEN] Write SQS topology tests + compile fence.
       Files:
       - `tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/Topology/SqsTopologyBuilderTests.cs` (new)
       - `tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/Topology/SqsBuilderCompileFenceTests.cs` (new) — asserts no `.Topic`/`.Exchange`/`.Stream`/`.Subscription`.

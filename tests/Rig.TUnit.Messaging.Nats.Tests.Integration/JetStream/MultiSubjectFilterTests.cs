@@ -16,7 +16,7 @@ public sealed class MultiSubjectFilterTests
         var bSubject   = $"b.{streamName}";
         var cSubject   = $"c.{streamName}";
 
-        await fx.EnsureStreamAsync(streamName, [aSubject, bSubject, cSubject], ct);  // CS1061 RED
+        await fx.EnsureStreamAsync(streamName, [aSubject, bSubject, cSubject], ct: ct);  // CS1061 RED
 
         await using var sender   = new NatsJetStreamEventSender(fx.JetStream, aSubject);  // CS0246 RED
         await using var bSender  = new NatsJetStreamEventSender(fx.JetStream, bSubject);

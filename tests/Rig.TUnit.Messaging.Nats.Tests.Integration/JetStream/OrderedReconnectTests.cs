@@ -15,7 +15,7 @@ public sealed class OrderedReconnectTests
         var streamName = $"ordered-reconnect-{Guid.NewGuid():N}";
         var subject    = $"events.{streamName}";
 
-        await fx.EnsureStreamAsync(streamName, [subject], ct);   // CS1061 RED until T051-GREEN
+        await fx.EnsureStreamAsync(streamName, [subject], ct: ct);   // CS1061 RED until T051-GREEN
 
         await using var sender   = new NatsJetStreamEventSender(fx.JetStream, subject);  // CS0246 RED
         await using var listener = new NatsJetStreamListener(fx.JetStream, streamName);  // CS0246 RED

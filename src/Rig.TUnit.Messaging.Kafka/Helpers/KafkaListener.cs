@@ -13,6 +13,7 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
     private readonly TimeSpan _joinTimeout;
     private readonly int _partitions;
     private readonly IReadOnlyDictionary<string, string>? _topicConfigs;
+    private int? _pinnedPartition;
     private CancellationTokenSource? _cts;
     private Task? _loop;
     private IConsumer<string, string>? _consumer;
@@ -39,6 +40,16 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         _topicConfigs = topicConfigs;
     }
 
+    /// <summary>
+    /// Pins this listener to a single partition. Must be called before <see cref="StartAsync"/>.
+    /// Uses <c>IConsumer.Assign</c> (static assignment) instead of <c>Subscribe</c> (group-rebalance).
+    /// </summary>
+    public KafkaListener Assign(int partition)
+    {
+        _pinnedPartition = partition;
+        return this;
+    }
+
     public override async Task StartAsync(CancellationToken ct)
     {
         // Pre-create the topic before subscribing. Broker-side auto-create
@@ -61,7 +72,16 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         _consumer = new ConsumerBuilder<string, string>(config)
             .SetPartitionsAssignedHandler((_, _) => _partitionsAssigned.TrySetResult())
             .Build();
-        _consumer.Subscribe(_topic);
+
+        if (_pinnedPartition.HasValue)
+        {
+            _consumer.Assign([new TopicPartitionOffset(_topic, new Partition(_pinnedPartition.Value), Offset.Beginning)]);
+            _partitionsAssigned.TrySetResult();
+        }
+        else
+        {
+            _consumer.Subscribe(_topic);
+        }
 
         _loop = Task.Run(() => ConsumeLoop(_cts.Token), _cts.Token);
 

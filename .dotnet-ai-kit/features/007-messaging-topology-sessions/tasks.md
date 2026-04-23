@@ -301,7 +301,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       Test: `Assign_ToPartition3_OnlyReceivesHash3-Messages`.
       Commit: `test(007): RED T024 — KafkaListener.Assign pinned partition`
 
-- [ ] **T024-GREEN** [depends: T024-RED] Add `KafkaListener.Assign(int partition)` helper.
+- [x] **T024-GREEN** [depends: T024-RED] Add `KafkaListener.Assign(int partition)` helper.
       Files:
       - `src/Rig.TUnit.Messaging.Kafka/Helpers/KafkaListener.cs`
       - `docs/providers/kafka.md` — pinned-partition note.

@@ -124,6 +124,7 @@
     <PackageVersion Include="RabbitMQ.Client" Version="7.0.0" />
     <PackageVersion Include="AWSSDK.SQS" Version="3.7.400" />
     <PackageVersion Include="NATS.Client.Core" Version="2.5.0" />
+    <PackageVersion Include="NATS.Client.JetStream" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup Label="Data Generation / Mocking">

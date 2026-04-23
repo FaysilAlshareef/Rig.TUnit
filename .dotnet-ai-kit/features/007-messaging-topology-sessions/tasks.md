@@ -164,7 +164,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T012 — Provider-scoped topology interfaces + admin helper (flips T015b/c/d GREEN)
 
-- [ ] **T012-RED** [depends: T011-GREEN] Write unit + integration tests for topology.
+- [x] **T012-RED** [depends: T011-GREEN] Write unit + integration tests for topology.
       Files:
       - `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Unit/Topology/ServiceBusAdministrationHelperTests.cs` (new) — mock `ServiceBusAdministrationClient`, assert expected `Create*Async` calls.
       - `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Topology/ServiceBusAdminEmulatorTests.cs` (new) — topic + subscription + DLQ + SQL filter + idempotency.

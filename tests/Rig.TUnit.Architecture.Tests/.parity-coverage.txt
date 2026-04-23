@@ -1,1 +1,2 @@
 Rig.TUnit.Messaging.ServiceBus
+Rig.TUnit.Messaging.Kafka

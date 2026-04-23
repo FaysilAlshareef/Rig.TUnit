@@ -284,7 +284,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/Topology/KafkaTopologyBuilderLiveTests.cs` (new) — includes `WithTopology_CalledTwice_IsIdempotent` (re-apply same declaration, assert no exception + same topic shape).
       Commit: `test(007): RED T023 — Kafka topology builder + compile fence + idempotency`
 
-- [ ] **T023-GREEN** [depends: T023-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
+- [x] **T023-GREEN** [depends: T023-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
       Files:
       - `src/Rig.TUnit.Messaging.Kafka/Topology/IKafkaTopologyBuilder.cs` (new)
       - `src/Rig.TUnit.Messaging.Kafka/Topology/IKafkaTopicConfig.cs` (new)

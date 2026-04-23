@@ -436,12 +436,12 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T041 — Listener binding declaration
 
-- [ ] **T041-RED** [depends: T040-GREEN] Write `RabbitMqBindingListenerTests`.
+- [x] **T041-RED** [depends: T040-GREEN] Write `RabbitMqBindingListenerTests`.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/RabbitMqBindingListenerTests.cs` (new)
       Test: `ListenOn_TopicExchangeWithBinding_ReceivesOnlyMatchingRoutingKey_AndPopulatesSessionKey`.
       Commit: `test(007): RED T041 — listener binding + SessionKey from x-partition-key`
 
-- [ ] **T041-GREEN** [depends: T041-RED] Declare exchange + binding before `BasicConsumeAsync`; read `x-partition-key` into `CapturedMessage.SessionKey`.
+- [x] **T041-GREEN** [depends: T041-RED] Declare exchange + binding before `BasicConsumeAsync`; read `x-partition-key` into `CapturedMessage.SessionKey`.
       Files:
       - `src/Rig.TUnit.Messaging.RabbitMq/Helpers/RabbitMqListener.cs`
       - `docs/providers/rabbitmq.md` — exchange + binding example.

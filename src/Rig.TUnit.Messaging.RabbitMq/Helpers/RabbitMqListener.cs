@@ -8,16 +8,28 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
 {
     private readonly string _connectionString;
     private readonly string _queue;
+    private readonly string? _exchange;
+    private readonly string? _exchangeType;
+    private readonly string? _routingKey;
     private readonly TimeProvider _clock;
     private IConnection? _connection;
     private IChannel? _channel;
 
-    public RabbitMqListener(string connectionString, string queue, TimeProvider? clock = null)
+    public RabbitMqListener(
+        string connectionString,
+        string queue,
+        string? exchange = null,
+        string? exchangeType = null,
+        string? routingKey = null,
+        TimeProvider? clock = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
         ArgumentException.ThrowIfNullOrWhiteSpace(queue);
         _connectionString = connectionString;
         _queue = queue;
+        _exchange = exchange;
+        _exchangeType = exchangeType;
+        _routingKey = routingKey;
         _clock = clock ?? TimeProvider.System;
     }
 
@@ -27,6 +39,24 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
         _connection = await factory.CreateConnectionAsync(ct).ConfigureAwait(false);
         _channel = await _connection.CreateChannelAsync(cancellationToken: ct).ConfigureAwait(false);
         await _channel.QueueDeclareAsync(_queue, durable: false, exclusive: false, autoDelete: false, arguments: null, cancellationToken: ct).ConfigureAwait(false);
+
+        if (_exchange is not null)
+        {
+            await _channel.ExchangeDeclareAsync(
+                _exchange,
+                type: _exchangeType ?? "direct",
+                durable: false,
+                autoDelete: false,
+                arguments: null,
+                cancellationToken: ct).ConfigureAwait(false);
+
+            await _channel.QueueBindAsync(
+                _queue,
+                _exchange,
+                routingKey: _routingKey ?? "#",
+                arguments: null,
+                cancellationToken: ct).ConfigureAwait(false);
+        }
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += (_, ea) =>
@@ -44,12 +74,15 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
                 }
             }
 
+            headers.TryGetValue("x-partition-key", out var sessionKey);
+
             Record(new CapturedMessage<BasicDeliverEventArgs>(
                 ea,
                 _clock.GetUtcNow(),
                 headers,
                 System.Text.Encoding.UTF8.GetString(ea.Body.Span),
-                ea.BasicProperties.CorrelationId));
+                ea.BasicProperties.CorrelationId,
+                sessionKey));
 
             return Task.CompletedTask;
         };

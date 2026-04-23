@@ -4,6 +4,7 @@ using Rig.TUnit.Messaging.Assertions;
 using Rig.TUnit.Messaging.Helpers;
 using Rig.TUnit.Messaging.RabbitMq.Builder;
 using Rig.TUnit.Messaging.RabbitMq.Helpers;
+using Rig.TUnit.Messaging.RabbitMq.Topology;
 
 namespace Rig.TUnit.Messaging.RabbitMq.Tests.Integration.Topology;
 

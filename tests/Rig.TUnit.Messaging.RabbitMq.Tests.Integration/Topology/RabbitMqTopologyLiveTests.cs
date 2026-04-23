@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Rig.TUnit.Core.Builder;
 using Rig.TUnit.Messaging.RabbitMq.Builder;
+using Rig.TUnit.Messaging.RabbitMq.Topology;
 
 namespace Rig.TUnit.Messaging.RabbitMq.Tests.Integration.Topology;
 

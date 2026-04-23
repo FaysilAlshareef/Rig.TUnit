@@ -449,14 +449,14 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T042 — Topology builder + WithTopology + compile fence + parity append (flips T044a/b/c/d GREEN)
 
-- [ ] **T042-RED** [depends: T041-GREEN] Write topology tests + compile fence.
+- [x] **T042-RED** [depends: T041-GREEN] Write topology tests + compile fence.
       Files:
       - `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Unit/Topology/RabbitMqTopologyBuilderTests.cs` (new) — mock `IChannel`.
       - `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Unit/Topology/RabbitMqBuilderCompileFenceTests.cs` (new) — asserts no `.Subscription`/`.Stream` on builder; no `.WithFifo`/`.WithRequiresSession`/`.WithPartitions` on `IRabbitMqQueueConfig`.
       - `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/RabbitMqTopologyLiveTests.cs` (new) — includes `WithTopology_CalledTwice_IsIdempotent` (re-apply exchange + queue + binding, assert no `OperationInterruptedException` from `PRECONDITION_FAILED` on conflicting args).
       Commit: `test(007): RED T042 — RabbitMq topology builder + compile fence + idempotency`
 
-- [ ] **T042-GREEN** [depends: T042-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
+- [x] **T042-GREEN** [depends: T042-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
       Files:
       - `src/Rig.TUnit.Messaging.RabbitMq/Topology/IRabbitMqTopologyBuilder.cs` (new)
       - `src/Rig.TUnit.Messaging.RabbitMq/Topology/IRabbitMqExchangeConfig.cs` (new)

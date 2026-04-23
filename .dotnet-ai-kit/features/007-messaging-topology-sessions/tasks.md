@@ -30,7 +30,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 > One PR: `#007-p0`. Merge before any provider phase starts.
 
-- [ ] **T000-RED** Write `SendContextTests`.
+- [x] **T000-RED** Write `SendContextTests`.
       File: `tests/Rig.TUnit.Messaging.Tests.Unit/Helpers/SendContextTests.cs` (new)
       Tests:
       - `SendContext_Default_IsAllNulls`
@@ -38,7 +38,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `BuildHeaders_WithSendContext_PreservesLegacyHeaderPropagation`
       Commit: `test(007): RED T000 — SendContext record shape + BuildHeaders overload parity`
 
-- [ ] **T000-GREEN** [depends: T000-RED] Add `SendContext` record + `BuildHeaders(SendContext, …)` overload; narrow `CapturedMessage<TMessage>.Body` from `string?` → `string`; add trailing `string? SessionKey = null`. **Ripples**: 3 provider listeners construct `CapturedMessage` with nullable body values today — coerce `null → string.Empty` at each call site so Phase 0 compiles at the solution level.
+- [x] **T000-GREEN** [depends: T000-RED] Add `SendContext` record + `BuildHeaders(SendContext, …)` overload; narrow `CapturedMessage<TMessage>.Body` from `string?` → `string`; add trailing `string? SessionKey = null`. **Ripples**: 3 provider listeners construct `CapturedMessage` with nullable body values today — coerce `null → string.Empty` at each call site so Phase 0 compiles at the solution level.
       Files:
       - `src/Rig.TUnit.Messaging/Helpers/SendContext.cs` (new)
       - `src/Rig.TUnit.Messaging/Helpers/EventSenderBase.cs` (overload added)
@@ -50,20 +50,20 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `README.md` — messaging section intro paragraph (mention `SendContext` + `SessionKey`)
       Commit: `feat(007): GREEN T000 — SendContext + BuildHeaders overload + CapturedMessage extension + listener null-coercion`
 
-- [ ] **T001-RED** [depends: T000-GREEN] Write `ITopologyBuilderContractTests`.
+- [x] **T001-RED** [depends: T000-GREEN] Write `ITopologyBuilderContractTests`.
       File: `tests/Rig.TUnit.Messaging.Tests.Unit/Topology/ITopologyBuilderContractTests.cs` (new)
       Tests:
       - `ITopologyBuilder_DeclaresOnlyApplyAsync` — reflection asserts exactly one method (`ApplyAsync`).
       - `ITopologyBuilder_ApplyAsync_AcceptsCancellationToken`
       Commit: `test(007): RED T001 — ITopologyBuilder marker contract`
 
-- [ ] **T001-GREEN** [depends: T001-RED] Add `ITopologyBuilder` marker (no fluent methods — per C-003).
+- [x] **T001-GREEN** [depends: T001-RED] Add `ITopologyBuilder` marker (no fluent methods — per C-003).
       Files:
       - `src/Rig.TUnit.Messaging/Topology/ITopologyBuilder.cs` (new)
       - `docs/ordering-assertions.md` (create — stub linking to per-provider docs; will be filled in T063)
       Commit: `feat(007): GREEN T001 — ITopologyBuilder marker interface`
 
-- [ ] **T002** [depends: T001-GREEN] Regression guard — `MessagingRigBuilder<TSelf>` base class must not declare `WithTopology` (per C-003). Single-GREEN: the test is structural, not behavioural, so there is no RED state to drive.
+- [x] **T002** [depends: T001-GREEN] Regression guard — `MessagingRigBuilder<TSelf>` base class must not declare `WithTopology` (per C-003). Single-GREEN: the test is structural, not behavioural, so there is no RED state to drive.
       Files:
       - `tests/Rig.TUnit.Messaging.Tests.Unit/Builder/MessagingRigBuilderNoGenericWithTopologyTests.cs` (new) — reflection asserts base class declares no `WithTopology` method.
       - `src/Rig.TUnit.Messaging/Builder/MessagingRigBuilder.cs` — add XML doc comment block noting `WithTopology` lives on provider-specific `RigBuilder`s per C-003.

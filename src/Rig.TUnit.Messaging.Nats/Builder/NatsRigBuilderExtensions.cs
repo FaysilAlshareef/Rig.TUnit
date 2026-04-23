@@ -1,4 +1,5 @@
 using Rig.TUnit.Core.Builder;
+using Rig.TUnit.Messaging.Nats.Fixtures;
 
 namespace Rig.TUnit.Messaging.Nats.Builder;
 
@@ -14,6 +15,20 @@ public static class NatsRigBuilderExtensions
         ArgumentNullException.ThrowIfNull(configure);
 
         var builder = new NatsRigBuilder(rig, source);
+        configure(builder);
+        return rig;
+    }
+
+    public static RigBuilder UseNats(
+        this RigBuilder rig,
+        NatsJetStreamFixture fixture,
+        Action<NatsRigBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(rig);
+        ArgumentNullException.ThrowIfNull(fixture);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = new NatsRigBuilder(rig, fixture, fixture.JetStream);
         configure(builder);
         return rig;
     }

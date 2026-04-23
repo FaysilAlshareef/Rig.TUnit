@@ -141,7 +141,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `SendAsync_WithDefaultSendContext_BehavesLikeLegacyOverload`
       Commit: `test(007): RED T010 — ServiceBus SendContext mapping + equality validation`
 
-- [ ] **T010-GREEN** [depends: T010-RED] Add `ServiceBusEventSender.SendAsync(SendContext, …)` overload.
+- [x] **T010-GREEN** [depends: T010-RED] Add `ServiceBusEventSender.SendAsync(SendContext, …)` overload.
       Files:
       - `src/Rig.TUnit.Messaging.ServiceBus/Helpers/ServiceBusEventSender.cs`
       - `docs/providers/service-bus.md` — session usage section; inline XML on new overload.

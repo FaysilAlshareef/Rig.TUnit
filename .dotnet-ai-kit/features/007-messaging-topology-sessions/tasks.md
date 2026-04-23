@@ -337,7 +337,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T030 — SqsEventSender `SendContext` overload
 
-- [ ] **T030-RED** [depends: T033a-RED, T033b-RED, T033c-RED] Write `SqsEventSenderSendContextTests`.
+- [x] **T030-RED** [depends: T033a-RED, T033b-RED, T033c-RED] Write `SqsEventSenderSendContextTests`.
       File: `tests/Rig.TUnit.Messaging.Sqs.Tests.Unit/SqsEventSenderSendContextTests.cs` (new)
       Tests:
       - `SendAsync_FifoQueueMissingSessionKey_ThrowsInvalidOperationException`

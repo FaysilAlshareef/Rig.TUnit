@@ -63,15 +63,16 @@ public sealed class KafkaTopologyBuilderLiveTests
         var fx = await SharedKafkaFixture.GetAsync();
 
         KafkaRigBuilder? captured = null;
+        KafkaRigBuilder? returned = null;
         new ServiceCollection().AddRigTUnit(rig =>
             rig.UseKafka(fx, builder =>
             {
                 captured = builder;
-                var returned = builder.WithTopology(t =>
+                returned = builder.WithTopology(t =>
                     t.Topic($"chain-{Guid.NewGuid():N}"));
-                Assert.That(returned).IsEqualTo(builder);
             }));
 
         await Assert.That(captured).IsNotNull();
+        await Assert.That(returned).IsEqualTo(captured);
     }
 }

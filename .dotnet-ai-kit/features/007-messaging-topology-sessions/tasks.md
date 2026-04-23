@@ -361,7 +361,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Topology/SqsTopologyBuilderLiveTests.cs` (new) — includes `WithTopology_CalledTwice_IsIdempotent` (re-apply same declaration, assert `CreateQueueAsync` handles existing queue without throwing).
       Commit: `test(007): RED T031 — SQS topology builder + compile fence + idempotency`
 
-- [ ] **T031-GREEN** [depends: T031-RED] Add interfaces + impl + `WithTopology` + parity append.
+- [x] **T031-GREEN** [depends: T031-RED] Add interfaces + impl + `WithTopology` + parity append.
       Files:
       - `src/Rig.TUnit.Messaging.Sqs/Topology/ISqsTopologyBuilder.cs` (new)
       - `src/Rig.TUnit.Messaging.Sqs/Topology/ISqsQueueConfig.cs` (new)

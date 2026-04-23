@@ -1,8 +1,9 @@
+using Amazon.SQS;
+using NSubstitute;
 using Rig.TUnit.Messaging.Sqs.Topology;
 
 namespace Rig.TUnit.Messaging.Sqs.Tests.Unit.Topology;
 
-// T031-RED: compile-fail until T031-GREEN adds ISqsTopologyBuilder/ISqsQueueConfig/SqsTopologyBuilder.
 public sealed class SqsTopologyBuilderTests
 {
     [Test]
@@ -17,7 +18,7 @@ public sealed class SqsTopologyBuilderTests
     public async Task Queue_WithNoConfig_ReturnsBuilderForChaining()
     {
         // Arrange
-        ISqsTopologyBuilder builder = new SqsTopologyBuilder(null!, "https://sqs.us-east-1.amazonaws.com/");
+        ISqsTopologyBuilder builder = new SqsTopologyBuilder(Substitute.For<IAmazonSQS>(), "https://sqs.us-east-1.amazonaws.com/");
 
         // Act
         var result = builder.Queue("my-queue");
@@ -30,7 +31,7 @@ public sealed class SqsTopologyBuilderTests
     public async Task Queue_WithFifo_ReturnsBuilderForChaining()
     {
         // Arrange
-        ISqsTopologyBuilder builder = new SqsTopologyBuilder(null!, "https://sqs.us-east-1.amazonaws.com/");
+        ISqsTopologyBuilder builder = new SqsTopologyBuilder(Substitute.For<IAmazonSQS>(), "https://sqs.us-east-1.amazonaws.com/");
 
         // Act
         var result = builder.Queue("orders.fifo", cfg => cfg.WithFifo());
@@ -43,7 +44,7 @@ public sealed class SqsTopologyBuilderTests
     public async Task Queue_WithFifoAndContentBasedDedup_ReturnsBuilderForChaining()
     {
         // Arrange
-        ISqsTopologyBuilder builder = new SqsTopologyBuilder(null!, "https://sqs.us-east-1.amazonaws.com/");
+        ISqsTopologyBuilder builder = new SqsTopologyBuilder(Substitute.For<IAmazonSQS>(), "https://sqs.us-east-1.amazonaws.com/");
 
         // Act
         var result = builder.Queue("orders.fifo", cfg =>

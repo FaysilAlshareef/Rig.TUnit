@@ -149,7 +149,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T011 — ServiceBusSessionListener (flips T015a GREEN once paired with T010)
 
-- [ ] **T011-RED** [depends: T010-GREEN] Write `ServiceBusSessionListenerTests`.
+- [x] **T011-RED** [depends: T010-GREEN] Write `ServiceBusSessionListenerTests`.
       File: `tests/Rig.TUnit.Messaging.ServiceBus.Tests.Integration/Sessions/ServiceBusSessionListenerTests.cs` (new)
       Tests:
       - `SessionListener_10Sessions10Messages_CapturesSessionKeyOnEveryMessage`

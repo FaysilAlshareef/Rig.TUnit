@@ -286,6 +286,37 @@ For significant changes, open an issue first to discuss the approach.
 
 ---
 
+## How testing works
+
+Every public API in `Rig.TUnit.*` is covered by unit tests (≥ 90 % line / ≥ 85 % branch) and,
+for each provider, by integration tests that run against a real containerised broker via
+Testcontainers.
+
+Provider completeness is enforced by the architecture-test suite. A file called
+`.parity-coverage.txt` (in `tests/Rig.TUnit.Architecture.Tests/`) lists the messaging-provider
+assembly names that have reached full parity with the Feature-007 shape:
+
+```
+Rig.TUnit.Messaging.ServiceBus
+Rig.TUnit.Messaging.Kafka
+```
+
+Each time a provider phase ships, its assembly name is appended to that file and the
+`ProviderCompletenessTests` suite immediately enforces three new invariants for it:
+
+1. **`WithTopology`** — the provider's `{Provider}RigBuilder` exposes a strongly-typed
+   `WithTopology(Action<I{Provider}TopologyBuilder>)` hook.
+2. **`SendContext` overload** — at least one `{Provider}EventSender` exposes a `SendAsync`
+   overload that accepts `SendContext` (carries `SessionKey`, `PartitionKey`, `DeduplicationKey`).
+3. **Session listener** (session/partition-capable providers only) — the assembly declares a
+   concrete `ListenerBase<T>` subtype that populates `CapturedMessage.SessionKey`.
+
+The file is intentionally empty at Phase 0 exit; all three assertions pass vacuously until the
+first provider phase appends its name. This keeps CI green during the phased rollout without
+requiring every provider to ship simultaneously.
+
+---
+
 ## Architecture
 
 ```mermaid

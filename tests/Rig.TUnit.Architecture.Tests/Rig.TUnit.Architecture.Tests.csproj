@@ -18,5 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="coverage-whitelist.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include=".parity-coverage.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

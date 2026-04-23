@@ -263,7 +263,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T022 — `EnsureTopicExistsAsync` honours configs (flips T025a GREEN)
 
-- [ ] **T022-RED** [depends: T021-GREEN] Write `KafkaTopicConfigTests`.
+- [x] **T022-RED** [depends: T021-GREEN] Write `KafkaTopicConfigTests`.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/Partitions/KafkaTopicConfigTests.cs` (new)
       Tests:
       - `EnsureTopicExistsAsync_WithPartitionsAndConfigs_CreatesTopicWithExactShape` — verifies via `AdminClient.DescribeConfigsAsync`.

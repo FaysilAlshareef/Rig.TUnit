@@ -248,7 +248,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T021 — `KafkaFixtureOptions.DefaultPartitions`
 
-- [ ] **T021-RED** [depends: T020-GREEN] Extend `KafkaFixtureOptionsTests`.
+- [x] **T021-RED** [depends: T020-GREEN] Extend `KafkaFixtureOptionsTests`.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Unit/KafkaFixtureOptionsTests.cs` (extend)
       Tests:
       - `DefaultPartitions_NotSet_DefaultsTo1`

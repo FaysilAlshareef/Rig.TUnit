@@ -24,9 +24,25 @@ public abstract class ListenerBase<TMessage>
     public abstract Task StopAsync(CancellationToken ct);
 }
 
+/// <summary>
+/// Envelope recording every message a listener observes.
+/// </summary>
+/// <param name="Message">The raw broker-typed message (e.g., <c>ServiceBusReceivedMessage</c>).</param>
+/// <param name="ReceivedAt">The timestamp at which the listener recorded the message.</param>
+/// <param name="Headers">The flattened header dictionary exposed by the provider.</param>
+/// <param name="Body">
+/// The message body as a string. Providers coerce absent bodies to <see cref="string.Empty"/> so
+/// tests never observe <see langword="null"/>.
+/// </param>
+/// <param name="CorrelationId">The optional <c>x-correlation-id</c> header, when present.</param>
+/// <param name="SessionKey">
+/// The per-session ordering key populated by session-aware listeners (ServiceBus <c>SessionId</c>,
+/// SQS <c>MessageGroupId</c>, etc.). <see langword="null"/> for listeners that do not resolve a key.
+/// </param>
 public sealed record CapturedMessage<TMessage>(
     TMessage Message,
     DateTimeOffset ReceivedAt,
     IReadOnlyDictionary<string, string> Headers,
-    string? Body,
-    string? CorrelationId);
+    string Body,
+    string? CorrelationId,
+    string? SessionKey = null);

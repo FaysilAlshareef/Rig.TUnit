@@ -92,7 +92,7 @@ public sealed class SqsListener : ListenerBase<Message>, IAsyncDisposable
                     msg,
                     _clock.GetUtcNow(),
                     headers,
-                    msg.Body,
+                    msg.Body ?? string.Empty,
                     correlationId));
 
                 await _client.DeleteMessageAsync(_queueUrl, msg.ReceiptHandle, ct).ConfigureAwait(false);

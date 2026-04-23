@@ -30,7 +30,7 @@ by providing:
 |--------|---------|
 | **SQL databases** | `SqlServer` · `MySql` · `Postgresql` · `Oracle` · `Sqlite` |
 | **NoSQL databases** | `Redis` · `Mongo` · `Cosmos` · `Cassandra` · `Dynamo` · `ElasticSearch` · `KurrentDb` |
-| **Messaging** | `ServiceBus` · `Kafka` · `RabbitMq` · `Nats` · `Sqs` |
+| **Messaging** | `ServiceBus` · `Kafka` · `RabbitMq` · `Nats` · `Sqs` — with a shared `SendContext` (session / partition / deduplication keys) and provider-specific `WithTopology(...)` hooks |
 | **Caching** | `Redis` · `Memory` · `Fusion` · `Hybrid` |
 | **Storage** | `AzureBlob` · `FileSystem` · `MinIO` · `S3` |
 | **Observability** | `Logging` · `AppInsights` · `Metrics` · `Tracing` · `Seq` |

@@ -148,7 +148,7 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
                 result,
                 _clock.GetUtcNow(),
                 headers,
-                result.Message.Value,
+                result.Message.Value ?? string.Empty,
                 correlationId));
         }
     }

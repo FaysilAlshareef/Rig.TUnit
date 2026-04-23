@@ -10,12 +10,12 @@ public sealed class ServiceBusListenerTests
     // Every test owns its own subscription so that parallel processor-based
     // and raw-receiver tests cannot steal each other's messages.
     // All subscriptions are pre-provisioned in TestInfrastructure/service-bus-config.json.
-    private const string Subscription      = "test-subscription";   // contract tests
+    private const string Subscription = "test-subscription";   // contract tests
     private const string DeliverSubscription = "deliver-subscription";
     private const string HeadersSubscription = "headers-subscription";
-    private const string AckSubscription   = "ack-subscription";
-    private const string NackSubscription  = "nack-subscription";
-    private const string DlqSubscription   = "dlq-subscription";
+    private const string AckSubscription = "ack-subscription";
+    private const string NackSubscription = "nack-subscription";
+    private const string DlqSubscription = "dlq-subscription";
     private const string RetrySubscription = "retry-subscription";
 
     [Test]

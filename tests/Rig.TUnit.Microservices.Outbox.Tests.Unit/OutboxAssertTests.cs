@@ -3,7 +3,7 @@ using Rig.TUnit.Microservices.Outbox.Fixtures;
 
 namespace Rig.TUnit.Microservices.Outbox.Tests.Unit;
 
-public sealed class OutboxAssertContainsTests
+public sealed class OutboxAssertTests
 {
     private sealed record SampleOutboxEvent(string Id);
 

@@ -356,11 +356,9 @@ jobs:
       - name: Publish markdown summary
         run: cat ./coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.70)
-        # T069b (Phase 3 close): originally flipped to blocking.
-        # 2026-04-20 (post-Phase-6c): reverted to warn-only while per-provider
-        # test backfill is in flight. Ratchet back up package-by-package in a
-        # follow-up feature. FR-022 / T015 allow a non-blocking reporting window.
-        # Disabled 2026-04-20; re-enabled by feat/006 T090
+        # Hard gate: fails the job when any non-excluded package drops below the
+        # floor. INTEGRATION_ONLY_PREFIXES (below) lists provider packages whose
+        # coverage is structurally unreachable from unit tests.
         shell: bash
         run: |
           set -euo pipefail

@@ -35,26 +35,32 @@ public sealed class CiTests
     public async Task TrxEnricher_AppendsStdOutToNamedTest()
     {
         var path = Path.GetTempFileName();
-        var xml = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-          <Results>
-            <UnitTestResult testName="OrdersTest_Create" outcome="Passed" />
-          </Results>
-        </TestRun>
-        """;
-        await File.WriteAllTextAsync(path, xml);
-
-        var enricher = new TrxEnricher();
-        var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+        try
         {
-            ["OrdersTest_Create"] = new[] { "trace:abc123" },
-        });
+            var xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+              <Results>
+                <UnitTestResult testName="OrdersTest_Create" outcome="Passed" />
+              </Results>
+            </TestRun>
+            """;
+            await File.WriteAllTextAsync(path, xml);
 
-        var contents = await File.ReadAllTextAsync(path);
-        await Assert.That(enriched).IsEqualTo(1);
-        await Assert.That(contents).Contains("trace:abc123");
-        File.Delete(path);
+            var enricher = new TrxEnricher();
+            var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["OrdersTest_Create"] = new[] { "trace:abc123" },
+            });
+
+            var contents = await File.ReadAllTextAsync(path);
+            await Assert.That(enriched).IsEqualTo(1);
+            await Assert.That(contents).Contains("trace:abc123");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Test]
@@ -88,48 +94,60 @@ public sealed class CiTests
     public async Task TrxEnricher_TestNameNotInEnrichments_EnrichedCountIsZero()
     {
         var path = Path.GetTempFileName();
-        var xml = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-          <Results>
-            <UnitTestResult testName="SomeTest" outcome="Passed" />
-          </Results>
-        </TestRun>
-        """;
-        await File.WriteAllTextAsync(path, xml);
-
-        var enricher = new TrxEnricher();
-        var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+        try
         {
-            ["AnotherTest"] = new[] { "item" },
-        });
+            var xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+              <Results>
+                <UnitTestResult testName="SomeTest" outcome="Passed" />
+              </Results>
+            </TestRun>
+            """;
+            await File.WriteAllTextAsync(path, xml);
 
-        await Assert.That(enriched).IsEqualTo(0);
-        File.Delete(path);
+            var enricher = new TrxEnricher();
+            var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["AnotherTest"] = new[] { "item" },
+            });
+
+            await Assert.That(enriched).IsEqualTo(0);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Test]
     public async Task TrxEnricher_EmptyEnrichmentsList_IsSkipped()
     {
         var path = Path.GetTempFileName();
-        var xml = """
-        <?xml version="1.0" encoding="utf-8"?>
-        <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-          <Results>
-            <UnitTestResult testName="SomeTest" outcome="Passed" />
-          </Results>
-        </TestRun>
-        """;
-        await File.WriteAllTextAsync(path, xml);
-
-        var enricher = new TrxEnricher();
-        var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+        try
         {
-            ["SomeTest"] = Array.Empty<string>(), // empty list — should not enrich
-        });
+            var xml = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <TestRun xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+              <Results>
+                <UnitTestResult testName="SomeTest" outcome="Passed" />
+              </Results>
+            </TestRun>
+            """;
+            await File.WriteAllTextAsync(path, xml);
 
-        await Assert.That(enriched).IsEqualTo(0);
-        File.Delete(path);
+            var enricher = new TrxEnricher();
+            var enriched = enricher.EnrichFile(path, new Dictionary<string, IReadOnlyList<string>>
+            {
+                ["SomeTest"] = Array.Empty<string>(),
+            });
+
+            await Assert.That(enriched).IsEqualTo(0);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Test]

@@ -41,3 +41,7 @@ Thumbs.db
 ## Tool-local outputs (not committed)
 coderabbit-review.txt
 coderabbit-*.txt
+
+## Accidental Windows-path files captured by mis-quoted shell commands
+C:Users*
+/C\:*

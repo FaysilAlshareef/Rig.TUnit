@@ -39,7 +39,7 @@
 
 ### Skipped per user request
 - All `*.Tests.Integration` projects (10 integration matrices in CI: SQL, NoSQL, Caching, Messaging, Microservices, Security, Observability, Storage, Core).
-- Re-run with the full integration matrix in CI before merge (see `Integration — *` jobs in [ci.yml](.github/workflows/ci.yml)).
+- Re-run with the full integration matrix in CI before merge (see `Integration — *` jobs in [ci.yml](../../../.github/workflows/ci.yml)).
 
 ## Summary
 

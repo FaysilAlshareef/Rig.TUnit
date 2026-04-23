@@ -5,8 +5,8 @@ namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration.Topology;
 
 /// <summary>
 /// Probes emulator v1.1.2 capabilities at the Azure.Messaging.ServiceBus 7.20.1 SDK level.
-/// Results drive the capability table in docs/providers/service-bus.md and any [Skip]
-/// annotations in Phase 1 tests per C-004.
+/// Results drive the capability table in docs/providers/service-bus.md and any
+/// skip annotations in Phase 1 tests per C-004.
 /// </summary>
 public sealed class ServiceBusEmulatorCapabilityProbeTests
 {
@@ -99,8 +99,8 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
             "dlq-subscription",
             new ServiceBusReceiverOptions { SubQueue = SubQueue.DeadLetter });
 
-        // Assert — peek returns null (empty) without throwing
-        var peeked = await dlqReceiver.PeekMessageAsync(cancellationToken: ct);
-        await Assert.That(true).IsTrue(); // emulator DLQ is accessible
+        // Assert — DLQ receiver is accessible; peek completes without throwing
+        await dlqReceiver.PeekMessageAsync(cancellationToken: ct);
+        await Assert.That(dlqReceiver.FullyQualifiedNamespace).IsNotEmpty();
     }
 }

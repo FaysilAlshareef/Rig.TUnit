@@ -296,7 +296,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T024 — Pinned-partition helper
 
-- [ ] **T024-RED** [depends: T023-GREEN] Write `KafkaPinnedPartitionTests`.
+- [x] **T024-RED** [depends: T023-GREEN] Write `KafkaPinnedPartitionTests`.
       File: `tests/Rig.TUnit.Messaging.Kafka.Tests.Integration/Partitions/KafkaPinnedPartitionTests.cs` (new)
       Test: `Assign_ToPartition3_OnlyReceivesHash3-Messages`.
       Commit: `test(007): RED T024 — KafkaListener.Assign pinned partition`

@@ -317,19 +317,19 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### Scenario RED leads
 
-- [ ] **T033a-RED** [P] [depends: Phase 0] Scenario: FIFO ordering per group.
+- [x] **T033a-RED** [P] [depends: Phase 0] Scenario: FIFO ordering per group.
       File: `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Fifo/FifoOrderingTests.cs` (new)
       Assertion: 5 groups × 10 messages; `OrderingAssert.PerKeyMonotonic` per group.
       Docs: `docs/providers/sqs.md`.
       Commit: `test(007): RED T033a — FIFO ordering per group`
 
-- [ ] **T033b-RED** [P] [depends: Phase 0] Scenario: DLQ redrive.
+- [x] **T033b-RED** [P] [depends: Phase 0] Scenario: DLQ redrive.
       File: `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Fifo/DlqRedriveTests.cs` (new)
       Assertion: message fails `MaxReceiveCount` times → on DLQ.
       Docs: `docs/providers/sqs.md`.
       Commit: `test(007): RED T033b — SQS DLQ redrive`
 
-- [ ] **T033c-RED** [P] [depends: Phase 0] Scenario: content-based deduplication.
+- [x] **T033c-RED** [P] [depends: Phase 0] Scenario: content-based deduplication.
       File: `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Fifo/ContentBasedDedupTests.cs` (new)
       Assertion: duplicate body within 5-min window received once.
       Docs: `docs/providers/sqs.md`.

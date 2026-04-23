@@ -394,25 +394,25 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### Scenario RED leads
 
-- [ ] **T044a-RED** [P] [depends: Phase 0] Scenario: topic-exchange fan-out.
+- [x] **T044a-RED** [P] [depends: Phase 0] Scenario: topic-exchange fan-out.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/TopicFanoutTests.cs` (new)
       Assertion: 3 queues bound on `user.*`/`order.*`/`stock.*`; each receives only its subject.
       Docs: `docs/providers/rabbitmq.md`.
       Commit: `test(007): RED T044a — topic-exchange fan-out`
 
-- [ ] **T044b-RED** [P] [depends: Phase 0] Scenario: DLX on nack.
+- [x] **T044b-RED** [P] [depends: Phase 0] Scenario: DLX on nack.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/DlxOnNackTests.cs` (new)
       Assertion: nacked message routes via `x-dead-letter-exchange` to DLX queue.
       Docs: `docs/providers/rabbitmq.md`.
       Commit: `test(007): RED T044b — DLX on nack`
 
-- [ ] **T044c-RED** [P] [depends: Phase 0] Scenario: priority queue ordering.
+- [x] **T044c-RED** [P] [depends: Phase 0] Scenario: priority queue ordering.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/PriorityOrderingTests.cs` (new)
       Assertion: priority queue delivers high-priority messages first.
       Docs: `docs/providers/rabbitmq.md`.
       Commit: `test(007): RED T044c — priority queue ordering`
 
-- [ ] **T044d-RED** [P] [depends: Phase 0] Scenario: quorum queue.
+- [x] **T044d-RED** [P] [depends: Phase 0] Scenario: quorum queue.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Integration/Topology/QuorumQueueTests.cs` (new)
       Assertion: `x-queue-type=quorum` queue accepts messages and survives broker restart.
       Docs: `docs/providers/rabbitmq.md`.
@@ -420,7 +420,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T040 — RabbitMqEventSender `SendContext` + exchange/routingKey
 
-- [ ] **T040-RED** [depends: T044a-RED, T044b-RED, T044c-RED, T044d-RED] Write `RabbitMqEventSenderSendContextTests`.
+- [x] **T040-RED** [depends: T044a-RED, T044b-RED, T044c-RED, T044d-RED] Write `RabbitMqEventSenderSendContextTests`.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Unit/RabbitMqEventSenderSendContextTests.cs` (new)
       Tests:
       - `SendAsync_WithExchangeAndRoutingKey_PassesToBasicPublishAsync`
@@ -428,7 +428,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `SendAsync_DefaultExchange_LegacyBehaviour` (regression)
       Commit: `test(007): RED T040 — RabbitMq SendContext + explicit exchange/routingKey`
 
-- [ ] **T040-GREEN** [depends: T040-RED] Add overload with `exchange` + `routingKey` + `x-partition-key` header; legacy default-exchange behaviour preserved when both omitted.
+- [x] **T040-GREEN** [depends: T040-RED] Add overload with `exchange` + `routingKey` + `x-partition-key` header; legacy default-exchange behaviour preserved when both omitted.
       Files:
       - `src/Rig.TUnit.Messaging.RabbitMq/Helpers/RabbitMqEventSender.cs`
       - `docs/providers/rabbitmq.md` (create) — routing-key + header conventions; inline XML.

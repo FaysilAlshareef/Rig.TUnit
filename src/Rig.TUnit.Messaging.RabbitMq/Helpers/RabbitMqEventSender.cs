@@ -18,6 +18,23 @@ public sealed class RabbitMqEventSender : EventSenderBase, IAsyncDisposable
         _queue = queue;
     }
 
+    public Task SendAsync(
+        string body,
+        SendContext context,
+        string? correlationId = null,
+        string? causationId = null,
+        string? traceparent = null,
+        IReadOnlyDictionary<string, string>? additionalHeaders = null,
+        CancellationToken ct = default)
+    {
+        var extra = context.PartitionKey is not null
+            ? MergeHeader(additionalHeaders, "x-partition-key", context.PartitionKey)
+            : additionalHeaders;
+
+        var routingKey = context.PartitionKey ?? _queue;
+        return SendCoreAsync(body, exchange: "", routingKey, correlationId, causationId, traceparent, extra, ct);
+    }
+
     public async Task SendAsync(
         string body,
         string? correlationId = null,
@@ -25,6 +42,20 @@ public sealed class RabbitMqEventSender : EventSenderBase, IAsyncDisposable
         string? traceparent = null,
         IReadOnlyDictionary<string, string>? additionalHeaders = null,
         CancellationToken ct = default)
+    {
+        await SendCoreAsync(body, exchange: "", _queue, correlationId, causationId, traceparent, additionalHeaders, ct)
+            .ConfigureAwait(false);
+    }
+
+    private async Task SendCoreAsync(
+        string body,
+        string exchange,
+        string routingKey,
+        string? correlationId,
+        string? causationId,
+        string? traceparent,
+        IReadOnlyDictionary<string, string>? additionalHeaders,
+        CancellationToken ct)
     {
         if (_connection is null)
         {
@@ -45,12 +76,24 @@ public sealed class RabbitMqEventSender : EventSenderBase, IAsyncDisposable
         };
 
         await _channel!.BasicPublishAsync(
-            exchange: "",
-            routingKey: _queue,
+            exchange: exchange,
+            routingKey: routingKey,
             mandatory: false,
             basicProperties: props,
             body: System.Text.Encoding.UTF8.GetBytes(body),
             cancellationToken: ct).ConfigureAwait(false);
+    }
+
+    private static IReadOnlyDictionary<string, string> MergeHeader(
+        IReadOnlyDictionary<string, string>? existing,
+        string key,
+        string value)
+    {
+        var merged = existing is not null
+            ? new Dictionary<string, string>(existing, StringComparer.Ordinal)
+            : new Dictionary<string, string>(StringComparer.Ordinal);
+        merged[key] = value;
+        return merged;
     }
 
     public async ValueTask DisposeAsync()

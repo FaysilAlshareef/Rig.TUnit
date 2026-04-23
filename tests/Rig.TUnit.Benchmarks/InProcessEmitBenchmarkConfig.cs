@@ -15,7 +15,7 @@ public sealed class InProcessEmitBenchmarkConfig : ManualConfig
     public InProcessEmitBenchmarkConfig()
     {
         AddJob(Job.Dry
-            .WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core80)
+            .WithRuntime(BenchmarkDotNet.Environments.CoreRuntime.Core90)
             .WithToolchain(InProcessEmitToolchain.Instance)
             .WithStrategy(RunStrategy.ColdStart)
             .WithIterationCount(1)

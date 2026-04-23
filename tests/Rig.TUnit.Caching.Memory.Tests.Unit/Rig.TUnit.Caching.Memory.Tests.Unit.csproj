@@ -2,6 +2,7 @@
   <ItemGroup>
     <PackageReference Include="TUnit" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Memory\Rig.TUnit.Caching.Memory.csproj" />

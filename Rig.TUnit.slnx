@@ -88,8 +88,11 @@
     <Project Path="tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration/Rig.TUnit.Databases.Sql.Sqlite.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit/Rig.TUnit.Databases.Sql.Sqlite.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Databases.NoSql.Tests.Contract/Rig.TUnit.Databases.NoSql.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Databases.NoSql.Tests.Unit/Rig.TUnit.Databases.NoSql.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Tests.Contract/Rig.TUnit.Caching.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Caching.Tests.Unit/Rig.TUnit.Caching.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Messaging.Tests.Contract/Rig.TUnit.Messaging.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Messaging.Tests.Unit/Rig.TUnit.Messaging.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tests.Contract/Rig.TUnit.Observability.Tests.Contract.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Tracing.Tests.Integration/Rig.TUnit.Observability.Tracing.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Observability.Logging.Tests.Integration/Rig.TUnit.Observability.Logging.Tests.Integration.csproj" />
@@ -132,6 +135,7 @@
     <Project Path="tests/Rig.TUnit.Caching.Hybrid.Tests.Integration/Rig.TUnit.Caching.Hybrid.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Caching.Fusion.Tests.Integration/Rig.TUnit.Caching.Fusion.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.Tests.Contract/Rig.TUnit.Storage.Tests.Contract.csproj" />
+    <Project Path="tests/Rig.TUnit.Storage.Tests.Unit/Rig.TUnit.Storage.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.AzureBlob.Tests.Integration/Rig.TUnit.Storage.AzureBlob.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Integration/Rig.TUnit.Storage.S3.Tests.Integration.csproj" />
     <Project Path="tests/Rig.TUnit.Parallelism.Tests.Integration/Rig.TUnit.Parallelism.Tests.Integration.csproj" />
@@ -168,6 +172,7 @@
     <Project Path="tests/Rig.TUnit.Storage.S3.Tests.Unit/Rig.TUnit.Storage.S3.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.MinIO.Tests.Unit/Rig.TUnit.Storage.MinIO.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Storage.FileSystem.Tests.Unit/Rig.TUnit.Storage.FileSystem.Tests.Unit.csproj" />
+    <Project Path="tests/Rig.TUnit.Security.Tests.Unit/Rig.TUnit.Security.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Jwt.Tests.Unit/Rig.TUnit.Security.Jwt.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.OAuth.Tests.Unit/Rig.TUnit.Security.OAuth.Tests.Unit.csproj" />
     <Project Path="tests/Rig.TUnit.Security.Mtls.Tests.Integration/Rig.TUnit.Security.Mtls.Tests.Integration.csproj" />

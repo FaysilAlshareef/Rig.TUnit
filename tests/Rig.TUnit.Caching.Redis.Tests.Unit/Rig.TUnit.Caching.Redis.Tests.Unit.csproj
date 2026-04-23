@@ -4,6 +4,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="NSubstitute" />
     <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Rig.TUnit.Caching.Redis\Rig.TUnit.Caching.Redis.csproj" />

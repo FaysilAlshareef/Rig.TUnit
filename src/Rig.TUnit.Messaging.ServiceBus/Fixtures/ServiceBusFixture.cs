@@ -44,6 +44,7 @@ public sealed class ServiceBusFixture : MessagingFixtureBase
 
         _container = new ServiceBusBuilder($"mcr.microsoft.com/azure-messaging/servicebus-emulator:{_options.ImageTag}")
             .WithAcceptLicenseAgreement(_options.AcceptEula)
+            .WithConfig(_options.ConfigFilePath)
             .Build();
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));

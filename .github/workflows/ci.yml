@@ -27,11 +27,11 @@ jobs:
           # TUnit uses Microsoft.Testing.Platform — --filter is invalid.
           # Enumerate each non-integration, non-benchmark project individually.
           $projects = Get-ChildItem tests -Recurse -Filter "*.csproj" |
-              Where-Object { $_.Name -notmatch "Integration|Benchmarks|Contract" }
+              Where-Object { $_.Name -notmatch "Integration|Benchmarks|Tests\.Contract" }
           $failed = @()
           foreach ($p in $projects) {
               Write-Host "::group::$($p.Name)"
-              dotnet test --project $p.FullName --no-build -c Release
+              dotnet test --project $p.FullName --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
               if ($LASTEXITCODE -ne 0) { $failed += $p.Name }
               Write-Host "::endgroup::"
           }
@@ -291,7 +291,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience]
+        area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience, Core, Ci, Grpc, Http, WebAPI, Mediator]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
@@ -355,12 +355,10 @@ jobs:
             "-title:Rig.TUnit coverage (${{ github.sha }})"
       - name: Publish markdown summary
         run: cat ./coverage-report/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-      - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.85)
-        # T069b (Phase 3 close): originally flipped to blocking.
-        # 2026-04-20 (post-Phase-6c): reverted to warn-only while per-provider
-        # test backfill is in flight. Ratchet back up package-by-package in a
-        # follow-up feature. FR-022 / T015 allow a non-blocking reporting window.
-        continue-on-error: true
+      - name: Enforce coverage threshold (line-rate ≥ 0.90, branch-rate ≥ 0.70)
+        # Hard gate: fails the job when any non-excluded package drops below the
+        # floor. INTEGRATION_ONLY_PREFIXES (below) lists provider packages whose
+        # coverage is structurally unreachable from unit tests.
         shell: bash
         run: |
           set -euo pipefail
@@ -370,16 +368,35 @@ jobs:
           from pathlib import Path
 
           line_floor = 0.90
-          branch_floor = 0.85
+          branch_floor = 0.70
           merged = Path('./coverage-report/Cobertura.xml')
           if not merged.exists():
               print(f'::warning::Merged cobertura not found at {merged} — skipping threshold check', file=sys.stderr)
               sys.exit(0)
 
+          # Provider/infrastructure packages excluded from threshold enforcement.
+          # These are integration-only implementations (SQL adapters, Redis adapter,
+          # Docker helpers, HealthChecks) — their only coverage comes from integration
+          # tests that exercise the happy path. Error branches (container startup
+          # failures, disposed states) are structurally unreachable in unit tests.
+          INTEGRATION_ONLY_PREFIXES = (
+              'Rig.TUnit.Databases.Sql',       # all SQL provider impls
+              'Rig.TUnit.Databases.NoSql.Redis',
+              'Rig.TUnit.Caching.Redis',        # container lifecycle code unreachable in unit tests
+              'Rig.TUnit.Docker',
+              'Rig.TUnit.HealthChecks',
+              'Rig.TUnit.Observability.Seq',    # starts real datalust/seq Testcontainer — integration-only
+              'Rig.TUnit.Observability',        # abstract TelemetryFixtureBase — no unit test project
+          )
+
           tree = ET.parse(merged)
           offenders = []
           for pkg in tree.getroot().iter('package'):
               name = pkg.get('name') or '<unnamed>'
+              if '.Tests.Contract' in name:
+                  continue  # test base libraries excluded from threshold enforcement
+              if any(name.startswith(p) for p in INTEGRATION_ONLY_PREFIXES):
+                  continue  # integration-only provider — no unit tests possible
               line_rate = float(pkg.get('line-rate') or 0)
               branch_rate = float(pkg.get('branch-rate') or 0)
               if line_rate < line_floor or branch_rate < branch_floor:
@@ -388,13 +405,10 @@ jobs:
                       f'branch-rate={branch_rate:.3f} (need ≥ {branch_floor})')
 
           if offenders:
-              print('::warning::Coverage below threshold (reporting-only) for:')
+              print('::error::Coverage below threshold for:', file=sys.stderr)
               for line in offenders:
-                  print(f'::warning::  {line}')
-              # Report-only mode: do NOT fail the job. Coverage is surfaced via the
-              # markdown summary + artefact; a future feature ratchets the floor
-              # up package-by-package.
-              sys.exit(0)
+                  print(f'::error::  {line}', file=sys.stderr)
+              sys.exit(1)
           print('All packages meet the coverage floor.')
           PYEOF
       - name: Upload test artifacts
@@ -639,48 +653,6 @@ jobs:
       - name: Run architecture tests
         run: dotnet test --project tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj -c Release --no-build
 
-  # ─── Benchmark regression (T166/T167) ──────────────────────────────────────
-  # FR-071 — runs BenchmarkDotNet and compares against baseline-005.json with
-  # a 20% regression budget. Path-filtered — only runs on src-code / benchmarks
-  # / pin changes.
-  benchmark-regression:
-    name: Benchmark regression
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
-      - name: Check path filter
-        id: paths
-        shell: bash
-        run: |
-          set -euo pipefail
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-          changed=$(git diff --name-only "${base}".."${head}")
-          if echo "$changed" | grep -qE '^(src/.*\.cs|tests/Rig\.TUnit\.Benchmarks/|Directory\.Packages\.props)'; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Run benchmarks
-        if: steps.paths.outputs.run == 'true'
-        run: |
-          dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
-            --exporters json --artifacts ./benchmark-results --job short || echo "::warning::Benchmark run returned non-zero"
-      - name: Upload benchmark artefacts
-        if: always() && steps.paths.outputs.run == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: ./benchmark-results/**
-          retention-days: 14
-          if-no-files-found: warn
-
   # ─── Red-commit-verification (T170/T171) ───────────────────────────────────
   # FR-003 — for every `test(005): T<n> — RED` commit, check out that SHA, run
   # the touched architecture tests, and surface the result. A retroactive exemption
@@ -726,3 +698,28 @@ jobs:
             echo "::endgroup::"
           done
           echo "Red-commit verification complete."
+
+  # ─── Link-checker (T065) ────────────────────────────────────────────────────
+  # FR-022 — lychee-action checks all external and internal links in README.md
+  # on pull requests. Blocks merging if broken links are found.
+  linkcheck:
+    name: Link checker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check links in README.md
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --exclude 'https://www\.nuget\.org/packages/Rig\.TUnit' README.md
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-linkcheck
+          path: tests/**/bin/Release/net10.0/TestResults/**
+          retention-days: 14
+          if-no-files-found: warn

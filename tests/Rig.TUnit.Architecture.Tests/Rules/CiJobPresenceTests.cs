@@ -3,24 +3,22 @@ using YamlDotNet.RepresentationModel;
 namespace Rig.TUnit.Architecture.Tests.Rules;
 
 /// <summary>
-/// Phase 7 FR-070/FR-071/FR-072: <c>.github/workflows/ci.yml</c> MUST declare
-/// <c>architecture-tests</c>, <c>benchmark-regression</c>, <c>commit-discipline-gate</c>,
-/// <c>red-commit-verification</c>, <c>markdown-link-check</c>, <c>snippet-extraction</c>,
-/// and <c>coverage-summary</c> jobs.
+/// Phase 7 FR-070/FR-071/FR-072: the .github/workflows/ tree MUST declare every
+/// required job. <c>benchmark-regression</c> lives in <c>benchmark.yml</c>
+/// (post-merge-only, see feat/006 wrap-up); all other Phase 7 jobs live in
+/// <c>ci.yml</c>.
 /// </summary>
 public sealed class CiJobPresenceTests
 {
-    private const string WorkflowRelativePath = ".github/workflows/ci.yml";
-
-    private static readonly string[] RequiredJobs =
+    private static readonly (string Workflow, string Job)[] RequiredJobs =
     [
-        "architecture-tests",
-        "benchmark-regression",
-        "commit-discipline-gate",
-        "red-commit-verification",
-        "markdown-link-check",
-        "snippet-extraction",
-        "coverage-summary",
+        (".github/workflows/ci.yml",        "architecture-tests"),
+        (".github/workflows/benchmark.yml", "benchmark-regression"),
+        (".github/workflows/ci.yml",        "commit-discipline-gate"),
+        (".github/workflows/ci.yml",        "red-commit-verification"),
+        (".github/workflows/ci.yml",        "markdown-link-check"),
+        (".github/workflows/ci.yml",        "snippet-extraction"),
+        (".github/workflows/ci.yml",        "coverage-summary"),
     ];
 
     [Test]
@@ -32,46 +30,48 @@ public sealed class CiJobPresenceTests
             return;
         }
 
-        var path = Path.Combine(repoRoot, WorkflowRelativePath);
-        var offendersEarly = new List<string>();
-        if (!File.Exists(path))
-        {
-            offendersEarly.Add($"{WorkflowRelativePath}: missing");
-            await Assert.That(offendersEarly).IsEmpty().Because("ci.yml must exist");
-            return;
-        }
-
-        using var reader = new StreamReader(path);
-        var stream = new YamlStream();
-        stream.Load(reader);
-        var root = stream.Documents[0].RootNode as YamlMappingNode;
-
         var offenders = new List<string>();
-        var jobs = root is null ? null : GetMapping(root, "jobs");
-        if (jobs is null)
+        var jobsByWorkflow = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
+
+        foreach (var workflow in RequiredJobs.Select(r => r.Workflow).Distinct())
         {
-            offenders.Add("ci.yml: `jobs:` key missing");
-        }
-        else
-        {
-            var presentJobs = jobs.Children.Keys
+            var path = Path.Combine(repoRoot, workflow);
+            if (!File.Exists(path))
+            {
+                offenders.Add($"{workflow}: missing");
+                continue;
+            }
+
+            using var reader = new StreamReader(path);
+            var stream = new YamlStream();
+            stream.Load(reader);
+            var root = stream.Documents[0].RootNode as YamlMappingNode;
+            var jobs = root is null ? null : GetMapping(root, "jobs");
+            if (jobs is null)
+            {
+                offenders.Add($"{workflow}: `jobs:` key missing");
+                jobsByWorkflow[workflow] = new HashSet<string>(StringComparer.Ordinal);
+                continue;
+            }
+
+            jobsByWorkflow[workflow] = jobs.Children.Keys
                 .OfType<YamlScalarNode>()
                 .Where(k => k.Value is { Length: > 0 })
                 .Select(k => k.Value!)
                 .ToHashSet(StringComparer.Ordinal);
+        }
 
-            foreach (var required in RequiredJobs)
+        foreach (var (workflow, job) in RequiredJobs)
+        {
+            if (jobsByWorkflow.TryGetValue(workflow, out var present) && !present.Contains(job))
             {
-                if (!presentJobs.Contains(required))
-                {
-                    offenders.Add($"ci.yml: required job `{required}` is missing");
-                }
+                offenders.Add($"{workflow}: required job `{job}` is missing");
             }
         }
 
         await Assert.That(offenders).IsEmpty().Because(
             "FR-070 / FR-071 / FR-072 / SC-016 / SC-017 / SC-019: every Phase 7 CI job must "
-            + "be declared in .github/workflows/ci.yml.");
+            + "be declared in its designated .github/workflows/ file.");
     }
 
     private static YamlMappingNode? GetMapping(YamlMappingNode mapping, string key)

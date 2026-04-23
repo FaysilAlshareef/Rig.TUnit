@@ -47,6 +47,6 @@ public sealed class SessionFifoOrderingTests
 
         // Assert
         await Assert.That(listener.Captured.Count).IsGreaterThanOrEqualTo(totalExpected);
-        OrderingAssert.PerKeyMonotonic(listener, m => m.SessionKey!, m => m.SequenceNumber);
+        OrderingAssert.PerKeyMonotonic(listener, m => m.SessionId!, m => m.SequenceNumber);
     }
 }

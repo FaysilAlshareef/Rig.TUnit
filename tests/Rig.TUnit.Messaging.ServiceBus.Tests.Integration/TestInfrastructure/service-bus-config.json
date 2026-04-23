@@ -13,7 +13,14 @@
               { "Name": "ack-subscription" },
               { "Name": "nack-subscription" },
               { "Name": "dlq-subscription" },
-              { "Name": "retry-subscription" }
+              { "Name": "retry-subscription" },
+              { "Name": "session-ordering-subscription", "Properties": { "RequiresSession": true } },
+              { "Name": "session-capture-subscription", "Properties": { "RequiresSession": true } },
+              { "Name": "session-order-subscription", "Properties": { "RequiresSession": true } },
+              { "Name": "partitioned-fanout-subscription" },
+              { "Name": "dlq-drive-subscription" },
+              { "Name": "sql-filter-eu-subscription" },
+              { "Name": "sql-filter-all-subscription" }
             ]
           }
         ]

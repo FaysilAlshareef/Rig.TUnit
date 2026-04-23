@@ -156,7 +156,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `SessionListener_ParallelSessions_EachSessionHandlerSeesOwnMessagesInOrder`
       Commit: `test(007): RED T011 — ServiceBusSessionListener captures SessionKey`
 
-- [ ] **T011-GREEN** [depends: T011-RED] Add `ServiceBusSessionListener` using `ServiceBusClient.CreateSessionProcessor`.
+- [x] **T011-GREEN** [depends: T011-RED] Add `ServiceBusSessionListener` using `ServiceBusClient.CreateSessionProcessor`.
       Files:
       - `src/Rig.TUnit.Messaging.ServiceBus/Helpers/ServiceBusSessionListener.cs` (new)
       - `docs/providers/service-bus.md` — session listener section; inline XML on every public member.

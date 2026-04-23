@@ -25,7 +25,10 @@ public sealed class NatsJetStreamEventSender : EventSenderBase, IAsyncDisposable
         CancellationToken ct = default)
     {
         var ctx = context ?? new SendContext();
-        var headers = BuildHeaders(ctx, correlationId, causationId, traceparent, additionalHeaders);
+        var extra = ctx.SessionKey is not null
+            ? MergeHeader(additionalHeaders, "x-session-key", ctx.SessionKey)
+            : additionalHeaders;
+        var headers = BuildHeaders(ctx, correlationId, causationId, traceparent, extra);
 
         await _jetStream.PublishAsync(
             _subject,
@@ -35,6 +38,16 @@ public sealed class NatsJetStreamEventSender : EventSenderBase, IAsyncDisposable
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    private static IReadOnlyDictionary<string, string> MergeHeader(
+        IReadOnlyDictionary<string, string>? existing, string key, string value)
+    {
+        var merged = existing is null
+            ? new Dictionary<string, string>(StringComparer.Ordinal)
+            : new Dictionary<string, string>(existing, StringComparer.Ordinal);
+        merged[key] = value;
+        return merged;
+    }
 
     private static NATS.Client.Core.NatsHeaders? BuildNatsHeaders(
         IReadOnlyDictionary<string, string> headers)

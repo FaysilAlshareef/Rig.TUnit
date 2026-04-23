@@ -69,7 +69,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `src/Rig.TUnit.Messaging/Builder/MessagingRigBuilder.cs` — add XML doc comment block noting `WithTopology` lives on provider-specific `RigBuilder`s per C-003.
       Commit: `feat(007): GREEN T002 — regression guard against base-class WithTopology (no red — structural assertion; test passes from day one)`
 
-- [ ] **T003-RED** [depends: T002] Write extended `ProviderCompletenessTests`.
+- [x] **T003-RED** [depends: T002] Write extended `ProviderCompletenessTests`.
       File: `tests/Rig.TUnit.Architecture.Tests/Rules/ProviderCompletenessTests.cs` (extend)
       New tests:
       - `Providers_InParityCoverage_DeclareWithTopology` — for every assembly in `.parity-coverage.txt`, its `RigBuilder` declares a `WithTopology(Action<T>)` method where `T : ITopologyBuilder`.
@@ -78,7 +78,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `ParityCoverageFile_Exists_WithLoadableAssemblies`
       Commit: `test(007): RED T003 — provider-parity driven by .parity-coverage.txt`
 
-- [ ] **T003-GREEN** [depends: T003-RED] Create empty `.parity-coverage.txt`; test passes vacuously per C-005.
+- [x] **T003-GREEN** [depends: T003-RED] Create empty `.parity-coverage.txt`; test passes vacuously per C-005.
       Files:
       - `tests/Rig.TUnit.Architecture.Tests/.parity-coverage.txt` (new, empty)
       - `tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj` — add `<None Include=".parity-coverage.txt"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></None>` so the test can read it at runtime from `bin/`.

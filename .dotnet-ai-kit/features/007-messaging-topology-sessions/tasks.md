@@ -373,7 +373,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T032 — Listener attributes
 
-- [ ] **T032-RED** [depends: T031-GREEN] Write `SqsSessionListenerCaptureTests`.
+- [x] **T032-RED** [depends: T031-GREEN] Write `SqsSessionListenerCaptureTests`.
       File: `tests/Rig.TUnit.Messaging.Sqs.Tests.Integration/Fifo/SqsSessionListenerCaptureTests.cs` (new)
       Test: `ReceiveMessage_WithMessageGroupId_PopulatesCapturedMessageSessionKey`.
       Commit: `test(007): RED T032 — SqsListener captures MessageGroupId`
@@ -470,12 +470,12 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T043 — Queue-argument plumbing
 
-- [ ] **T043-RED** [depends: T042-GREEN] Write `RabbitMqQueueArgsTests`.
+- [x] **T043-RED** [depends: T042-GREEN] Write `RabbitMqQueueArgsTests`.
       File: `tests/Rig.TUnit.Messaging.RabbitMq.Tests.Unit/Topology/RabbitMqQueueArgsTests.cs` (new)
       Tests: one per `With…` method mapping to the expected AMQP argument (TTL, max-length, max-priority, DLX, DLX-routing-key, quorum).
       Commit: `test(007): RED T043 — RabbitMq queue argument plumbing`
 
-- [ ] **T043-GREEN** [depends: T043-RED] Implement `.WithMessageTtl`, `.WithMaxLength`, `.WithMaxPriority`, `.WithDeadLetterExchange`, `.WithQuorum` on `RabbitMqQueueConfig`.
+- [x] **T043-GREEN** [depends: T043-RED] Implement `.WithMessageTtl`, `.WithMaxLength`, `.WithMaxPriority`, `.WithDeadLetterExchange`, `.WithQuorum` on `RabbitMqQueueConfig`.
       Files:
       - `src/Rig.TUnit.Messaging.RabbitMq/Topology/RabbitMqQueueConfig.cs` (sealed impl of `IRabbitMqQueueConfig` — added in T042, methods filled in T043).
       - `docs/providers/rabbitmq.md` — queue-args reference table.

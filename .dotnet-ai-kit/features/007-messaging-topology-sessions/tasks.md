@@ -378,7 +378,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       Test: `ReceiveMessage_WithMessageGroupId_PopulatesCapturedMessageSessionKey`.
       Commit: `test(007): RED T032 — SqsListener captures MessageGroupId`
 
-- [ ] **T032-GREEN** [depends: T032-RED] Request `MessageGroupId` + `SequenceNumber` attributes; populate `CapturedMessage.SessionKey`.
+- [x] **T032-GREEN** [depends: T032-RED] Request `MessageGroupId` + `SequenceNumber` attributes; populate `CapturedMessage.SessionKey`.
       Files:
       - `src/Rig.TUnit.Messaging.Sqs/Helpers/SqsListener.cs`
       - `docs/providers/sqs.md` — listener behaviour table.

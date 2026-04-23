@@ -277,7 +277,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T023 — Provider-scoped topology + WithTopology + parity append (flips T025b GREEN)
 
-- [ ] **T023-RED** [depends: T022-GREEN] Write Kafka topology tests + compile fence.
+- [x] **T023-RED** [depends: T022-GREEN] Write Kafka topology tests + compile fence.
       Files:
       - `tests/Rig.TUnit.Messaging.Kafka.Tests.Unit/Topology/KafkaTopologyBuilderTests.cs` (new) — mock `AdminClient`, assert `CreateTopicsAsync` call.
       - `tests/Rig.TUnit.Messaging.Kafka.Tests.Unit/Topology/KafkaBuilderCompileFenceTests.cs` (new) — reflection asserts `IKafkaTopologyBuilder` has no `.Queue` / `.Exchange` / `.Subscription`.

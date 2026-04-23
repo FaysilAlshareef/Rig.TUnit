@@ -109,6 +109,89 @@ services.AddRigTUnit(rig =>
 
 ---
 
+## Messaging topology & sessions
+
+All messaging providers share a unified `SendContext` record that carries cross-cutting keys:
+
+| Field | Provider mapping | Purpose |
+|-------|-----------------|---------|
+| `SessionKey` | ServiceBus session ID · SQS MessageGroupId · NATS `x-session-key` header | FIFO ordering per group |
+| `PartitionKey` | Kafka message key · RabbitMQ routing key | Partition / exchange routing |
+| `DeduplicationKey` | ServiceBus `MessageId` · SQS deduplication ID | Idempotent send |
+
+Pass a `SendContext` to any `*EventSender.SendAsync` overload:
+
+```csharp
+await sender.SendAsync("payload", context: new SendContext(SessionKey: "order-42"), ct: ct);
+```
+
+### Provider examples
+
+**Azure Service Bus — session FIFO**
+
+```csharp
+await using var sender   = new ServiceBusEventSender(client, "orders");
+await using var listener = new ServiceBusSessionListener(client, "orders", "shipping-sessions");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+**Apache Kafka — partition-key routing**
+
+```csharp
+await using var sender   = new KafkaEventSender(fixture.ConnectionString, "orders");
+var listener = new KafkaListener(fixture.ConnectionString, "orders", "grp");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(PartitionKey: "cust-1"), ct: ct);
+```
+
+**Amazon SQS — FIFO group ordering**
+
+```csharp
+var sender   = new SqsEventSender(fixture.Client, fifoQueueUrl);
+var listener = new SqsListener(fixture.Client, fifoQueueUrl);
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+**RabbitMQ — topic exchange fan-out**
+
+```csharp
+builder.WithTopology(t =>
+    t.Exchange("events", ExchangeType.Topic)
+     .BindQueue("order-queue", "order.*"));
+await captured.ApplyTopologyAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(PartitionKey: "order.created"), ct: ct);
+```
+
+**NATS JetStream — ordered consumer**
+
+```csharp
+var fx = await SharedNatsJetStreamFixture.GetAsync();
+builder.WithTopology(t => t.Stream("events", cfg => cfg.WithSubjects("events.>")));
+await captured.ApplyTopologyAsync(ct);
+await using var sender   = new NatsJetStreamEventSender(fx.JetStream, "events.orders");
+await using var listener = new NatsJetStreamListener(fx.JetStream, "events", "events.orders");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+### `WithTopology` hook
+
+Every messaging provider exposes a strongly-typed `WithTopology` builder hook:
+
+```csharp
+services.AddRigTUnit(rig =>
+    rig.UseServiceBus(source, sb =>
+        sb.WithTopology(t => t.Topic("orders", cfg => cfg.WithMaxSizeInMegabytes(1024)))));
+```
+
+The topology is applied idempotently — create-or-update — so tests can run in any order without
+pre-provisioning infrastructure. See the per-provider docs in [`docs/providers/`](docs/providers/)
+for full option references.
+
+---
+
 ## Isolation
 
 Every fixture automatically derives an `IsolationKey` from TUnit's execution context:
@@ -150,7 +233,7 @@ var key = IsolationKey.FromName("shared-read-model");
 | Azure Service Bus | `Rig.TUnit.Messaging.ServiceBus` | `ServiceBusFixture` | `MessageAssert`, `OrderingAssert` |
 | Apache Kafka | `Rig.TUnit.Messaging.Kafka` | `KafkaFixture` | `MessageAssert` |
 | RabbitMQ | `Rig.TUnit.Messaging.RabbitMq` | `RabbitMqFixture` | `MessageAssert` |
-| NATS | `Rig.TUnit.Messaging.Nats` | `NatsFixture` | `MessageAssert` |
+| NATS | `Rig.TUnit.Messaging.Nats` | `NatsFixture` · `NatsJetStreamFixture` | `MessageAssert` |
 | Amazon SQS | `Rig.TUnit.Messaging.Sqs` | `SqsFixture` | `MessageAssert` |
 | Redis Cache | `Rig.TUnit.Caching.Redis` | `RedisCacheFixture` | — |
 | Memory Cache | `Rig.TUnit.Caching.Memory` | `MemoryCacheFixture` | `CacheAssert` |
@@ -299,6 +382,9 @@ assembly names that have reached full parity with the Feature-007 shape:
 ```
 Rig.TUnit.Messaging.ServiceBus
 Rig.TUnit.Messaging.Kafka
+Rig.TUnit.Messaging.Sqs
+Rig.TUnit.Messaging.RabbitMq
+Rig.TUnit.Messaging.Nats
 ```
 
 Each time a provider phase ships, its assembly name is appended to that file and the

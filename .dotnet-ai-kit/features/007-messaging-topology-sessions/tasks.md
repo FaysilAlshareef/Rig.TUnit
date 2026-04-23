@@ -492,7 +492,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T050 — package + dependency guard (single GREEN)
 
-- [ ] **T050** [depends: Phase 0] Add `NATS.Client.JetStream` package + extend `DependencyDirectionTests`.
+- [x] **T050** [depends: Phase 0] Add `NATS.Client.JetStream` package + extend `DependencyDirectionTests`.
       Files:
       - `Directory.Packages.props` (add `<PackageVersion Include="NATS.Client.JetStream" Version="2.5.0" />`)
       - `src/Rig.TUnit.Messaging.Nats/Rig.TUnit.Messaging.Nats.csproj` (`<PackageReference Include="NATS.Client.JetStream" />`)
@@ -502,19 +502,19 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### Scenario RED leads
 
-- [ ] **T055a-RED** [P] [depends: T050] Scenario: ordered delivery across reconnects.
+- [x] **T055a-RED** [P] [depends: T050] Scenario: ordered delivery across reconnects.
       File: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/OrderedReconnectTests.cs` (new)
       Assertion: ordered consumer survives a brief disconnect without duplicates.
       Docs: `docs/providers/nats.md`.
       Commit: `test(007): RED T055a — JetStream ordered reconnect`
 
-- [ ] **T055b-RED** [P] [depends: T050] Scenario: multi-subject filter.
+- [x] **T055b-RED** [P] [depends: T050] Scenario: multi-subject filter.
       File: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/MultiSubjectFilterTests.cs` (new)
       Assertion: consumer with `FilterSubjects("a.*", "b.*")` only sees those subjects.
       Docs: `docs/providers/nats.md`.
       Commit: `test(007): RED T055b — JetStream multi-subject filter`
 
-- [ ] **T055c-RED** [P] [depends: T050] Scenario: retention policy.
+- [x] **T055c-RED** [P] [depends: T050] Scenario: retention policy.
       File: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/RetentionPolicyTests.cs` (new)
       Assertion: stream with `RetentionPolicy.Limits` + `MaxMsgs=10` drops oldest.
       Docs: `docs/providers/nats.md`.
@@ -522,12 +522,12 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T051 — NatsJetStreamFixture
 
-- [ ] **T051-RED** [depends: T050, T055a-RED, T055b-RED, T055c-RED] Write `NatsJetStreamFixtureTests`.
+- [x] **T051-RED** [depends: T050, T055a-RED, T055b-RED, T055c-RED] Write `NatsJetStreamFixtureTests`.
       File: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/NatsJetStreamFixtureTests.cs` (new)
       Tests: lifecycle, connection opens, JetStream context reachable.
       Commit: `test(007): RED T051 — NatsJetStreamFixture lifecycle`
 
-- [ ] **T051-GREEN** [depends: T051-RED] Add `NatsJetStreamFixture` alongside existing `NatsFixture`.
+- [x] **T051-GREEN** [depends: T051-RED] Add `NatsJetStreamFixture` alongside existing `NatsFixture`.
       Files:
       - `src/Rig.TUnit.Messaging.Nats/Fixtures/NatsJetStreamFixture.cs` (new)
       - `docs/providers/nats.md` — core vs JetStream fixture split; inline XML.
@@ -535,13 +535,13 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T052 — NatsJetStreamEventSender
 
-- [ ] **T052-RED** [depends: T051-GREEN] Write sender tests.
+- [x] **T052-RED** [depends: T051-GREEN] Write sender tests.
       Files:
       - `tests/Rig.TUnit.Messaging.Nats.Tests.Unit/NatsJetStreamEventSenderTests.cs` (new) — mock `INatsJSContext`.
       - `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/NatsJetStreamSenderLiveTests.cs` (new).
       Commit: `test(007): RED T052 — NatsJetStreamEventSender SendContext mapping`
 
-- [ ] **T052-GREEN** [depends: T052-RED] Add `NatsJetStreamEventSender` via `INatsJSContext.PublishAsync`.
+- [x] **T052-GREEN** [depends: T052-RED] Add `NatsJetStreamEventSender` via `INatsJSContext.PublishAsync`.
       Files:
       - `src/Rig.TUnit.Messaging.Nats/Helpers/NatsJetStreamEventSender.cs` (new)
       - `docs/providers/nats.md` — JetStream send example.
@@ -549,14 +549,14 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T053 — NatsJetStreamListener (flips T055a GREEN)
 
-- [ ] **T053-RED** [depends: T052-GREEN] Write listener tests.
+- [x] **T053-RED** [depends: T052-GREEN] Write listener tests.
       File: `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/NatsJetStreamListenerTests.cs` (new)
       Tests:
       - `OrderedConsumer_RecordsSessionKeyFromSubjectSegment`
       - `OrderedConsumer_NoDuplicatesAcrossAck`
       Commit: `test(007): RED T053 — NatsJetStreamListener ordered consumer`
 
-- [ ] **T053-GREEN** [depends: T053-RED] Add listener with `DeliverPolicy.All + ReplayPolicy.Instant + FlowControl=true + AckPolicy.Explicit`.
+- [x] **T053-GREEN** [depends: T053-RED] Add listener with `DeliverPolicy.All + ReplayPolicy.Instant + FlowControl=true + AckPolicy.Explicit`.
       Files:
       - `src/Rig.TUnit.Messaging.Nats/Helpers/NatsJetStreamListener.cs` (new)
       - `docs/providers/nats.md` — ordered-consumer example.
@@ -564,14 +564,14 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 ### T054 — Topology builder + WithTopology + parity append (flips T055b/c GREEN)
 
-- [ ] **T054-RED** [depends: T053-GREEN] Write topology tests + compile fence.
+- [x] **T054-RED** [depends: T053-GREEN] Write topology tests + compile fence.
       Files:
       - `tests/Rig.TUnit.Messaging.Nats.Tests.Unit/Topology/NatsTopologyBuilderTests.cs` (new)
       - `tests/Rig.TUnit.Messaging.Nats.Tests.Unit/Topology/NatsBuilderCompileFenceTests.cs` (new) — asserts `INatsTopologyBuilder` has no `.Queue`/`.Topic`/`.Exchange`/`.Subscription`.
       - `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/NatsTopologyBuilderLiveTests.cs` (new) — includes `WithTopology_CalledTwice_IsIdempotent` (re-apply stream + consumer, assert `CreateStreamAsync` / `CreateConsumerAsync` handle existing entities without throwing).
       Commit: `test(007): RED T054 — NATS topology builder + compile fence + idempotency`
 
-- [ ] **T054-GREEN** [depends: T054-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
+- [x] **T054-GREEN** [depends: T054-RED] Add provider-scoped interfaces + impl + `WithTopology` + parity append.
       Files:
       - `src/Rig.TUnit.Messaging.Nats/Topology/INatsTopologyBuilder.cs` (new)
       - `src/Rig.TUnit.Messaging.Nats/Topology/INatsStreamConfig.cs` (new)

@@ -1,4 +1,5 @@
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Rig.TUnit.Messaging.Helpers;
 
 namespace Rig.TUnit.Messaging.Kafka.Helpers;
@@ -34,6 +35,13 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
 
     public override async Task StartAsync(CancellationToken ct)
     {
+        // Pre-create the topic before subscribing. Broker-side auto-create
+        // only fires on produce, so a consumer that subscribes to a
+        // not-yet-existing topic gets an empty metadata response and the
+        // first rebalance never completes — StartAsync would cancel out
+        // before the sender catches up.
+        await EnsureTopicExistsAsync(ct).ConfigureAwait(false);
+
         _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
         _partitionsAssigned = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
@@ -61,6 +69,21 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
             static state => ((TaskCompletionSource)state!).TrySetCanceled(),
             _partitionsAssigned);
         await _partitionsAssigned.Task.ConfigureAwait(false);
+    }
+
+    private async Task EnsureTopicExistsAsync(CancellationToken ct)
+    {
+        using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrap }).Build();
+        try
+        {
+            await admin.CreateTopicsAsync(
+                [new TopicSpecification { Name = _topic, NumPartitions = 1, ReplicationFactor = 1 }])
+                .WaitAsync(ct).ConfigureAwait(false);
+        }
+        catch (CreateTopicsException ex) when (ex.Results.All(r => r.Error.Code == ErrorCode.TopicAlreadyExists))
+        {
+            // Topic was already there — fine, the consumer can proceed.
+        }
     }
 
     public override async Task StopAsync(CancellationToken ct)

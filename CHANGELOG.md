@@ -33,6 +33,26 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
   overload, and session-listener invariants for every assembly listed in
   `.parity-coverage.txt` (FR-007-08).
 
+### Added — Feature 007 Phase 5 (planned release N+3: NATS JetStream)
+
+- **NATS JetStream**: `NatsJetStreamFixture` — Testcontainers-backed fixture exposing an
+  `INatsJSContext` (`JetStream` property), `EnsureStreamAsync(name, subjects, maxMsgs?, ct)` with
+  idempotent create-or-update semantics, and `GetStreamAsync(name, ct)` (T051).
+  `NatsJetStreamEventSender` publishes via `INatsJSContext.PublishAsync` and writes
+  `x-session-key` NATS header when `SendContext.SessionKey` is set (T052).
+  `NatsJetStreamListener` creates an ordered consumer per `NatsJSOrderedConsumerOpts`
+  with optional `FilterSubjects`, reads `x-session-key` into `CapturedMessage.SessionKey`,
+  and acknowledges each message via `AckAsync` (T053).
+  `INatsTopologyBuilder` + `NatsTopologyBuilder` (stream + subjects + max-messages +
+  retention-policy via `NatsRetentionPolicy.{Limits,Interest,WorkQueue}`); idempotency via
+  `NatsJSApiException(Code == 400)` → `UpdateStreamAsync` (T054).
+  `NatsRigBuilder.WithTopology` hook + `ApplyTopologyAsync`; `UseNats(NatsJetStreamFixture, …)`
+  extension overload passes `fixture.JetStream` into the builder.
+- Architecture parity: `Rig.TUnit.Messaging.Nats` appended to `.parity-coverage.txt` —
+  all 5 messaging providers now at full Feature-007 parity.
+  `DependencyDirectionTests.NatsJetStream_ReferencedOnlyByNatsProvider` guards against
+  accidental `NATS.Client.JetStream` leakage into other provider assemblies.
+
 ### Added — Feature 007 Phase 4 (planned release N+2: RabbitMQ topology)
 
 - **RabbitMQ**: `RabbitMqEventSender.SendAsync(SendContext)` sets `RoutingKey` from

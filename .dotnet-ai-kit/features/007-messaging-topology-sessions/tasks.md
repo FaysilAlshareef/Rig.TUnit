@@ -600,7 +600,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       Sub-tasks: T061-N1 (release N+1: Phases 0+1+2+3), T061-N2 (release N+2: Phase 4), T061-N3 (release N+3: Phase 5).
       Commit: one per release — e.g. `docs(007): GREEN T061-N1 — CHANGELOG entry for release N+1 (no red — docs-only)`
 
-- [ ] **T062** [depends: T013-GREEN, T023-GREEN] Benchmarks for ServiceBus session vs non-session + Kafka multi-partition per-key.
+- [x] **T062** [depends: T013-GREEN, T023-GREEN] Benchmarks for ServiceBus session vs non-session + Kafka multi-partition per-key.
       Files:
       - `tests/Rig.TUnit.Benchmarks/ServiceBusMessagingBenchmarks.cs` (extend — add `SessionProcessor_VsNonSession_Throughput`)
       - `tests/Rig.TUnit.Benchmarks/KafkaMessagingBenchmarks.cs` (extend — add `MultiPartition_PerKey_Throughput`)
@@ -609,7 +609,7 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `docs/providers/kafka.md` — benchmark reference
       Commit: `feat(007): GREEN T062 — benchmarks: ServiceBus session + Kafka multi-partition (no red — benchmark additions)`
 
-- [ ] **T063** [depends: all provider phases shipped] Update `OrderingAssert` XML docs with provider capability matrix; mirror in `docs/ordering-assertions.md`.
+- [x] **T063** [depends: all provider phases shipped] Update `OrderingAssert` XML docs with provider capability matrix; mirror in `docs/ordering-assertions.md`.
       Files:
       - `src/Rig.TUnit.Messaging/Assertions/OrderingAssert.cs` (XML doc block only — no signature change)
       - `docs/ordering-assertions.md` (update with the capability matrix)

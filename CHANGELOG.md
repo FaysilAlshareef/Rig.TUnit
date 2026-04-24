@@ -33,6 +33,19 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
   overload, and session-listener invariants for every assembly listed in
   `.parity-coverage.txt` (FR-007-08).
 
+### Added — Feature 007 Phase 4 (planned release N+2: RabbitMQ topology)
+
+- **RabbitMQ**: `RabbitMqEventSender.SendAsync(SendContext)` sets `RoutingKey` from
+  `PartitionKey ?? SessionKey` and propagates deduplication key via `MessageId` header (T040).
+  `RabbitMqSessionListener` reads `x-session-key` from AMQP message headers and surfaces it
+  in `CapturedMessage.SessionKey` (T041). `IRabbitMqTopologyBuilder` + `RabbitMqTopologyBuilder`
+  supporting topic-exchange fan-out with `BindQueue(queue, routingKey)`, DLX routing via
+  `WithDeadLetterExchange`, per-queue `WithMaxPriority` for priority queues, and
+  `WithQuorumQueue()` for HA quorum queues (T042/T043). `RabbitMqRigBuilder.WithTopology` hook.
+- Architecture parity: `Rig.TUnit.Messaging.RabbitMq` appended to `.parity-coverage.txt`;
+  `ProviderCompletenessTests` suite extends coverage to RabbitMQ topology + session-listener
+  invariants.
+
 ### Added — Feature 005 (Legacy Coverage & Docs Parity)
 - MTP-native `--coverage` collection on every `integration-*` CI job (FR-020).
 - `coverage-summary` CI job merging cobertura → Html + Markdown via ReportGenerator,

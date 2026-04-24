@@ -53,6 +53,17 @@ services.AddRigTUnit(rig =>
                 .WithConfig("cleanup.policy", "compact")))));
 ```
 
+## Benchmarks
+
+Allocation benchmarks for multi-partition per-key fan-out are in
+`tests/Rig.TUnit.Benchmarks/KafkaMessagingBenchmarks.cs`:
+
+| Benchmark | What it measures |
+|-----------|-----------------|
+| `MultiPartition_PerKey_Throughput` | Allocation burst of constructing 8 `SendContext` values each with a distinct `PartitionKey` — models the per-key routing overhead at fan-out start |
+
+Run locally: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*Kafka*" --exporters json`
+
 ## Compacted topics
 
 Set `cleanup.policy=compact` via `WithTopology` (or directly via Kafka Admin API) to ensure only

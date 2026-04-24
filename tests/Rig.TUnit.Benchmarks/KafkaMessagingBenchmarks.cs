@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using Rig.TUnit.Messaging.Helpers;
 using Rig.TUnit.Messaging.Kafka.Helpers;
 using Rig.TUnit.Messaging.Kafka.Options;
 
@@ -34,4 +35,18 @@ public class KafkaMessagingBenchmarks
     [Benchmark]
     public KafkaEventSender Sender_Construct()
         => new(OfflineBootstrap, "topic");
+
+    /// <summary>
+    /// Feature 007: allocation cost of constructing 8 <see cref="SendContext"/> values each with a
+    /// distinct <see cref="SendContext.PartitionKey"/>. Models the per-key routing allocation burst
+    /// at the start of a multi-partition fan-out scenario.
+    /// </summary>
+    [Benchmark]
+    public SendContext[] MultiPartition_PerKey_Throughput()
+    {
+        var contexts = new SendContext[8];
+        for (var i = 0; i < 8; i++)
+            contexts[i] = new SendContext(PartitionKey: $"customer-{i}");
+        return contexts;
+    }
 }

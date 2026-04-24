@@ -590,12 +590,12 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 
 > Runs in parallel with whichever release is shipping. May overlap with any provider phase's exit gate.
 
-- [ ] **T060** [depends: at least one provider phase shipped] Top-level README messaging section + cross-link audit.
+- [x] **T060** [depends: at least one provider phase shipped] Top-level README messaging section + cross-link audit.
       File: `README.md`
       Change: add "Messaging topology & sessions" section with a minimal per-provider example for every provider that has shipped in the current release.
       Commit: `docs(007): GREEN T060 — README messaging topology & sessions section (no red — docs-only)`
 
-- [ ] **T061** [depends: T060 per-release; depends: that release's provider phases GREEN] CHANGELOG entry per shipped release — one entry for each release containing phases, **not one batched entry** per NFR-C5.
+- [x] **T061** [depends: T060 per-release; depends: that release's provider phases GREEN] CHANGELOG entry per shipped release — one entry for each release containing phases, **not one batched entry** per NFR-C5.
       File: `CHANGELOG.md`
       Sub-tasks: T061-N1 (release N+1: Phases 0+1+2+3), T061-N2 (release N+2: Phase 4), T061-N3 (release N+3: Phase 5).
       Commit: one per release — e.g. `docs(007): GREEN T061-N1 — CHANGELOG entry for release N+1 (no red — docs-only)`

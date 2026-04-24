@@ -68,6 +68,18 @@ services.AddRigTUnit(rig =>
 
 _The table above is updated by the emulator capability probe in T014._
 
+## Benchmarks
+
+Allocation benchmarks for session vs non-session message construction are in
+`tests/Rig.TUnit.Benchmarks/ServiceBusMessagingBenchmarks.cs`:
+
+| Benchmark | What it measures |
+|-----------|-----------------|
+| `SessionProcessor_VsNonSession_Throughput` | `ServiceBusMessage` allocation + `SendContext` routing overhead with session ID set |
+| `SessionProcessor_NoSession_Baseline` | Same message without a session key — baseline comparison |
+
+Run locally: `dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --filter "*ServiceBus*" --exporters json`
+
 ## Migration from JSON seed
 
 Prior to Feature 007 T016, session and filter subscriptions were pre-provisioned in

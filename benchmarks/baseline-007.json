@@ -1,0 +1,17 @@
+{
+  "_comment": "Benchmark baseline for Feature 007 (messaging topology & sessions). Populated from the first successful CI run of the 'benchmark-regression' job on feat/007-messaging-topology-sessions after Phase 6 lands. Each new benchmark's mean/stdDev is recorded here; future PRs compare within the 20% regression budget.",
+  "schemaVersion": 1,
+  "meta": {
+    "capturedAt": null,
+    "captureBranch": "feat/007-messaging-topology-sessions",
+    "captureCommitSha": null,
+    "ciRunId": null,
+    "regressionBudgetPercent": 20,
+    "note": "populate via 'dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- --exporters json --artifacts ./benchmark-results' then merge per-benchmark JSON. See T062 in undo-log.md."
+  },
+  "benchmarks": {
+    "ServiceBusMessagingBenchmarks.SessionProcessor_VsNonSession_Throughput": null,
+    "ServiceBusMessagingBenchmarks.SessionProcessor_NoSession_Baseline": null,
+    "KafkaMessagingBenchmarks.MultiPartition_PerKey_Throughput": null
+  }
+}

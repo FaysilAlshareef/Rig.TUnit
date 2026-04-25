@@ -43,8 +43,17 @@ public sealed class PartitionedFanoutTests
             }
         }
 
+        // Wait for broker delivery. The previous 30 s deadline was tight when
+        // running under the shared fixture: ServiceBusListener attaches via
+        // CreateProcessor with default MaxConcurrentCalls=1 and PrefetchCount=0,
+        // which serialises receive-and-complete round-trips at ~50–150 ms each
+        // on the emulator. With the broker also handling parallel topology
+        // tests on the same namespace, dropping a single per-key message under
+        // the threshold has been observed in CI. 90 s gives the per-message
+        // receive path comfortable headroom; the test still aborts early once
+        // all 20 messages land.
         var totalExpected = keyCount * messagesPerKey;
-        var deadline = DateTimeOffset.UtcNow.AddSeconds(30);
+        var deadline = DateTimeOffset.UtcNow.AddSeconds(90);
         while (listener.Captured.Count < totalExpected && DateTimeOffset.UtcNow < deadline)
         {
             await Task.Delay(300, ct);

@@ -520,6 +520,11 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       Docs: `docs/providers/nats.md`.
       Commit: `test(007): RED T055c — JetStream retention policy`
 
+- [x] **T055c-GREEN** [depends: T054-GREEN] Flip RetentionPolicyTests to compile + assert correctly. The original RED commit's `IsLessThanOrEqualTo(10UL)` failed type inference because TUnit's `Assert.That(stream.Info.State.Messages)` returns `ValueAssertion<long>` (the NATS .NET 2.5 client exposes `StreamState.Messages` as `long`, not `ulong`). Stale `// CS0246 RED` / `// CS1061 RED` comments referenced types that have shipped (`NatsJetStreamFixture.EnsureStreamAsync`, `GetStreamAsync` in T051; `NatsJetStreamEventSender` in T052) — also removed.
+      Files:
+      - `tests/Rig.TUnit.Messaging.Nats.Tests.Integration/JetStream/RetentionPolicyTests.cs` — `IsLessThanOrEqualTo(10L)` so the `long` overload binds; deleted stale RED markers.
+      Commit: `fix(007): T055c GREEN — RetentionPolicyTests compiles + asserts on long (no red — test-only repair completing T054-GREEN flip)`
+
 ### T051 — NatsJetStreamFixture
 
 - [x] **T051-RED** [depends: T050, T055a-RED, T055b-RED, T055c-RED] Write `NatsJetStreamFixtureTests`.

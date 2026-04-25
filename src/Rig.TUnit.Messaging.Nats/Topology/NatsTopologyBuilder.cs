@@ -31,7 +31,11 @@ public sealed class NatsTopologyBuilder : INatsTopologyBuilder
             {
                 await _jetStream.CreateStreamAsync(config, ct).ConfigureAwait(false);
             }
-            catch (NatsJSApiException ex) when (ex.Error.Code == 400)
+            // 10058 = JSStreamNameExistErr (stream name already in use). Generic
+            // 400 covers any "bad request" — including unrelated validation errors
+            // such as invalid retention policy, which we do NOT want to mask by
+            // falling back to UpdateStreamAsync.
+            catch (NatsJSApiException ex) when (ex.Error.ErrCode == 10058)
             {
                 await _jetStream.UpdateStreamAsync(config, ct).ConfigureAwait(false);
             }
@@ -65,9 +69,9 @@ public sealed class NatsTopologyBuilder : INatsTopologyBuilder
         {
             _retention = policy switch
             {
-                NatsRetentionPolicy.Interest   => StreamConfigRetention.Interest,
-                NatsRetentionPolicy.WorkQueue  => StreamConfigRetention.Workqueue,
-                _                              => StreamConfigRetention.Limits
+                NatsRetentionPolicy.Interest => StreamConfigRetention.Interest,
+                NatsRetentionPolicy.WorkQueue => StreamConfigRetention.Workqueue,
+                _ => StreamConfigRetention.Limits
             };
             return this;
         }
@@ -76,7 +80,7 @@ public sealed class NatsTopologyBuilder : INatsTopologyBuilder
             new(_name, _subjects)
             {
                 Retention = _retention,
-                MaxMsgs   = _maxMsgs
+                MaxMsgs = _maxMsgs
             };
     }
 }

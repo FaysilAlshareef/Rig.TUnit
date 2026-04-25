@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Rig.TUnit.Messaging.Helpers;
@@ -12,8 +13,16 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
     private readonly string? _exchangeType;
     private readonly string? _routingKey;
     private readonly TimeProvider _clock;
+    private readonly ConcurrentQueue<Exception> _errors = new();
     private IConnection? _connection;
     private IChannel? _channel;
+
+    /// <summary>
+    /// Decode failures (malformed header bytes, non-UTF8 body) surfaced from <c>ReceivedAsync</c>.
+    /// The consumer runs with <c>autoAck: true</c>, so without this surface a malformed message
+    /// would be acked and silently dropped — tests would only see "no messages received".
+    /// </summary>
+    public IReadOnlyCollection<Exception> Errors => _errors.ToArray();
 
     public RabbitMqListener(
         string connectionString,
@@ -61,29 +70,7 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += (_, ea) =>
         {
-            var headers = new Dictionary<string, string>(StringComparer.Ordinal);
-            if (ea.BasicProperties.Headers is not null)
-            {
-                foreach (var kv in ea.BasicProperties.Headers)
-                {
-                    headers[kv.Key] = kv.Value switch
-                    {
-                        byte[] bytes => System.Text.Encoding.UTF8.GetString(bytes),
-                        _ => kv.Value?.ToString() ?? "",
-                    };
-                }
-            }
-
-            headers.TryGetValue("x-partition-key", out var sessionKey);
-
-            Record(new CapturedMessage<BasicDeliverEventArgs>(
-                ea,
-                _clock.GetUtcNow(),
-                headers,
-                System.Text.Encoding.UTF8.GetString(ea.Body.Span),
-                ea.BasicProperties.CorrelationId,
-                sessionKey));
-
+            CaptureDelivery(ea);
             return Task.CompletedTask;
         };
 
@@ -107,4 +94,47 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
     }
 
     public async ValueTask DisposeAsync() => await StopAsync(CancellationToken.None).ConfigureAwait(false);
+
+    private void CaptureDelivery(BasicDeliverEventArgs ea)
+    {
+        // The consumer runs autoAck:true — the broker has already removed the
+        // message by the time we get here. A throw inside the ReceivedAsync
+        // callback would silently drop the payload and tests would only see
+        // "no messages". Decode failures are returned as a typed error via
+        // the Errors collection so consumers can assert on them — this is
+        // the "return a typed error" branch of the project error-handling rule.
+        try
+        {
+            var headers = new Dictionary<string, string>(StringComparer.Ordinal);
+            if (ea.BasicProperties.Headers is not null)
+            {
+                foreach (var kv in ea.BasicProperties.Headers)
+                {
+                    headers[kv.Key] = kv.Value switch
+                    {
+                        byte[] bytes => System.Text.Encoding.UTF8.GetString(bytes),
+                        _ => kv.Value?.ToString() ?? "",
+                    };
+                }
+            }
+
+            headers.TryGetValue("x-partition-key", out var sessionKey);
+
+            Record(new CapturedMessage<BasicDeliverEventArgs>(
+                ea,
+                _clock.GetUtcNow(),
+                headers,
+                System.Text.Encoding.UTF8.GetString(ea.Body.Span),
+                ea.BasicProperties.CorrelationId,
+                sessionKey));
+        }
+        catch (System.Text.DecoderFallbackException ex)
+        {
+            _errors.Enqueue(ex);
+        }
+        catch (ArgumentException ex)
+        {
+            _errors.Enqueue(ex);
+        }
+    }
 }

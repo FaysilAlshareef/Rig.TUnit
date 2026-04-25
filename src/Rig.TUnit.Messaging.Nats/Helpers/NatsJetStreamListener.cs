@@ -17,18 +17,29 @@ public sealed class NatsJetStreamListener : ListenerBase<NatsMessageRecord>, IAs
         string streamName,
         params string[] filterSubjects)
     {
-        _jetStream      = jetStream ?? throw new ArgumentNullException(nameof(jetStream));
+        _jetStream = jetStream ?? throw new ArgumentNullException(nameof(jetStream));
         ArgumentException.ThrowIfNullOrWhiteSpace(streamName);
-        _streamName     = streamName;
+        _streamName = streamName;
         _filterSubjects = filterSubjects;
-        _clock          = TimeProvider.System;
+        _clock = TimeProvider.System;
     }
 
     public override async Task StartAsync(CancellationToken ct)
     {
-        _cts  = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        _loop = Task.Run(() => ConsumeLoopAsync(_cts.Token), _cts.Token);
-        await Task.Yield();
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+
+        // Create the consumer here (before spawning the loop) so any broker
+        // error surfaces to the StartAsync caller, and so a fast publisher
+        // cannot race a not-yet-created consumer.
+        var opts = _filterSubjects.Length > 0
+            ? new NatsJSOrderedConsumerOpts { FilterSubjects = _filterSubjects }
+            : new NatsJSOrderedConsumerOpts();
+
+        var consumer = await _jetStream
+            .CreateOrderedConsumerAsync(_streamName, opts, _cts.Token)
+            .ConfigureAwait(false);
+
+        _loop = Task.Run(() => ConsumeLoopAsync(consumer, _cts.Token), _cts.Token);
     }
 
     public override async Task StopAsync(CancellationToken ct)
@@ -49,18 +60,10 @@ public sealed class NatsJetStreamListener : ListenerBase<NatsMessageRecord>, IAs
 
     public async ValueTask DisposeAsync() => await StopAsync(CancellationToken.None).ConfigureAwait(false);
 
-    private async Task ConsumeLoopAsync(CancellationToken ct)
+    private async Task ConsumeLoopAsync(INatsJSConsumer consumer, CancellationToken ct)
     {
         try
         {
-            var opts = _filterSubjects.Length > 0
-                ? new NatsJSOrderedConsumerOpts { FilterSubjects = _filterSubjects }
-                : new NatsJSOrderedConsumerOpts();
-
-            var consumer = await _jetStream
-                .CreateOrderedConsumerAsync(_streamName, opts, ct)
-                .ConfigureAwait(false);
-
             await foreach (var msg in consumer.ConsumeAsync<string>(cancellationToken: ct).ConfigureAwait(false))
             {
                 var headers = new Dictionary<string, string>(StringComparer.Ordinal);

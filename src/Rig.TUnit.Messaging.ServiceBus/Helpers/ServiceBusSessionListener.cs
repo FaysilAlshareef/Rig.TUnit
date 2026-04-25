@@ -1,6 +1,6 @@
+using System.Collections.Concurrent;
 using Azure.Messaging.ServiceBus;
 using Rig.TUnit.Messaging.Helpers;
-using System.Collections.Concurrent;
 
 namespace Rig.TUnit.Messaging.ServiceBus.Helpers;
 
@@ -19,6 +19,7 @@ public sealed class ServiceBusSessionListener
     private readonly TimeProvider _clock;
     private ServiceBusSessionProcessor? _processor;
     private readonly ConcurrentBag<string> _observedSessions = new();
+    private readonly ConcurrentQueue<Exception> _observedErrors = new();
 
     public ServiceBusSessionListener(
         ServiceBusClient client,
@@ -38,6 +39,16 @@ public sealed class ServiceBusSessionListener
 
     /// <summary>The distinct session IDs observed since <see cref="StartAsync"/> was called.</summary>
     public IReadOnlyCollection<string> ObservedSessions => _observedSessions.Distinct().ToArray();
+
+    /// <summary>
+    /// Errors surfaced by <see cref="ServiceBusSessionProcessor"/> (lost session locks, auth failures,
+    /// missing subscription, etc.) since <see cref="StartAsync"/>. Tests can assert on these instead of
+    /// only observing the symptom "no messages received".
+    /// </summary>
+    public IReadOnlyCollection<Exception> ObservedErrors => _observedErrors.ToArray();
+
+    /// <summary>The most recent error surfaced by the processor, or <see langword="null"/> if none.</summary>
+    public Exception? LastError => _observedErrors.LastOrDefault();
 
     public override async Task StartAsync(CancellationToken ct)
     {
@@ -84,5 +95,12 @@ public sealed class ServiceBusSessionListener
         return args.CompleteMessageAsync(args.Message);
     }
 
-    private Task HandleErrorAsync(ProcessErrorEventArgs args) => Task.CompletedTask;
+    private Task HandleErrorAsync(ProcessErrorEventArgs args)
+    {
+        if (args.Exception is not null)
+        {
+            _observedErrors.Enqueue(args.Exception);
+        }
+        return Task.CompletedTask;
+    }
 }

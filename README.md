@@ -178,17 +178,90 @@ await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct
 
 ### `WithTopology` hook
 
-Every messaging provider exposes a strongly-typed `WithTopology` builder hook:
+Every messaging provider exposes a strongly-typed `WithTopology` builder hook on its
+`{Provider}RigBuilder`. The base `MessagingRigBuilder<TSelf>` deliberately does **not**
+declare a generic `WithTopology` — each provider's surface is legitimately different and
+the type system carries that constraint.
+
+| Provider | Hook returns | Top-level concepts |
+|----------|-------------|--------------------|
+| Azure Service Bus | `IServiceBusTopologyBuilder` | `Topic` · `Subscription` (with `RequiresSession`, `MaxDeliveryCount`, SQL rule filter) · `Queue` · `WithDeadLetter` |
+| Apache Kafka | `IKafkaTopologyBuilder` | `Topic` (with `WithPartitions`, `WithReplicationFactor`, `WithConfig`) |
+| RabbitMQ | `IRabbitMqTopologyBuilder` | `Exchange(name, ExchangeType)` · `Queue` (with `WithMessageTtl`, `WithMaxLength`, `WithMaxPriority`, `WithDeadLetterExchange`, `WithQuorum`) · `Binding` |
+| Amazon SQS | `ISqsTopologyBuilder` | `Queue` (with `WithFifo`, `WithVisibilityTimeout`, `WithDeadLetter`, `WithMessageRetentionPeriod`) |
+| NATS JetStream | `INatsTopologyBuilder` | `Stream` (with `WithSubjects`, `WithMaxMessages`, `WithRetentionPolicy`) · `Consumer` |
 
 ```csharp
 services.AddRigTUnit(rig =>
     rig.UseServiceBus(source, sb =>
-        sb.WithTopology(t => t.Topic("orders", cfg => cfg.WithMaxSizeInMegabytes(1024)))));
+        sb.WithTopology(t =>
+            t.Topic("orders")
+             .Subscription("orders", "shipping", s => s
+                 .WithRequiresSession()
+                 .WithMaxDeliveryCount(5)
+                 .WithDeadLetter("orders-dlq")))));
 ```
 
-The topology is applied idempotently — create-or-update — so tests can run in any order without
-pre-provisioning infrastructure. See the per-provider docs in [`docs/providers/`](docs/providers/)
-for full option references.
+`ApplyAsync` is invoked automatically by the rig at fixture init and is **idempotent**:
+create-or-update on every provider, so tests can run in any order without pre-provisioning
+infrastructure and re-runs of the same declaration never throw.
+
+### Administration helpers (provision without the rig)
+
+When you don't own the rig but still need to provision broker topology — typical for
+parameterised integration tests, custom fixtures, or migration verification — the
+provider-specific admin helper is callable directly:
+
+```csharp
+// Service Bus — declarative topic + session subscription, no JSON seed.
+var admin  = new ServiceBusAdministrationClient(connectionString);
+var helper = new ServiceBusAdministrationHelper(admin);
+var subName = $"sess-{Guid.NewGuid():N}";
+await helper.CreateSubscriptionIfNotExistsAsync(
+    "orders", subName, requiresSession: true, ct);
+// ... use the subscription ...
+await admin.DeleteSubscriptionAsync("orders", subName, ct);
+```
+
+Each provider exposes the equivalent surface: Kafka via `Confluent.Kafka.AdminClient`
+(wrapped in `KafkaListener.EnsureTopicExistsAsync`), RabbitMQ via `IChannel` declarations
+in `RabbitMqListener.StartAsync`, NATS JetStream via `INatsJSContext` operations in
+`NatsTopologyBuilder.ApplyAsync`, SQS via `IAmazonSQS` in `SqsTopologyBuilder.ApplyAsync`.
+Each helper:
+
+- Returns gracefully when the resource already exists (create-or-update semantics).
+- Throws specifically when the broker rejects the operation for a real reason (e.g.
+  NATS `JSStreamNameExistErr` / 10058 → fall back to update; any other 400 → propagate).
+- Does **not** create test-state assumptions — every helper is callable from any test
+  framework, not just TUnit.
+
+### Session-aware listeners
+
+For providers with native session/group semantics, ship a dedicated listener that
+populates `CapturedMessage.SessionKey` from the broker's per-message ordering field:
+
+| Provider | Listener | Populates `SessionKey` from |
+|----------|----------|----------------------------|
+| Azure Service Bus | `ServiceBusSessionListener` | `ServiceBusReceivedMessage.SessionId` |
+| Apache Kafka | `KafkaListener` (with `Assign(int partition)`) | `Message.Key` (per partition) |
+| Amazon SQS FIFO | `SqsListener` | `MessageGroupId` attribute |
+| NATS JetStream | `NatsJetStreamListener` | `x-session-key` header |
+| RabbitMQ | `RabbitMqListener` (binding-aware) | `x-partition-key` header |
+
+```csharp
+await using var listener = new ServiceBusSessionListener(client, "orders", "shipping");
+await listener.StartAsync(ct);
+// ... messages flow ...
+OrderingAssert.PerKeyMonotonic(listener, m => m.SessionKey!, m => /* sequence */);
+```
+
+`ServiceBusSessionListener` also surfaces broker errors (lost session locks, auth
+failures) via `ObservedErrors` / `LastError` so they're assertable instead of silently
+discarded. `RabbitMqListener.Errors` carries decode failures (autoAck path).
+
+See the per-provider docs in [`docs/providers/`](docs/providers/) for full option
+references and the [ordering-assertions capability matrix](docs/ordering-assertions.md)
+for which provider supports which `OrderingAssert` mode.
 
 ---
 

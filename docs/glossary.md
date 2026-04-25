@@ -28,8 +28,36 @@ terminology in a README, add it to this glossary first.
 
 - **Listener** — `{Provider}Listener` helper that subscribes to a topic/queue/subject
   and captures messages for assertion.
+- **Session-aware listener** — `{Provider}SessionListener` (or partition-aware
+  equivalent) that populates `CapturedMessage.SessionKey` from the broker's
+  per-message ordering field — `ServiceBusSessionListener.SessionId`,
+  `KafkaListener` (per partition), `SqsListener.MessageGroupId`,
+  `NatsJetStreamListener.x-session-key`, `RabbitMqListener.x-partition-key`.
 - **Sender / EventSender** — `{Provider}EventSender` helper that publishes a test
   event with correlation IDs pre-populated.
+- **`SendContext`** — record at `Rig.TUnit.Messaging.Helpers.SendContext` carrying
+  cross-provider routing keys: `SessionKey` (FIFO ordering per group),
+  `PartitionKey` (partition / routing-key selection), `DeduplicationKey`
+  (idempotent send). Each provider maps these to its native primitive — see the
+  family README for the mapping table.
+- **`CapturedMessage<T>`** — listener-side envelope at
+  `Rig.TUnit.Messaging.Helpers.CapturedMessage` with the raw broker-typed message,
+  flattened headers, body, optional correlation ID, and optional session key.
+- **`ITopologyBuilder`** — marker interface at
+  `Rig.TUnit.Messaging.Topology.ITopologyBuilder` carrying only `ApplyAsync`. Each
+  provider package owns its own typed sub-interface
+  (`IServiceBusTopologyBuilder`, `IKafkaTopologyBuilder`, …) so unsupported
+  concepts are compile errors, not runtime no-ops (per Topology Builder Design C-003).
+- **`WithTopology` hook** — strongly-typed entry point on every provider's
+  `RigBuilder` (`ServiceBusRigBuilder.WithTopology(Action<IServiceBusTopologyBuilder>)`
+  and so on); applied idempotently at fixture init.
+- **Administration helper** — `{Provider}AdministrationHelper` (or equivalent
+  inline call in `{Provider}Listener.EnsureTopicExistsAsync` / similar) for
+  callers that need to provision topology outside the rig — parameterised tests,
+  custom fixtures, migration verification.
+- **Provider parity file** — `tests/Rig.TUnit.Architecture.Tests/.parity-coverage.txt`
+  enumerates the assemblies that have completed Feature 007 wiring; each name
+  appended to the file flips its parity-presence assertions on.
 - **Backplane** — pub/sub channel used for cache invalidation (Redis pub/sub).
 - **W3C traceparent** — standard header propagated through messaging + HTTP so
   distributed traces stitch together.

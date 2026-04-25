@@ -104,7 +104,7 @@ As a release manager, I need Feature 007 to land in three minor releases (Phase 
 
 - **NFR-C1** — coverage gate ≥ 90 % line / ≥ 85 % branch per package touched. New public types 100 % line-covered in their introducing PR.
 - ~~**NFR-C2**~~ — **superseded by C-000**. Packages are pre-release.
-- **NFR-C3** — docs (`README.md`, `docs/providers/*.md`, `CHANGELOG.md`, `docs/ordering-assertions.md`, inline XML on every new public member) ship in the **same PR** as the public-API change.
+- **NFR-C3** — docs (top-level `README.md`, **per-package family + provider `src/Rig.TUnit.Messaging*/README.md`**, `docs/providers/*.md`, `docs/glossary.md`, `CHANGELOG.md`, `docs/ordering-assertions.md`, inline XML on every new public member) ship in the **same PR** as the public-API change. Per-package READMEs must extend the existing 14-section canonical structure (enforced by `ReadmeCompletenessTests`) — no new H2 headings required, but each provider's README MUST mention every Feature 007 type it ships in its `Fixture + helper APIs`, `Quick start`, and `Provider quirks + edge cases` sections (review-gap finding from T060 → T064).
 - **NFR-C4** — provider-parity architecture test green from Phase 0 exit onward (extends `ProviderCompletenessTests`, `DependencyDirectionTests`). Per C-003, parity asserts **presence** of a `WithTopology(Action<T>)` method on every `{Provider}RigBuilder` with `T : ITopologyBuilder`; the specific `T` intentionally varies because each provider's fluent surface is provider-scoped.
 - **NFR-C5** — Phase 6 populates `benchmarks/baseline-007.json` (or appends to `baseline-006.json`) with ≥ 2 scenarios: ServiceBus session vs non-session; Kafka multi-partition per-key.
 
@@ -157,7 +157,7 @@ Every task that produces production code ships as **two commits**:
 
 Per **C-002**: every integration scenario (T015a–d, T025a–b, T033a–c, T044a–d, T055a–c) is also a discrete RED+GREEN pair. RED scenario tests land **at the start of their phase** before any provider production code; the subsequent unit-level GREEN commits are what flip each scenario RED → GREEN.
 
-Single-GREEN is allowed only for: (a) version-bump tasks that add no production behaviour (T014, T050); (b) config-file shrinkage gated on pre-existing tests (T016); (c) docs-only tasks (T060, T061, T062, T063).
+Single-GREEN is allowed only for: (a) version-bump tasks that add no production behaviour (T014, T050); (b) config-file shrinkage gated on pre-existing tests (T016); (c) docs-only tasks (T060, T061, T062, T063, T064).
 
 ---
 
@@ -280,8 +280,9 @@ Per NFR-C3, per-public-API doc updates already landed inline with each provider 
 | **T061** | `CHANGELOG.md`: **one entry per shipped phase**, not batched. | — | — | `CHANGELOG.md` | 🟢 | T060 | single GREEN per phase entry (accumulated). |
 | **T062** | Benchmarks: ServiceBus session vs non-session; Kafka multi-partition per-key. Land in existing `tests/Rig.TUnit.Benchmarks/` (see Q-4). | `tests/Rig.TUnit.Benchmarks/ServiceBusMessagingBenchmarks.cs` + `KafkaMessagingBenchmarks.cs` — new `[Benchmark]` methods; populate `benchmarks/baseline-007.json`. | Same files. | `docs/providers/service-bus.md`, `docs/providers/kafka.md` — benchmark reference. | 🟡 | all provider phases | single GREEN (benchmark additions). |
 | **T063** | Update `OrderingAssert` XML docs with supported-providers matrix; mirror in `docs/ordering-assertions.md`. | — (docs-only). | `src/Rig.TUnit.Messaging/Assertions/OrderingAssert.cs` (XML only). | `docs/ordering-assertions.md` — capability matrix. | 🟢 | T060–T062 | single GREEN (docs-only). |
+| **T064** | Per-package README sweep — extend the 14-section canonical READMEs of `src/Rig.TUnit.Messaging` (family base) and the five provider packages so they describe the Feature 007 surface (`SendContext`, session-aware listeners, `ITopologyBuilder` / `WithTopology`, admin helpers, queue/stream config interfaces). Top-level `README.md` adds a `WithTopology` capability matrix, a session-aware listener capability matrix, and an "administration helpers" sub-section. `docs/glossary.md` gets matching entries. **Reason**: post-merge review of T060 (commit `3db58f7`) caught that the docs-only task only touched the **top-level** README, leaving every provider package README still describing the pre-Feature-007 surface. | — (docs-only; covered by `ReadmeCompletenessTests` 14-section structural gate — extending existing sections, no new H2s). | — | 6 × `src/Rig.TUnit.Messaging.*/README.md`, top-level `README.md`, `docs/glossary.md`. | 🟢 | T063 | single GREEN (docs-only follow-up). |
 
-**Phase 6 exit gate**: README clean; `CHANGELOG.md` has one entry per shipped phase; `benchmarks/baseline-007.json` populated; `docs/ordering-assertions.md` lists all 5 providers.
+**Phase 6 exit gate**: README clean (top-level **and** per-package family / provider READMEs reflect the shipped surface); `CHANGELOG.md` has one entry per shipped phase; `benchmarks/baseline-007.json` populated; `docs/ordering-assertions.md` lists all 5 providers.
 
 ---
 

@@ -615,6 +615,18 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
       - `docs/ordering-assertions.md` (update with the capability matrix)
       Commit: `docs(007): GREEN T063 — OrderingAssert capability matrix (no red — docs-only)`
 
+- [x] **T064** [depends: all provider phases shipped] Provider + family READMEs sweep. Reason: post-merge review of T060 (commit `3db58f7`) found that the docs-only task touched the **top-level** `README.md` only — every provider package's `src/Rig.TUnit.Messaging.{Provider}/README.md` and the family-base `src/Rig.TUnit.Messaging/README.md` still described the pre-Feature-007 surface. The 14-section canonical structure enforced by `ReadmeCompletenessTests` is preserved by extending existing sections (no new H2s required).
+      Files:
+      - `src/Rig.TUnit.Messaging/README.md` — `SendContext`, `ITopologyBuilder` marker, `CapturedMessage<T>` extended.
+      - `src/Rig.TUnit.Messaging.ServiceBus/README.md` — `ServiceBusSessionListener`, `ServiceBusAdministrationHelper`, `ServiceBusTopologyBuilder`, `ServiceBusDeadLetterProbe`, equality validation, emulator capability gaps cross-reference.
+      - `src/Rig.TUnit.Messaging.Kafka/README.md` — `KafkaTopologyBuilder`, `KafkaListener.Assign(int)`, `DefaultPartitions` option, decoupling from `correlationId`.
+      - `src/Rig.TUnit.Messaging.RabbitMq/README.md` — `RabbitMqTopologyBuilder`, queue-args plumbing, `ExchangeType`, `RabbitMqListener.Errors`, autoAck quirk.
+      - `src/Rig.TUnit.Messaging.Sqs/README.md` — `SqsTopologyBuilder`, `WithFifo` suffix appender, `MessageGroupId` enforcement.
+      - `src/Rig.TUnit.Messaging.Nats/README.md` — `NatsJetStreamFixture` + JetStream sender/listener/topology, `NatsRetentionPolicy`, dependency-direction guard, `JSStreamNameExistErr` (10058) idempotency.
+      - `README.md` — admin-helpers section (provision without the rig), `WithTopology` capability matrix, session-aware listener capability matrix, link to `docs/ordering-assertions.md`.
+      - `docs/glossary.md` — new entries: `SendContext`, `CapturedMessage<T>`, `ITopologyBuilder`, `WithTopology` hook, session-aware listener, administration helper, provider parity file.
+      Commit: `docs(007): GREEN T064 — provider + family READMEs reflect Feature 007 surface (no red — docs-only follow-up to T060 review gap)`
+
 ---
 
 ## Task count summary
@@ -627,8 +639,8 @@ No `--no-verify`, no amends across RED/GREEN boundary, no destructive git operat
 | 3 — SQS | 9 | T033a/b/c RED + T030/T031/T032 × (RED+GREEN) |
 | 4 — RabbitMQ | 12 | T044a/b/c/d RED + T040/T041/T042/T043 × (RED+GREEN) |
 | 5 — NATS JetStream | 12 | T050 single + T055a/b/c RED + T051/T052/T053/T054 × (RED+GREEN) |
-| 6 — Docs & benchmarks | 6 | T060, T061-N1/-N2/-N3, T062, T063 |
-| **Total** | **72** | — |
+| 6 — Docs & benchmarks | 7 | T060, T061-N1/-N2/-N3, T062, T063, T064 |
+| **Total** | **73** | — |
 
 **Parallel opportunities**: 18 tasks marked `[P]` — all the scenario RED leads across Phases 1-5.
 

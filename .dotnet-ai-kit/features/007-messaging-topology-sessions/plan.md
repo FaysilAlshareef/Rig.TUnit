@@ -65,7 +65,7 @@ Source packages this plan modifies or extends (relative to repo root):
 | `tests/Rig.TUnit.Architecture.Tests/` | Parity assertion extensions + JetStream dependency guard + `.parity-coverage.txt` driver. | Phase 0 (T003), Phase 5 (T050). |
 | `tests/Rig.TUnit.Benchmarks/` | Session-vs-non-session and multi-partition benchmarks. | Phase 6 (T062). |
 | `tests/Rig.TUnit.Messaging.*.Tests.Unit` + `.Tests.Integration` | New unit and integration test projects per phase. | Every phase. |
-| `README.md`, `docs/providers/*.md` (5 files, some new), `docs/ordering-assertions.md`, `CHANGELOG.md`, `Directory.Packages.props` | Documentation + dependency bumps. | Every phase that changes public API. |
+| Top-level `README.md`, **per-package `src/Rig.TUnit.Messaging*/README.md` (1 family base + 5 providers)**, `docs/providers/*.md` (5 files, some new), `docs/glossary.md`, `docs/ordering-assertions.md`, `CHANGELOG.md`, `Directory.Packages.props` | Documentation + dependency bumps. | Every phase that changes public API; per-package READMEs swept in T064 if review finds them stale. |
 
 ### New NuGet dependencies
 
@@ -196,12 +196,13 @@ Each phase below mirrors the spec §Task List and adds: work sequencing, branchi
 
 Shipped **in parts** — each provider phase carries its own per-provider doc update (NFR-C3). Phase 6 is the consolidation and benchmark pass.
 
-- T060 — `README.md` messaging section + per-provider cross-link audit.
+- T060 — top-level `README.md` messaging section + per-provider cross-link audit.
 - T061 — `CHANGELOG.md` entry **per shipped release** (N+1, N+2, N+3 — three entries, not one).
 - T062 — `ServiceBusMessagingBenchmarks.cs` (session vs non-session) + `KafkaMessagingBenchmarks.cs` (multi-partition per-key); populate `benchmarks/baseline-007.json` with ≥ 2 scenarios.
 - T063 — `OrderingAssert` XML docs + `docs/ordering-assertions.md` provider capability matrix.
+- **T064 (added 2026-04-25, post-T060 review)** — per-package READMEs sweep. T060 only touched the top-level `README.md`; the family-base `src/Rig.TUnit.Messaging/README.md` and the five `src/Rig.TUnit.Messaging.{Provider}/README.md` files still described the pre-Feature-007 surface. T064 extends each of the six READMEs (preserving the 14-section canonical structure enforced by `ReadmeCompletenessTests`) plus expands the top-level README with admin-helpers + capability matrices, plus adds matching `docs/glossary.md` entries.
 
-**PRs**: split across releases — `#007-docs-n1`, `#007-docs-n2`, `#007-docs-n3` (or consolidated under each phase's PR, reviewer preference).
+**PRs**: split across releases — `#007-docs-n1`, `#007-docs-n2`, `#007-docs-n3` (or consolidated under each phase's PR, reviewer preference). T064 ships as a single docs-only follow-up PR after all provider phases are GREEN (release N+3 or later).
 
 ---
 
@@ -231,7 +232,7 @@ The file diff in each provider's GREEN PR is the visible rollout signal. `master
 | R3 | Phase 5 / DevOps | Add JetStream-only CI matrix row; skip on PRs that only touch core-NATS paths. Document in `docs/providers/nats.md`. |
 | R4 | Phase 3 | Docs mandate `IsolationKey`-prefixed `DeduplicationKey`; T030 validator throws if FIFO queue + missing `SessionKey`. |
 | R5 | T003 owner | Parity test enforces every assembly in `.parity-coverage.txt` (C-005); removing a line without documented justification is a reviewer-caught regression. |
-| R6 | Reviewer (per PR) | Every "single GREEN" task reviewer-flagged (T014, T016, T050, T060–T063). PR checklist confirms no out-of-declared-scope production file modified. |
+| R6 | Reviewer (per PR) | Every "single GREEN" task reviewer-flagged (T014, T016, T050, T060–T064). PR checklist confirms no out-of-declared-scope production file modified. Docs-only tasks must update **both** the top-level `README.md` and every affected per-package README (T060 review-gap finding → T064). |
 | R7 | Phase 6 | Benchmarks land in the existing `tests/Rig.TUnit.Benchmarks/` project (Q-4 resolution). No new project. |
 
 ---

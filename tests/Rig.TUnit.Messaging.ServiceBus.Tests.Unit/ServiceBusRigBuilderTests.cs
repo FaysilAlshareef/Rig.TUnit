@@ -46,4 +46,53 @@ public sealed class ServiceBusRigBuilderTests
         await Assert.That(() => new ServiceBusRigBuilder(captured!, null!))
             .ThrowsExactly<ArgumentNullException>();
     }
+
+    [Test]
+    public async Task WithTopology_NullConfigure_Throws()
+    {
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("Endpoint=sb://local/;SharedAccessKeyName=k;SharedAccessKey=dGVzdA==");
+        var builder = new ServiceBusRigBuilder(captured!, source);
+
+        await Assert.That(() => builder.WithTopology(null!))
+            .ThrowsExactly<ArgumentNullException>();
+    }
+
+    [Test]
+    public async Task WithTopology_ValidConfigure_ReturnsBuilder()
+    {
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("Endpoint=sb://local/;SharedAccessKeyName=k;SharedAccessKey=dGVzdA==");
+        var builder = new ServiceBusRigBuilder(captured!, source);
+
+        var returned = builder.WithTopology(_ => { });
+
+        await Assert.That(returned).IsSameReferenceAs(builder);
+    }
+
+    [Test]
+    public async Task ApplyTopologyAsync_NoTopologyConfigured_DoesNothing(CancellationToken ct)
+    {
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue("Endpoint=sb://local/;SharedAccessKeyName=k;SharedAccessKey=dGVzdA==");
+        var builder = new ServiceBusRigBuilder(captured!, source);
+
+        await Assert.That(async () => await builder.ApplyTopologyAsync(ct))
+            .ThrowsNothing();
+    }
+
+    [Test]
+    public async Task ConnectionString_ValueSource_ReturnsRawValue()
+    {
+        const string connStr = "Endpoint=sb://local/;SharedAccessKeyName=k;SharedAccessKey=dGVzdA==";
+        RigBuilder? captured = null;
+        new ServiceCollection().AddRigTUnit(rig => captured = rig);
+        var source = RigConnect.FromValue(connStr);
+        var builder = new ServiceBusRigBuilder(captured!, source);
+
+        await Assert.That(builder.ConnectionString).IsEqualTo(connStr);
+    }
 }

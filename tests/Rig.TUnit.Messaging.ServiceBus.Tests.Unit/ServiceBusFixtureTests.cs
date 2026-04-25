@@ -65,6 +65,15 @@ public sealed class ServiceBusFixtureTests
     }
 
     [Test]
+    public async Task GetAdminConnectionString_BeforeInitialize_ThrowsInvalidOperation()
+    {
+        var fx = new ServiceBusFixture();
+
+        await Assert.That(() => { _ = fx.AdminConnectionString; })
+            .ThrowsExactly<InvalidOperationException>();
+    }
+
+    [Test]
     public async Task TopicName_BeforeInitialize_ReturnsStableNonEmptyValue()
     {
         var fx = new ServiceBusFixture();

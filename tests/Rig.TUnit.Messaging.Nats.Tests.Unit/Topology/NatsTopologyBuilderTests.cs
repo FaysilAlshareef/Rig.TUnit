@@ -48,4 +48,73 @@ public sealed class NatsTopologyBuilderTests
                 c.Name == "capped" && c.MaxMsgs == 100),
             Arg.Any<CancellationToken>());
     }
+
+    [Test]
+    public async Task Stream_WithRetentionPolicy_Limits_MapsToStreamConfigRetentionLimits(CancellationToken ct)
+    {
+        var mockJs = Substitute.For<INatsJSContext>();
+        var builder = new NatsTopologyBuilder(mockJs);
+
+        builder.Stream("limits-stream", cfg => cfg
+            .WithSubjects("x.>")
+            .WithRetentionPolicy(NatsRetentionPolicy.Limits));
+
+        await builder.ApplyAsync(ct);
+        await mockJs.Received(1).CreateStreamAsync(
+            Arg.Is<NATS.Client.JetStream.Models.StreamConfig>(c =>
+                c.Name == "limits-stream"
+                && c.Retention == NATS.Client.JetStream.Models.StreamConfigRetention.Limits),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task Stream_WithRetentionPolicy_Interest_MapsToStreamConfigRetentionInterest(CancellationToken ct)
+    {
+        var mockJs = Substitute.For<INatsJSContext>();
+        var builder = new NatsTopologyBuilder(mockJs);
+
+        builder.Stream("interest-stream", cfg => cfg
+            .WithSubjects("y.>")
+            .WithRetentionPolicy(NatsRetentionPolicy.Interest));
+
+        await builder.ApplyAsync(ct);
+        await mockJs.Received(1).CreateStreamAsync(
+            Arg.Is<NATS.Client.JetStream.Models.StreamConfig>(c =>
+                c.Name == "interest-stream"
+                && c.Retention == NATS.Client.JetStream.Models.StreamConfigRetention.Interest),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task Stream_WithRetentionPolicy_WorkQueue_MapsToStreamConfigRetentionWorkqueue(CancellationToken ct)
+    {
+        var mockJs = Substitute.For<INatsJSContext>();
+        var builder = new NatsTopologyBuilder(mockJs);
+
+        builder.Stream("work-stream", cfg => cfg
+            .WithSubjects("z.>")
+            .WithRetentionPolicy(NatsRetentionPolicy.WorkQueue));
+
+        await builder.ApplyAsync(ct);
+        await mockJs.Received(1).CreateStreamAsync(
+            Arg.Is<NATS.Client.JetStream.Models.StreamConfig>(c =>
+                c.Name == "work-stream"
+                && c.Retention == NATS.Client.JetStream.Models.StreamConfigRetention.Workqueue),
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task Stream_NullName_ThrowsArgumentException(CancellationToken ct)
+    {
+        var mockJs = Substitute.For<INatsJSContext>();
+        var builder = new NatsTopologyBuilder(mockJs);
+
+        await Assert.That(() => builder.Stream(null!, cfg => cfg.WithSubjects("a.>")))
+            .Throws<ArgumentException>();
+        // No CreateStreamAsync should be queued
+        await builder.ApplyAsync(ct);
+        await mockJs.DidNotReceive().CreateStreamAsync(
+            Arg.Any<NATS.Client.JetStream.Models.StreamConfig>(),
+            Arg.Any<CancellationToken>());
+    }
 }

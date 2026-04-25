@@ -1,5 +1,6 @@
 using Azure.Messaging.ServiceBus;
 using Azure.Messaging.ServiceBus.Administration;
+using Rig.TUnit.Messaging.ServiceBus.Topology;
 
 namespace Rig.TUnit.Messaging.ServiceBus.Tests.Integration.Topology;
 
@@ -19,11 +20,12 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
         var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
+        var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"probe-session-{Guid.NewGuid():N}";
 
-        // Act — create topic + session-enabled subscription idempotently
-        if (!await admin.TopicExistsAsync(ProbeTopic, ct))
-            await admin.CreateTopicAsync(ProbeTopic, ct);
+        // Act — create topic via the race-safe helper (other probe tests share
+        // ProbeTopic; bare check-then-create races against parallel probes).
+        await helper.CreateTopicIfNotExistsAsync(ProbeTopic, ct);
 
         var subProps = new CreateSubscriptionOptions(ProbeTopic, subName)
         {
@@ -44,10 +46,10 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
         var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
+        var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"probe-sqlfilter-{Guid.NewGuid():N}";
 
-        if (!await admin.TopicExistsAsync(ProbeTopic, ct))
-            await admin.CreateTopicAsync(ProbeTopic, ct);
+        await helper.CreateTopicIfNotExistsAsync(ProbeTopic, ct);
 
         var subProps = new CreateSubscriptionOptions(ProbeTopic, subName);
         await admin.CreateSubscriptionAsync(subProps, ct);

@@ -17,18 +17,17 @@ public sealed class NatsJetStreamEventSender : EventSenderBase, IAsyncDisposable
 
     public async Task SendAsync(
         string body,
-        SendContext? context = null,
+        SendContext context = default,
         string? correlationId = null,
         string? causationId = null,
         string? traceparent = null,
         IReadOnlyDictionary<string, string>? additionalHeaders = null,
         CancellationToken ct = default)
     {
-        var ctx = context ?? new SendContext();
-        var extra = ctx.SessionKey is not null
-            ? MergeHeader(additionalHeaders, "x-session-key", ctx.SessionKey)
+        var extra = context.SessionKey is not null
+            ? MergeHeader(additionalHeaders, "x-session-key", context.SessionKey)
             : additionalHeaders;
-        var headers = BuildHeaders(ctx, correlationId, causationId, traceparent, extra);
+        var headers = BuildHeaders(context, correlationId, causationId, traceparent, extra);
 
         await _jetStream.PublishAsync(
             _subject,

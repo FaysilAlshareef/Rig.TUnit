@@ -1,3 +1,4 @@
+using NATS.Client.Core;
 using NATS.Client.JetStream;
 using NSubstitute;
 using Rig.TUnit.Messaging.Helpers;
@@ -36,7 +37,7 @@ public sealed class NatsJetStreamEventSenderTests
     {
         // Arrange
         var mockJs = Substitute.For<INatsJSContext>();
-        var sender = new NatsJetStreamEventSender(mockJs, "events.test");  // CS0246 RED
+        var sender = new NatsJetStreamEventSender(mockJs, "events.test");
         var context = new SendContext(SessionKey: "session-42");
 
         // Act — will throw (mock returns default ValueTask) but we just verify call was made
@@ -46,10 +47,15 @@ public sealed class NatsJetStreamEventSenderTests
         }
         catch { /* mock doesn't return real ack — exception is expected */ }
 
-        // Assert — PublishAsync was called with the correct subject
+        // Assert — PublishAsync was called with the correct subject and a
+        // NatsHeaders bag containing the x-session-key header from SendContext.
         await mockJs.Received(1).PublishAsync(
             Arg.Is<string>(s => s == "events.test"),
             Arg.Any<string>(),
+            headers: Arg.Is<NatsHeaders?>(h =>
+                h != null
+                && h.ContainsKey("x-session-key")
+                && h["x-session-key"].ToString() == "session-42"),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 
@@ -57,7 +63,7 @@ public sealed class NatsJetStreamEventSenderTests
     public async Task SendAsync_DefaultSendContext_BehavesLikeLegacyOverload(CancellationToken ct)
     {
         var mockJs = Substitute.For<INatsJSContext>();
-        var sender = new NatsJetStreamEventSender(mockJs, "events.test");  // CS0246 RED
+        var sender = new NatsJetStreamEventSender(mockJs, "events.test");
 
         try
         {
@@ -65,9 +71,16 @@ public sealed class NatsJetStreamEventSenderTests
         }
         catch { /* mock — expected */ }
 
+        // Default SendContext: no x-session-key header, but the W3C traceparent
+        // header is auto-emitted by EventSenderBase — so headers is non-null
+        // but does not carry session metadata.
         await mockJs.Received(1).PublishAsync(
             Arg.Is<string>(s => s == "events.test"),
             Arg.Any<string>(),
+            headers: Arg.Is<NatsHeaders?>(h =>
+                h != null
+                && !h.ContainsKey("x-session-key")
+                && h.ContainsKey("traceparent")),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 }

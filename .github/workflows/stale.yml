@@ -1,0 +1,42 @@
+name: Stale issues & PRs
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # every Monday 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # Issues: nudge after 90d idle, close after 14d more without activity.
+          days-before-issue-stale: 90
+          days-before-issue-close: 14
+          stale-issue-label: "status:stale"
+          exempt-issue-labels: "priority:critical,priority:high,status:in-progress,status:blocked,good-first-issue,help-wanted"
+          stale-issue-message: |
+            This issue has been idle for 90 days. It will be closed in 14 days
+            unless someone comments to keep it open. Thank you for your contribution.
+          close-issue-message: |
+            Closing as stale. Re-open if it is still relevant — fresh context welcome.
+
+          # PRs: nudge after 30d idle, close after 14d more without activity.
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: "status:stale"
+          exempt-pr-labels: "priority:critical,priority:high,status:in-progress,status:blocked"
+          stale-pr-message: |
+            This pull request has been idle for 30 days. It will be closed in 14 days
+            unless someone pushes a new commit or comments. Thank you for your contribution.
+          close-pr-message: |
+            Closing as stale. Re-open if you intend to continue.
+
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          delete-branch: false

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Redis-as-database backed by Testcontainers. Use for Redis-as-database scenarios; for caching see Rig.TUnit.Caching.Redis.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="StackExchange.Redis" />

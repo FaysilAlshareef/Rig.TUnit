@@ -1,0 +1,51 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: 'New providers'
+    labels: ['type:provider']
+  - title: 'New features'
+    labels: ['type:feature']
+  - title: 'Bug fixes'
+    labels: ['type:bug']
+  - title: 'Performance'
+    labels: ['type:perf']
+  - title: 'Security'
+    labels: ['type:security']
+  - title: 'Documentation'
+    labels: ['type:docs']
+  - title: 'Tests / coverage'
+    labels: ['type:test']
+  - title: 'CI / build'
+    labels: ['type:ci', 'dependencies']
+  - title: 'Refactor / cleanup'
+    labels: ['refactor']
+
+change-template: '- $TITLE (#$NUMBER) by @$AUTHOR'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels: ['release:major', 'breaking-change']
+  minor:
+    labels: ['release:minor', 'type:feature', 'type:provider']
+  patch:
+    labels: ['release:patch', 'type:bug', 'type:perf', 'type:docs']
+  default: patch
+
+template: |
+  ## What's changed
+
+  $CHANGES
+
+  ## Install
+
+  ```bash
+  dotnet add package Rig.TUnit --version $RESOLVED_VERSION --prerelease
+  ```
+
+  **Full changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+exclude-labels:
+  - 'skip-changelog'
+  - 'duplicate'

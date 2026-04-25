@@ -1,0 +1,18 @@
+# Code owners for Rig.TUnit.
+# Lines from this file are matched against the path of every changed file in a PR.
+# The last matching line wins. Owners listed here are automatically requested for review.
+
+*                       @FaysilAlshareef
+.github/                @FaysilAlshareef
+.github/workflows/      @FaysilAlshareef
+src/                    @FaysilAlshareef
+tests/                  @FaysilAlshareef
+docs/                   @FaysilAlshareef
+SECURITY.md             @FaysilAlshareef
+CODE_OF_CONDUCT.md      @FaysilAlshareef
+CONTRIBUTING.md         @FaysilAlshareef
+CHANGELOG.md            @FaysilAlshareef
+LICENSE                 @FaysilAlshareef
+Directory.Build.props   @FaysilAlshareef
+Directory.Packages.props @FaysilAlshareef
+global.json             @FaysilAlshareef

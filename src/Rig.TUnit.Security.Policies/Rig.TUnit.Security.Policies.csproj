@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Description>TUnit fixture for ASP.NET Core authorisation policies - claim-based, role-based, and resource-based assertions.</Description>
     <UseAspNetCore>true</UseAspNetCore>
   </PropertyGroup>
   <ItemGroup>

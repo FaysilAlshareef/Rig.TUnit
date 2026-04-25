@@ -1,0 +1,57 @@
+name: Feature request
+description: Propose a new capability or an enhancement to an existing one.
+title: "[feature] "
+labels: ["type:feature", "status:needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, consider opening a [Discussion → Ideas](https://github.com/FaysilAlshareef/Rig.TUnit/discussions/new?category=ideas)
+        for early-stage thinking. File this form when you have a concrete proposal.
+  - type: dropdown
+    id: family
+    attributes:
+      label: Affected family
+      options:
+        - SQL databases
+        - NoSQL databases
+        - Messaging
+        - Caching
+        - Storage
+        - Observability
+        - Security
+        - Microservices
+        - Infrastructure (HTTP / gRPC / health / resilience / mediator / docker)
+        - Cross-cutting / core
+    validations: { required: true }
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this solve? What's the user story?
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API / behaviour
+      description: |
+        Sketch the API surface, the new fixture, the new assertion — code is welcome.
+      render: csharp
+    validations: { required: true }
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you evaluate? Why is this the best path?
+  - type: textarea
+    id: scope
+    attributes:
+      label: Out-of-scope / non-goals
+      description: Anything explicitly NOT in scope to keep the proposal focused.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - { label: I searched issues and discussions for duplicates., required: true }
+        - { label: This proposal is additive (no breaking changes) OR I have flagged it `breaking-change`., required: true }

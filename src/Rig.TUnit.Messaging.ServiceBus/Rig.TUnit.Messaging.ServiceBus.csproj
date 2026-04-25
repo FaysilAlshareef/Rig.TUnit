@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Azure Service Bus backed by Testcontainers. Native sessions, deduplication, partition keys, and runtime topology builder for topics, subscriptions, and rules.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.ServiceBus" />

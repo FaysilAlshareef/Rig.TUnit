@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [master, main]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+
 jobs:
 
   # ─── Build + Unit + Arch ────────────────────────────────────────────────────
@@ -485,27 +494,10 @@ jobs:
           fi
           echo "Commit discipline gate passed."
 
-  # ─── Markdown link check (T160) ────────────────────────────────────────────
-  # FR-067 — scans every .md file under the repo for dead links. Blocks PR on
-  # failure. Allow-list for known-flaky domains is in .github/mlc_config.json.
-  markdown-link-check:
-    name: Markdown link check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - name: Check links
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-          config-file: '.github/mlc_config.json'
-          check-modified-files-only: 'no'
-          # Scope to project docs — skip `.claude/skills/` which ships template
-          # READMEs with placeholder links (`docs/runbook.md` etc.) that are
-          # meant as scaffolds, not real references in this repo.
-          folder-path: 'src,tests,docs,planning,.dotnet-ai-kit,.github'
-          file-path: 'README.md,CONTRIBUTING.md,CHANGELOG.md'
-          max-depth: 6
+  # ─── Markdown link check ───────────────────────────────────────────────────
+  # Consolidated under the `linkcheck` job (lychee). The previous gaurav-nelson
+  # job was dropped during release-readiness CI cleanup — duplicate coverage,
+  # higher false-positive rate, ~2 minutes of redundant runtime per PR.
 
   # ─── Snippet extraction (T162) ─────────────────────────────────────────────
   # FR-068 — extracts every leaf README's `## Quick start` C# fenced code block
@@ -653,51 +645,11 @@ jobs:
       - name: Run architecture tests
         run: dotnet test --project tests/Rig.TUnit.Architecture.Tests/Rig.TUnit.Architecture.Tests.csproj -c Release --no-build
 
-  # ─── Red-commit-verification (T170/T171) ───────────────────────────────────
-  # FR-003 — for every `test(005): T<n> — RED` commit, check out that SHA, run
-  # the touched architecture tests, and surface the result. A retroactive exemption
-  # list (T169) covers pre-hardening commits.
-  red-commit-verification:
-    name: Red-commit verification
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
-      - name: Verify every RED commit fails at its SHA
-        shell: bash
-        run: |
-          set -euo pipefail
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-          # Retroactive exemption list — pre-hardening RED commits that predate
-          # red-commit-verification. Populate as audit identifies specific SHAs.
-          EXEMPT_SHAS=()
-          mapfile -t red_commits < <(git log --reverse --pretty=format:"%H|%s" "${base}".."${head}" \
-            | grep -E '^[0-9a-f]+\|test\(005\):' || true)
-          for line in "${red_commits[@]}"; do
-            sha="${line%%|*}"
-            subject="${line#*|}"
-            exempt=false
-            for e in "${EXEMPT_SHAS[@]}"; do
-              if [[ "${sha}" == "${e}"* ]]; then
-                exempt=true
-                break
-              fi
-            done
-            if $exempt; then
-              echo "::notice::Skipping exempt RED commit ${sha::7}"
-              continue
-            fi
-            echo "::group::Verifying RED commit ${sha::7} ($subject)"
-            echo "::notice::Inspected — full runtime verification (dotnet test at SHA) is a best-effort pass; integration-touching RED commits legitimately pass the architecture subset."
-            echo "::endgroup::"
-          done
-          echo "Red-commit verification complete."
+  # ─── Red-commit-verification ───────────────────────────────────────────────
+  # Removed during release-readiness CI cleanup. The previous job emitted only
+  # ::notice:: log lines without performing any real verification. The
+  # `commit-discipline-gate` above already enforces RED -> GREEN subject
+  # pairing on every PR, which is the load-bearing check.
 
   # ─── Link-checker (T065) ────────────────────────────────────────────────────
   # FR-022 — lychee-action checks all external and internal links in README.md
@@ -722,4 +674,56 @@ jobs:
           name: test-results-linkcheck
           path: tests/**/bin/Release/net10.0/TestResults/**
           retention-days: 14
+          if-no-files-found: warn
+
+  # ─── Pack & validate (release-readiness) ───────────────────────────────────
+  # Builds every src/**/*.csproj as a NuGet package and verifies each .nupkg
+  # carries a description, authors, projectUrl, repository URL, README, and
+  # a license expression. Fails the PR when a packable project regresses on
+  # metadata - the load-bearing check that protects nuget.org publishes.
+  pack-validate:
+    name: Pack & validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0   # MinVer needs full tag history
+      - uses: ./.github/actions/setup-dotnet-cache
+      - name: Restore
+        run: dotnet restore Rig.TUnit.slnx
+      - name: Build
+        run: dotnet build Rig.TUnit.slnx -c Release --no-restore
+      - name: Pack
+        run: dotnet pack Rig.TUnit.slnx -c Release --no-build -o ./artifacts
+      - name: Validate package metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          missing=0
+          count=0
+          for pkg in artifacts/*.nupkg; do
+            count=$((count + 1))
+            nuspec=$(unzip -p "$pkg" '*.nuspec')
+            for tag in description authors projectUrl repository readme; do
+              if ! grep -qi "<$tag" <<<"$nuspec"; then
+                echo "::error file=$pkg::missing <$tag>"
+                missing=$((missing + 1))
+              fi
+            done
+            if ! grep -qi '<license' <<<"$nuspec"; then
+              echo "::error file=$pkg::missing <license> expression"
+              missing=$((missing + 1))
+            fi
+          done
+          echo "Inspected $count package(s); $missing metadata violation(s)."
+          [[ $missing -eq 0 ]] || exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pack-artefacts
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          retention-days: 7
           if-no-files-found: warn

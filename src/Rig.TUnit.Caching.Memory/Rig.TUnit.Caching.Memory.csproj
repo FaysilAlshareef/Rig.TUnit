@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for IMemoryCache - in-process, no container required. Suitable for unit-style cache tests.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Rig.TUnit.Caching.Memory.Tests.Unit" />
   </ItemGroup>

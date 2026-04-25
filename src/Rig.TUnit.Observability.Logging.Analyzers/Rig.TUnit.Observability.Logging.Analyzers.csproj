@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Description>Roslyn analyzers for log-template hygiene used by tests in this rig.</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -8,6 +9,13 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591;RS1036</NoWarn>
+    <!--
+      Internal analyzer - used by Rig.TUnit's own tests for log-template hygiene.
+      NOT shipped as a NuGet package; consumers do not reference it directly.
+      Re-enable IsPackable once the analyzer ships its own consumer-facing rules
+      (planned follow-up). See planning/release-readiness-and-nuget-publishing.
+    -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />

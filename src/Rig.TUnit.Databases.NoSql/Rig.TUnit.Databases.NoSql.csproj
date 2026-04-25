@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>NoSQL family base - INoSqlFixture, change-feed utilities, conflict-resolution helpers. Pull a leaf provider for a working fixture.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
   </ItemGroup>

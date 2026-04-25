@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>SQL family base - ISqlFixture, schema helpers, transaction-isolation utilities. Pull a leaf package (SqlServer, Postgresql, MySql, Oracle, Sqlite) for a working fixture.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />

@@ -1,0 +1,26 @@
+name: Setup .NET + cache
+description: Sets up the .NET SDK and caches the NuGet HTTP cache + global-packages folder.
+
+inputs:
+  dotnet-version:
+    description: .NET SDK version (matches global.json by default)
+    required: false
+    default: '10.0.x'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.nuget/packages
+          ~/.nuget/http-cache
+        key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', '**/*.csproj') }}
+        restore-keys: |
+          nuget-${{ runner.os }}-

@@ -1,0 +1,19 @@
+title: "[idea] "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What's the idea?
+      description: Sketch the proposal. Pre-feature-request brainstorming lives here.
+    validations: { required: true }
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem would this solve? Who benefits?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or prior art
+      description: Other libraries that do this? Other directions you considered?

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Messaging family base - EventSenderBase, ListenerBase, unified SendContext (SessionKey, PartitionKey, DeduplicationKey), and ITopologyBuilder consumed by every messaging leaf package.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.Extensions.Options" />

@@ -59,9 +59,22 @@ public sealed class ServiceBusFixture : MessagingFixtureBase
             return;
         }
 
+        // Testcontainers' WithConfig() wraps the path in `new FileInfo(path)`,
+        // which resolves relative paths against `Environment.CurrentDirectory`
+        // — that's the dotnet-test invocation directory (often the repo root),
+        // NOT the test-exe's bin folder where the JSON is copied. Resolve to an
+        // absolute path against AppContext.BaseDirectory so the mount is always
+        // pointed at the file copied into the test output. Without this, the
+        // Testcontainers volume mount silently picks up a non-existent file,
+        // the emulator starts with empty config, and admin operations later
+        // fail with MessagingEntityNotFound.
+        var configPath = Path.IsPathRooted(_options.ConfigFilePath)
+            ? _options.ConfigFilePath
+            : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, _options.ConfigFilePath));
+
         _container = new ServiceBusBuilder($"mcr.microsoft.com/azure-messaging/servicebus-emulator:{_options.ImageTag}")
             .WithAcceptLicenseAgreement(_options.AcceptEula)
-            .WithConfig(_options.ConfigFilePath)
+            .WithConfig(configPath)
             .Build();
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(_options.StartupTimeoutSeconds));

@@ -43,31 +43,38 @@ public sealed class PartitionedFanoutTests
             }
         }
 
-        // Wait for broker delivery. The previous 30 s deadline was tight when
-        // running under the shared fixture: ServiceBusListener attaches via
-        // CreateProcessor with default MaxConcurrentCalls=1 and PrefetchCount=0,
-        // which serialises receive-and-complete round-trips at ~50–150 ms each
-        // on the emulator. With the broker also handling parallel topology
-        // tests on the same namespace, dropping a single per-key message under
-        // the threshold has been observed in CI. 90 s gives the per-message
-        // receive path comfortable headroom; the test still aborts early once
-        // all 20 messages land.
-        var totalExpected = keyCount * messagesPerKey;
+        // Wait for broker delivery on a per-partition-key basis. Looping on the
+        // total `Captured.Count` is unreliable because the prefetched processor
+        // can redeliver a message whose lock expires before completion: total
+        // count then crosses the threshold while one slow partition still has
+        // unique-message arrivals pending. Counting **distinct** bodies per key
+        // also guards the final assertion against redelivery duplicates so a
+        // pk that legitimately landed all four messages can't fail because
+        // another pk inflated its share.
         var deadline = DateTimeOffset.UtcNow.AddSeconds(90);
-        while (listener.Captured.Count < totalExpected && DateTimeOffset.UtcNow < deadline)
+        while (DateTimeOffset.UtcNow < deadline)
         {
+            var snapshot = listener.Captured;
+            var allReady = partitionKeys.All(pk =>
+                snapshot.Select(m => m.Body)
+                        .Where(b => b.StartsWith($"fanout-{pk}-", StringComparison.Ordinal))
+                        .Distinct(StringComparer.Ordinal)
+                        .Count() >= messagesPerKey);
+            if (allReady) break;
             await Task.Delay(300, ct);
         }
 
         await listener.StopAsync(ct);
 
-        // Assert — every partition key's messages arrived
-        await Assert.That(listener.Captured.Count).IsGreaterThanOrEqualTo(totalExpected);
+        // Assert — every partition key's distinct messages arrived
         foreach (var pk in partitionKeys)
         {
-            var forKey = listener.Captured.Where(m =>
-                m.Body.StartsWith($"fanout-{pk}-", StringComparison.Ordinal)).ToList();
-            await Assert.That(forKey.Count).IsGreaterThanOrEqualTo(messagesPerKey);
+            var distinctForKey = listener.Captured
+                .Select(m => m.Body)
+                .Where(b => b.StartsWith($"fanout-{pk}-", StringComparison.Ordinal))
+                .Distinct(StringComparer.Ordinal)
+                .Count();
+            await Assert.That(distinctForKey).IsGreaterThanOrEqualTo(messagesPerKey);
         }
 
         // Cleanup

@@ -431,6 +431,14 @@ The `.githooks/commit-msg` hook enforces valid prefixes on every commit:
 
 ---
 
+## Roadmap
+
+Active feature work follows a Spec-Driven Development pipeline (`/dai.spec` → `/dai.plan` → `/dai.tasks` → `/dai.implement` → `/dai.verify` → `/dai.pr`). Planned features that haven't been picked up yet live as short briefs under [`planning/<slug>/README.md`](planning/).
+
+The full roadmap (43 planned features grouped by family — cross-cutting, SQL, NoSQL, caching, storage, security, observability, microservices, HTTP/gRPC, health-checks/resilience/concurrency/WebAPI/CI) lives at **[docs/ROADMAP.md](docs/ROADMAP.md)**. Numbering and stage rules are formalised in [ADR-009](docs/adr/ADR-009-feature-numbering-after-007.md).
+
+---
+
 ## Contributing
 
 1. Fork the repository and create a feature branch: `feat/NNN-short-name`
@@ -438,7 +446,7 @@ The `.githooks/commit-msg` hook enforces valid prefixes on every commit:
 3. Ensure unit tests pass (`dotnet test {YourProject} -c Release`) and coverage stays ≥ 90%
 4. Open a pull request — CI will run the full suite automatically
 
-For significant changes, open an issue first to discuss the approach.
+For significant changes, open an issue first to discuss the approach. To pick up a planned feature, read its brief under [`planning/<slug>/README.md`](planning/), copy the **Build prompt** section into `/dai.spec`, and update [docs/ROADMAP.md](docs/ROADMAP.md) when the status flips.
 
 ---
 

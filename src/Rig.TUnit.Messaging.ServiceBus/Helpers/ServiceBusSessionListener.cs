@@ -52,9 +52,19 @@ public sealed class ServiceBusSessionListener
 
     public override async Task StartAsync(CancellationToken ct)
     {
-        _processor = _options is not null
-            ? _client.CreateSessionProcessor(_topic, _subscription, _options)
-            : _client.CreateSessionProcessor(_topic, _subscription);
+        // Test-rig defaults when the caller did not supply options: drain up
+        // to 16 sessions in parallel with a small prefetch buffer per session
+        // so a burst of N sessions × M messages catches in seconds rather
+        // than serialising session lock-acquire round-trips. Per-session
+        // call concurrency stays at 1 to preserve the FIFO contract that
+        // session-aware listeners exist to demonstrate.
+        var options = _options ?? new ServiceBusSessionProcessorOptions
+        {
+            MaxConcurrentSessions = 16,
+            MaxConcurrentCallsPerSession = 1,
+            PrefetchCount = 10,
+        };
+        _processor = _client.CreateSessionProcessor(_topic, _subscription, options);
 
         _processor.ProcessMessageAsync += HandleMessageAsync;
         _processor.ProcessErrorAsync += HandleErrorAsync;

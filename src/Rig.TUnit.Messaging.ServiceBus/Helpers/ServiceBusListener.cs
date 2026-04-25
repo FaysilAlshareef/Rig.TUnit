@@ -23,7 +23,18 @@ public sealed class ServiceBusListener : ListenerBase<ServiceBusReceivedMessage>
 
     public override async Task StartAsync(CancellationToken ct)
     {
-        _processor = _client.CreateProcessor(_topic, _subscription);
+        // Test-rig defaults — drain in parallel + prefetch a small buffer so
+        // the listener catches a burst of N messages in seconds rather than
+        // serialising every receive/complete round-trip. The Azure SDK
+        // defaults (MaxConcurrentCalls=1, PrefetchCount=0) make sense for
+        // production back-pressure but turn integration tests into latency
+        // races against fixture deadlines.
+        var options = new ServiceBusProcessorOptions
+        {
+            MaxConcurrentCalls = 16,
+            PrefetchCount = 20,
+        };
+        _processor = _client.CreateProcessor(_topic, _subscription, options);
         _processor.ProcessMessageAsync += HandleMessageAsync;
         _processor.ProcessErrorAsync += HandleErrorAsync;
         await _processor.StartProcessingAsync(ct).ConfigureAwait(false);

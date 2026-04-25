@@ -162,7 +162,7 @@ These features add base-library primitives that downstream features depend on. I
 
 ## Rules
 
-- A planning brief never duplicates spec content — it's an **input** to `/dai.spec`, per [memory rule](../../.claude/rules/architecture-profile.md) `feedback_spec_home_is_sdd_feature_folder.md`.
+- A planning brief never duplicates spec content — it's an **input** to `/dai.spec`, per memory rule `feedback_spec_home_is_sdd_feature_folder.md`.
 - Numbering is monotonic. Cancelled features keep their ID and are marked `cancelled` in the row — IDs are never reused. See [ADR-009](adr/ADR-009-feature-numbering-after-007.md).
 - Dependency edges in **Depends on** are advisory; an enforcement test (`RoadmapCompletenessTests`) is planned but not required for the planning-stage docs to land.
 - This roadmap covers the gaps identified in the 2026-04-25 gap analysis; new gaps discovered later should append rows beyond F-050.

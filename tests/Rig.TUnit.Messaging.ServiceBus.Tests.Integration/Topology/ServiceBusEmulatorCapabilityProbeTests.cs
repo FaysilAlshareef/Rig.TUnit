@@ -18,7 +18,7 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var subName = $"probe-session-{Guid.NewGuid():N}";
 
         // Act — create topic + session-enabled subscription idempotently
@@ -43,7 +43,7 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var subName = $"probe-sqlfilter-{Guid.NewGuid():N}";
 
         if (!await admin.TopicExistsAsync(ProbeTopic, ct))
@@ -69,7 +69,7 @@ public sealed class ServiceBusEmulatorCapabilityProbeTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var topicName = $"probe-partitioned-{Guid.NewGuid():N}";
 
         // Act — emulator v1.1.2 may or may not honour EnablePartitioning

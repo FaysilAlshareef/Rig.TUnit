@@ -18,7 +18,7 @@ public sealed class ServiceBusSessionListenerTests
         const int sessionCount = 10;
         const int messagesPerSession = 10;
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"sess-cap-{Guid.NewGuid():N}";
 
@@ -68,7 +68,7 @@ public sealed class ServiceBusSessionListenerTests
         const int sessionCount = 5;
         const int messagesPerSession = 20;
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"sess-ord-{Guid.NewGuid():N}";
 

@@ -15,7 +15,7 @@ public sealed class DlqRedriveTests
         // Arrange — create subscription with MaxDeliveryCount=3 so 3 abandons move message to DLQ
         var testId = Guid.NewGuid().ToString("N");
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var subName = $"dlq-drive-{Guid.NewGuid():N}";
 
         var subOptions = new CreateSubscriptionOptions(Topic, subName) { MaxDeliveryCount = 3 };

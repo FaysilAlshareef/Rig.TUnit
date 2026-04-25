@@ -15,7 +15,7 @@ public sealed class ServiceBusAdminEmulatorTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var topicName = $"admin-test-{Guid.NewGuid():N}";
         var subName = "admin-sub";
@@ -39,7 +39,7 @@ public sealed class ServiceBusAdminEmulatorTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var topicName = $"filter-test-{Guid.NewGuid():N}";
         var subName = "eu-sub";
@@ -70,7 +70,7 @@ public sealed class ServiceBusAdminEmulatorTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var topicName = $"session-test-{Guid.NewGuid():N}";
         var subName = "session-sub";

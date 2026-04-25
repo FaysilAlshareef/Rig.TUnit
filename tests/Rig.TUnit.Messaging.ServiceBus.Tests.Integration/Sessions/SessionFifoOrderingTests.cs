@@ -18,7 +18,7 @@ public sealed class SessionFifoOrderingTests
         const int sessionCount = 10;
         const int messagesPerSession = 10;
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"sess-fifo-{Guid.NewGuid():N}";
 

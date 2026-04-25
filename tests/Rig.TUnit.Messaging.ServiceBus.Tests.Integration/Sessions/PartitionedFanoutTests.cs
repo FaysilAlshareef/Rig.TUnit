@@ -19,7 +19,7 @@ public sealed class PartitionedFanoutTests
         var partitionKeys = Enumerable.Range(0, keyCount).Select(i => $"pk-{i}").ToArray();
 
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var subName = $"fanout-{Guid.NewGuid():N}";
 

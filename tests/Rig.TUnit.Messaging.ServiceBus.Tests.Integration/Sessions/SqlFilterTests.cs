@@ -16,7 +16,7 @@ public sealed class SqlFilterTests
         // Arrange — EU sub has SqlRuleFilter("Region='EU'"); all-sub receives everything
         var testId = Guid.NewGuid().ToString("N");
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var helper = new ServiceBusAdministrationHelper(admin);
         var euSubName = $"sql-eu-{Guid.NewGuid():N}";
         var allSubName = $"sql-all-{Guid.NewGuid():N}";

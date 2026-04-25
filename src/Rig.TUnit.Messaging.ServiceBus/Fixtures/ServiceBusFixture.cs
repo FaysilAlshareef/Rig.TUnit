@@ -35,6 +35,23 @@ public sealed class ServiceBusFixture : MessagingFixtureBase
     public override string ConnectionString => _container?.GetConnectionString()
         ?? throw new InvalidOperationException("InitializeAsync must run first");
 
+    /// <summary>
+    /// Admin/management connection string for use with
+    /// <c>ServiceBusAdministrationClient</c>. The ServiceBus emulator exposes
+    /// management operations on a separate HTTP port (5300 by default), distinct
+    /// from the AMQP messaging port (5672). The standard <see cref="ConnectionString"/>
+    /// only carries the AMQP endpoint — admin-client requests against it produce
+    /// <c>HttpIOException: The response ended prematurely</c> because the AMQP
+    /// port doesn't speak HTTP. Use this property when constructing
+    /// <c>ServiceBusAdministrationClient</c> instances.
+    /// See <see href="https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator#choosing-the-right-connection-string">
+    /// official docs</see> and
+    /// <see href="https://github.com/testcontainers/testcontainers-dotnet/blob/develop/src/Testcontainers.ServiceBus/ServiceBusContainer.cs">
+    /// Testcontainers source</see>.
+    /// </summary>
+    public string AdminConnectionString => _container?.GetHttpConnectionString()
+        ?? throw new InvalidOperationException("InitializeAsync must run first");
+
     public override async Task InitializeAsync()
     {
         if (_container is not null)

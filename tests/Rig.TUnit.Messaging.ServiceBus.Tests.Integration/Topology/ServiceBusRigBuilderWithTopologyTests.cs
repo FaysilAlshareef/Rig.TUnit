@@ -16,7 +16,7 @@ public sealed class ServiceBusRigBuilderWithTopologyTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var topicName = $"rig-topology-{Guid.NewGuid():N}";
         var subName = "rig-sub";
         var queueName = $"rig-queue-{Guid.NewGuid():N}";
@@ -52,7 +52,7 @@ public sealed class ServiceBusRigBuilderWithTopologyTests
     {
         // Arrange
         var fx = await SharedServiceBusFixture.GetAsync();
-        var admin = new ServiceBusAdministrationClient(fx.ConnectionString);
+        var admin = new ServiceBusAdministrationClient(fx.AdminConnectionString);
         var topicName = $"rig-idempotent-{Guid.NewGuid():N}";
 
         ServiceBusRigBuilder? captured = null;

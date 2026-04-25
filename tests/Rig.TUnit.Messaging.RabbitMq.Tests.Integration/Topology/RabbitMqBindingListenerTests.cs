@@ -17,7 +17,7 @@ public sealed class RabbitMqBindingListenerTests
         var exchange = $"bind-test-{Guid.NewGuid():N}";
         var queue    = $"bind-q-{Guid.NewGuid():N}";
 
-        await using var sender = new RabbitMqEventSender(fx.ConnectionString, exchange);
+        await using var sender = new RabbitMqEventSender(fx.ConnectionString, exchange: exchange);
 
         // RabbitMqListener with exchange + binding — CS1061 RED until T041-GREEN
         await using var listener = new RabbitMqListener(

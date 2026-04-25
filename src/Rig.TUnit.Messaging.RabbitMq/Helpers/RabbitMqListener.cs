@@ -47,7 +47,30 @@ public sealed class RabbitMqListener : ListenerBase<BasicDeliverEventArgs>, IAsy
         var factory = new ConnectionFactory { Uri = new Uri(_connectionString) };
         _connection = await factory.CreateConnectionAsync(ct).ConfigureAwait(false);
         _channel = await _connection.CreateChannelAsync(cancellationToken: ct).ConfigureAwait(false);
-        await _channel.QueueDeclareAsync(_queue, durable: false, exclusive: false, autoDelete: false, arguments: null, cancellationToken: ct).ConfigureAwait(false);
+
+        // Passive-then-active queue declare: passive (`QueueDeclarePassiveAsync`)
+        // verifies an existing queue without redefining its arguments — this avoids
+        // PRECONDITION_FAILED when topology pre-declared the queue with custom
+        // args (x-max-priority, x-dead-letter-exchange, x-queue-type=quorum, etc.).
+        // If the queue does not exist, the broker closes the channel with a 404
+        // (OperationInterruptedException, ReplyCode == 404 / NotFound); we then
+        // open a fresh channel and create the queue with no args (legacy path
+        // for tests that don't use the topology builder). The catch is
+        // narrowly-filtered on ShutdownReason.ReplyCode, so any other broker
+        // failure (auth, connection lost, etc.) propagates to the caller.
+        try
+        {
+            await _channel.QueueDeclarePassiveAsync(_queue, ct).ConfigureAwait(false);
+        }
+        catch (RabbitMQ.Client.Exceptions.OperationInterruptedException ex)
+            when (ex.ShutdownReason?.ReplyCode == 404)
+        {
+            await _channel.DisposeAsync().ConfigureAwait(false);
+            _channel = await _connection.CreateChannelAsync(cancellationToken: ct).ConfigureAwait(false);
+            await _channel.QueueDeclareAsync(
+                _queue, durable: false, exclusive: false, autoDelete: false,
+                arguments: null, cancellationToken: ct).ConfigureAwait(false);
+        }
 
         if (_exchange is not null)
         {

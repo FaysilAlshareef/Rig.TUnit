@@ -68,8 +68,14 @@ public sealed class RabbitMqTopologyBuilder : IRabbitMqTopologyBuilder
 
         foreach (var q in _queues)
         {
+            // Quorum queues are inherently durable — declaring `durable: false` on a
+            // queue with `x-queue-type: quorum` is rejected by RabbitMQ with
+            // PRECONDITION_FAILED ("invalid property 'non-durable'").
+            var isQuorum = q.Arguments.TryGetValue("x-queue-type", out var qType)
+                && string.Equals(qType?.ToString(), "quorum", StringComparison.Ordinal);
+
             await channel.QueueDeclareAsync(
-                q.Name, durable: false, exclusive: false, autoDelete: false,
+                q.Name, durable: isQuorum, exclusive: false, autoDelete: false,
                 arguments: q.Arguments.Count > 0 ? q.Arguments : null,
                 cancellationToken: ct).ConfigureAwait(false);
         }

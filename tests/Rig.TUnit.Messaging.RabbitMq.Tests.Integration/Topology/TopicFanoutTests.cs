@@ -35,7 +35,7 @@ public sealed class TopicFanoutTests
 
         await captured!.ApplyTopologyAsync(ct);                  // CS1061 RED
 
-        await using var sender = new RabbitMqEventSender(fx.ConnectionString, exchange);
+        await using var sender = new RabbitMqEventSender(fx.ConnectionString, exchange: exchange);
         await using var userListener  = new RabbitMqListener(fx.ConnectionString, userQueue);
         await using var orderListener = new RabbitMqListener(fx.ConnectionString, orderQueue);
         await using var stockListener = new RabbitMqListener(fx.ConnectionString, stockQueue);

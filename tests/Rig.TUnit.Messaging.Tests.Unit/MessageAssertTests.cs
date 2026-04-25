@@ -104,7 +104,7 @@ public sealed class MessageAssertTests
     public Task WithHeader_MatchingHeader_DoesNotThrow()
     {
         var headers = new Dictionary<string, string> { ["x-tenant"] = "acme" };
-        var msg = new CapturedMessage<string>("body", DateTimeOffset.UtcNow, headers, null, null);
+        var msg = new CapturedMessage<string>("body", DateTimeOffset.UtcNow, headers, string.Empty, null);
 
         MessageAssert.WithHeader(msg, "x-tenant", "acme");
         return Task.CompletedTask;
@@ -114,7 +114,7 @@ public sealed class MessageAssertTests
     public async Task WithHeader_WrongHeaderValue_ThrowsInvalidOperationException()
     {
         var headers = new Dictionary<string, string> { ["x-tenant"] = "acme" };
-        var msg = new CapturedMessage<string>("body", DateTimeOffset.UtcNow, headers, null, null);
+        var msg = new CapturedMessage<string>("body", DateTimeOffset.UtcNow, headers, string.Empty, null);
 
         await Assert.That(() => MessageAssert.WithHeader(msg, "x-tenant", "other"))
             .ThrowsExactly<InvalidOperationException>();

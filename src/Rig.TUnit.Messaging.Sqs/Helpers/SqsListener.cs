@@ -63,6 +63,7 @@ public sealed class SqsListener : ListenerBase<Message>, IAsyncDisposable
                     MaxNumberOfMessages = 10,
                     WaitTimeSeconds = 5,
                     MessageAttributeNames = ["All"],
+                    MessageSystemAttributeNames = ["All"],
                 }, ct).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
@@ -88,12 +89,16 @@ public sealed class SqsListener : ListenerBase<Message>, IAsyncDisposable
 
                 headers.TryGetValue("x-correlation-id", out var correlationId);
 
+                string? sessionKey = null;
+                msg.Attributes?.TryGetValue("MessageGroupId", out sessionKey);
+
                 Record(new CapturedMessage<Message>(
                     msg,
                     _clock.GetUtcNow(),
                     headers,
-                    msg.Body,
-                    correlationId));
+                    msg.Body ?? string.Empty,
+                    correlationId,
+                    sessionKey));
 
                 await _client.DeleteMessageAsync(_queueUrl, msg.ReceiptHandle, ct).ConfigureAwait(false);
             }

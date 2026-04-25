@@ -6,6 +6,66 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 
 ## [Unreleased]
 
+### Added — Feature 007 Phases 0+1+2+3 (planned release N+1: SendContext · ServiceBus · Kafka · SQS)
+
+- `SendContext` record — unified `SessionKey`, `PartitionKey`, `DeduplicationKey` fields shared
+  by all messaging providers; `BuildHeaders(SendContext, …)` overload on `EventSenderBase`.
+  `CapturedMessage<TMessage>.Body` narrowed from `string?` → `string`; `SessionKey` added
+  to `CapturedMessage<TMessage>` (FR-007-01 — T000).
+- `ITopologyBuilder` marker interface; `ProviderCompletenessTests` parity gate +
+  `.parity-coverage.txt` automation (FR-007-03 — T001/T002/T003).
+- **Azure Service Bus**: `ServiceBusEventSender.SendAsync(SendContext)` overload sets session
+  ID, `MessageId` (deduplication), and partition key on the outgoing `ServiceBusMessage`
+  (T010). `ServiceBusSessionListener` wraps the native `ServiceBusSessionProcessor` and
+  surfaces `CapturedMessage.SessionKey` from the session ID (T011). `IServiceBusTopologyBuilder`
+  + `ServiceBusTopologyBuilder` (topic + subscription + rule + max-size configuration);
+  `ServiceBusRigBuilder.WithTopology` hook (T012/T013).
+- **Apache Kafka**: `KafkaEventSender.SendAsync(SendContext)` sets `Message.Key` from
+  `PartitionKey ?? SessionKey` for per-key partition affinity (T020/T021). `IKafkaTopologyBuilder`
+  + `KafkaTopologyBuilder` (topic + partition + replication-factor); `KafkaRigBuilder.WithTopology`
+  hook (T022/T023). `TopicPartitionOffsetSnapshot` utility for per-partition offset assertions
+  (T024).
+- **Amazon SQS**: `SqsEventSender.SendAsync(SendContext)` routes `SessionKey` →
+  `MessageGroupId` and `DeduplicationKey` → `MessageDeduplicationId` for FIFO queues (T030).
+  `IQueueTopologyBuilder` + `SqsTopologyBuilder` (standard + FIFO + DLQ binding);
+  `SqsRigBuilder.WithTopology` hook (T031/T032).
+- Architecture guard: `ProviderCompletenessTests` enforces `WithTopology`, `SendContext`
+  overload, and session-listener invariants for every assembly listed in
+  `.parity-coverage.txt` (FR-007-08).
+
+### Added — Feature 007 Phase 5 (planned release N+3: NATS JetStream)
+
+- **NATS JetStream**: `NatsJetStreamFixture` — Testcontainers-backed fixture exposing an
+  `INatsJSContext` (`JetStream` property), `EnsureStreamAsync(name, subjects, maxMsgs?, ct)` with
+  idempotent create-or-update semantics, and `GetStreamAsync(name, ct)` (T051).
+  `NatsJetStreamEventSender` publishes via `INatsJSContext.PublishAsync` and writes
+  `x-session-key` NATS header when `SendContext.SessionKey` is set (T052).
+  `NatsJetStreamListener` creates an ordered consumer per `NatsJSOrderedConsumerOpts`
+  with optional `FilterSubjects`, reads `x-session-key` into `CapturedMessage.SessionKey`,
+  and acknowledges each message via `AckAsync` (T053).
+  `INatsTopologyBuilder` + `NatsTopologyBuilder` (stream + subjects + max-messages +
+  retention-policy via `NatsRetentionPolicy.{Limits,Interest,WorkQueue}`); idempotency via
+  `NatsJSApiException(Code == 400)` → `UpdateStreamAsync` (T054).
+  `NatsRigBuilder.WithTopology` hook + `ApplyTopologyAsync`; `UseNats(NatsJetStreamFixture, …)`
+  extension overload passes `fixture.JetStream` into the builder.
+- Architecture parity: `Rig.TUnit.Messaging.Nats` appended to `.parity-coverage.txt` —
+  all 5 messaging providers now at full Feature-007 parity.
+  `DependencyDirectionTests.NatsJetStream_ReferencedOnlyByNatsProvider` guards against
+  accidental `NATS.Client.JetStream` leakage into other provider assemblies.
+
+### Added — Feature 007 Phase 4 (planned release N+2: RabbitMQ topology)
+
+- **RabbitMQ**: `RabbitMqEventSender.SendAsync(SendContext)` sets `RoutingKey` from
+  `PartitionKey ?? SessionKey` and propagates deduplication key via `MessageId` header (T040).
+  `RabbitMqSessionListener` reads `x-session-key` from AMQP message headers and surfaces it
+  in `CapturedMessage.SessionKey` (T041). `IRabbitMqTopologyBuilder` + `RabbitMqTopologyBuilder`
+  supporting topic-exchange fan-out with `BindQueue(queue, routingKey)`, DLX routing via
+  `WithDeadLetterExchange`, per-queue `WithMaxPriority` for priority queues, and
+  `WithQuorumQueue()` for HA quorum queues (T042/T043). `RabbitMqRigBuilder.WithTopology` hook.
+- Architecture parity: `Rig.TUnit.Messaging.RabbitMq` appended to `.parity-coverage.txt`;
+  `ProviderCompletenessTests` suite extends coverage to RabbitMQ topology + session-listener
+  invariants.
+
 ### Added — Feature 005 (Legacy Coverage & Docs Parity)
 - MTP-native `--coverage` collection on every `integration-*` CI job (FR-020).
 - `coverage-summary` CI job merging cobertura → Html + Markdown via ReportGenerator,

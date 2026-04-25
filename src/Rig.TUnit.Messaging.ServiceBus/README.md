@@ -1,6 +1,6 @@
 # Rig.TUnit.Messaging.ServiceBus
 
-> Microsoft-official Azure ServiceBus emulator fixture (`servicebus-emulator` + SQL Edge sidecar).
+> Microsoft-official Azure ServiceBus emulator fixture (`servicebus-emulator` + SQL Edge sidecar) with native session FIFO listener and runtime topology administration.
 
 ## What this package is
 
@@ -8,15 +8,38 @@ The Rig.TUnit Azure ServiceBus provider. `ServiceBusFixture` orchestrates
 Microsoft's official ServiceBus emulator
 (`mcr.microsoft.com/azure-messaging/servicebus-emulator`) plus the
 required SQL Edge sidecar (per C-001 — emulator uses SQL for internal
-state). EULA acceptance is mandatory: options.AcceptEula must be set to
-true explicitly. Ships session-aware `ServiceBusListener` /
-`ServiceBusEventSender` helpers.
+state). EULA acceptance is mandatory: `options.AcceptEula` must be set
+to `true` explicitly. Ships:
+
+- **`ServiceBusEventSender`** — sender with `SendContext` overload
+  mapping `SessionKey` → `SessionId`, `PartitionKey` → `PartitionKey`
+  (with equality validation), `DeduplicationKey` → `MessageId`.
+- **`ServiceBusListener`** — non-session subscription processor.
+- **`ServiceBusSessionListener`** — session-aware processor on top of
+  `ServiceBusClient.CreateSessionProcessor`; populates
+  `CapturedMessage.SessionKey` from the broker's `SessionId` and
+  surfaces broker errors via `ObservedErrors` / `LastError`.
+- **`ServiceBusAdministrationHelper`** — wraps
+  `ServiceBusAdministrationClient` (≥ 7.20.1) with idempotent
+  create-or-update operations for topics, subscriptions (with
+  `RequiresSession`, `MaxDeliveryCount`, `LockDuration`), SQL rule
+  filters, and queues.
+- **`ServiceBusTopologyBuilder`** + provider-scoped interfaces
+  (`IServiceBusTopologyBuilder`, `IServiceBusTopicConfig`,
+  `IServiceBusSubscriptionConfig`, `IServiceBusQueueConfig`) wired to
+  the rig via `ServiceBusRigBuilder.WithTopology(…)`.
+- **`ServiceBusDeadLetterProbe`** — DLQ inspection helper for tests
+  that assert poison-message routing.
 
 ## When to use it
 
-- Integration tests for Azure ServiceBus topics/subscriptions/queues.
-- Asserting session-ordered delivery guarantees.
-- Verifying dead-letter + retry behaviour.
+- Integration tests for Azure Service Bus topics, subscriptions, and queues.
+- Asserting session-ordered delivery (`OrderingAssert.PerKeyMonotonic`
+  with `SessionKey`).
+- Declaring topology at runtime from test code — no
+  `service-bus-config.json` seed required (per Feature 007 T016).
+- Verifying SQL rule filter routing (e.g. `Region='EU'`).
+- Verifying dead-letter + retry behaviour at `MaxDeliveryCount`.
 - **Not for**: unit tests; mock `ServiceBusSender` / `ServiceBusReceiver`.
 
 ## Prerequisites
@@ -30,15 +53,43 @@ true explicitly. Ships session-aware `ServiceBusListener` /
 
 ```csharp
 using Azure.Messaging.ServiceBus;
+using Azure.Messaging.ServiceBus.Administration;
+using Rig.TUnit.Messaging.Helpers;
 using Rig.TUnit.Messaging.ServiceBus.Fixtures;
-using Rig.TUnit.Messaging.ServiceBus.Senders;
+using Rig.TUnit.Messaging.ServiceBus.Helpers;
+using Rig.TUnit.Messaging.ServiceBus.Topology;
 
-await using var fx = new ServiceBusFixture();
+// 1) Spin the emulator + SQL sidecar.
+await using var fx = new ServiceBusFixture(o => o.AcceptEula = true);
 await fx.InitializeAsync();
 
-await using var sender = new ServiceBusEventSender(
-    new ServiceBusClient(fx.ConnectionString), topic: "orders");
-await sender.SendAsync("{\"orderId\":1}", correlationId: "abc");
+// 2) Provision topology at runtime via the admin client (no JSON seed).
+var admin   = new ServiceBusAdministrationClient(fx.ConnectionString);
+var helper  = new ServiceBusAdministrationHelper(admin);
+await helper.CreateSubscriptionIfNotExistsAsync(
+    "orders", "shipping", requiresSession: true, ct);
+
+// 3) Send + receive with native session FIFO.
+await using var client   = new ServiceBusClient(fx.ConnectionString);
+await using var sender   = new ServiceBusEventSender(client, "orders");
+await using var listener = new ServiceBusSessionListener(client, "orders", "shipping");
+
+await listener.StartAsync(ct);
+await sender.SendAsync(
+    "{\"orderId\":1}",
+    context: new SendContext(SessionKey: "customer-42"),
+    ct: ct);
+```
+
+Equivalent with the `WithTopology` rig hook:
+
+```csharp
+services.AddRigTUnit(rig =>
+    rig.UseServiceBus(RigConnect.FromValue(cs), sb =>
+        sb.WithTopology(t =>
+            t.Topic("orders")
+             .Subscription("orders", "shipping", s => s.WithRequiresSession())
+             .Subscription("orders", "billing"))));
 ```
 
 ## Options
@@ -55,9 +106,19 @@ await sender.SendAsync("{\"orderId\":1}", correlationId: "abc");
 
 - `Rig.TUnit.Messaging.ServiceBus.Fixtures.ServiceBusFixture`
 - `Rig.TUnit.Messaging.ServiceBus.Options.ServiceBusFixtureOptions`
-- `Rig.TUnit.Messaging.ServiceBus.Builder.ServiceBusRigBuilder`
-- `Rig.TUnit.Messaging.ServiceBus.Listeners.ServiceBusListener`
-- `Rig.TUnit.Messaging.ServiceBus.Senders.ServiceBusEventSender`
+- `Rig.TUnit.Messaging.ServiceBus.Builder.ServiceBusRigBuilder` —
+  ships `WithTopology(Action<IServiceBusTopologyBuilder>)`.
+- `Rig.TUnit.Messaging.ServiceBus.Helpers.ServiceBusListener`
+- `Rig.TUnit.Messaging.ServiceBus.Helpers.ServiceBusSessionListener` —
+  exposes `ObservedSessions`, `ObservedErrors`, `LastError`.
+- `Rig.TUnit.Messaging.ServiceBus.Helpers.ServiceBusEventSender` —
+  ships `SendAsync(string, SendContext, …)` overload.
+- `Rig.TUnit.Messaging.ServiceBus.Topology.IServiceBusTopologyBuilder`
+- `Rig.TUnit.Messaging.ServiceBus.Topology.IServiceBusTopicConfig` ·
+  `IServiceBusSubscriptionConfig` · `IServiceBusQueueConfig`
+- `Rig.TUnit.Messaging.ServiceBus.Topology.ServiceBusTopologyBuilder`
+- `Rig.TUnit.Messaging.ServiceBus.Topology.ServiceBusAdministrationHelper`
+- `Rig.TUnit.Messaging.ServiceBus.Helpers.ServiceBusDeadLetterProbe`
 
 ## Per-test isolation
 
@@ -85,13 +146,26 @@ See [docs/troubleshooting.md#servicebus](../../docs/troubleshooting.md).
 
 ## Provider quirks + edge cases
 
-- ServiceBus sessions preserve FIFO *within* a session; cross-session
-  ordering is best-effort. Tests must declare session IDs explicitly.
-- The emulator diverges from production on: advanced filter expressions
-  (SQL filter types), auto-forwarding, dead-letter TTL semantics.
-  Tests relying on these must run against real Azure.
-- Messages over 256 KB require `premium` tier — the emulator enforces
-  the 256 KB limit.
+- Service Bus sessions preserve FIFO *within* a session; cross-session
+  ordering is best-effort. Tests must declare session IDs explicitly via
+  `SendContext.SessionKey` and assert with
+  `OrderingAssert.PerKeyMonotonic(listener, m => m.SessionKey, …)`.
+- `SendContext.SessionKey` and `SendContext.PartitionKey` must be equal
+  if both are supplied on a session-aware entity — `ServiceBusEventSender`
+  throws `InvalidOperationException` before the broker round-trip.
+- `SendContext.DeduplicationKey` requires `RequiresDuplicateDetection`
+  on the entity; the topology builder exposes
+  `IServiceBusQueueConfig.WithDuplicateDetection(TimeSpan)` /
+  `IServiceBusSubscriptionConfig.WithDuplicateDetection(TimeSpan)`.
+- Topology is applied idempotently (`CreateOrUpdate*`), so re-running
+  the same `WithTopology` declaration in a parallel test is safe.
+- Emulator capability gaps (probed by
+  `ServiceBusEmulatorCapabilityProbeTests`) are documented in
+  [`docs/providers/service-bus.md`](../../docs/providers/service-bus.md).
+  Tests that need un-emulated features (advanced SQL filter types,
+  auto-forwarding, dead-letter TTL semantics, partitioned-entity
+  reconfiguration, premium-tier > 256 KB messages) must run against
+  real Azure and use `[Skip]` on the emulator path per C-004.
 
 ## Benchmarks
 
@@ -102,7 +176,12 @@ baseline in `benchmarks/baseline-005.json`.
 
 - [Architecture diagram](../../docs/architecture-diagram.md)
 - [Glossary](../../docs/glossary.md)
+- Provider deep-dive: [`docs/providers/service-bus.md`](../../docs/providers/service-bus.md)
+  (session FIFO, `WithTopology`, emulator capability table, JSON-seed
+  migration).
 - Family base: [`Rig.TUnit.Messaging`](../Rig.TUnit.Messaging/README.md)
+- Feature design: [Sessions & Partitions](../../planning/messaging-topology-and-sessions/Sessions-And-Partitions-Design.md) ·
+  [Topology Builder](../../planning/messaging-topology-and-sessions/Topology-Builder-Design.md)
 
 ## License
 

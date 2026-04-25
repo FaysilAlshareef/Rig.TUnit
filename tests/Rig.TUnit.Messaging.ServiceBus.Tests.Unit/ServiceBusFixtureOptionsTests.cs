@@ -22,7 +22,7 @@ public sealed class ServiceBusFixtureOptionsTests
     {
         var options = new ServiceBusFixtureOptions();
 
-        await Assert.That(options.ImageTag).IsEqualTo("1.1.2");
+        await Assert.That(options.ImageTag).IsEqualTo("2.0.0");
         await Assert.That(options.SqlEdgeImageTag).IsEqualTo("1.0.7");
         await Assert.That(options.ConfigFilePath).IsEqualTo("TestInfrastructure/service-bus-config.json");
         await Assert.That(options.AcceptEula).IsTrue();

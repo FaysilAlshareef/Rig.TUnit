@@ -30,7 +30,7 @@ by providing:
 |--------|---------|
 | **SQL databases** | `SqlServer` · `MySql` · `Postgresql` · `Oracle` · `Sqlite` |
 | **NoSQL databases** | `Redis` · `Mongo` · `Cosmos` · `Cassandra` · `Dynamo` · `ElasticSearch` · `KurrentDb` |
-| **Messaging** | `ServiceBus` · `Kafka` · `RabbitMq` · `Nats` · `Sqs` |
+| **Messaging** | `ServiceBus` · `Kafka` · `RabbitMq` · `Nats` · `Sqs` — with a shared `SendContext` (session / partition / deduplication keys) and provider-specific `WithTopology(...)` hooks |
 | **Caching** | `Redis` · `Memory` · `Fusion` · `Hybrid` |
 | **Storage** | `AzureBlob` · `FileSystem` · `MinIO` · `S3` |
 | **Observability** | `Logging` · `AppInsights` · `Metrics` · `Tracing` · `Seq` |
@@ -109,6 +109,162 @@ services.AddRigTUnit(rig =>
 
 ---
 
+## Messaging topology & sessions
+
+All messaging providers share a unified `SendContext` record that carries cross-cutting keys:
+
+| Field | Provider mapping | Purpose |
+|-------|-----------------|---------|
+| `SessionKey` | ServiceBus session ID · SQS MessageGroupId · NATS `x-session-key` header | FIFO ordering per group |
+| `PartitionKey` | Kafka message key · RabbitMQ routing key | Partition / exchange routing |
+| `DeduplicationKey` | ServiceBus `MessageId` · SQS deduplication ID | Idempotent send |
+
+Pass a `SendContext` to any `*EventSender.SendAsync` overload:
+
+```csharp
+await sender.SendAsync("payload", context: new SendContext(SessionKey: "order-42"), ct: ct);
+```
+
+### Provider examples
+
+**Azure Service Bus — session FIFO**
+
+```csharp
+await using var sender   = new ServiceBusEventSender(client, "orders");
+await using var listener = new ServiceBusSessionListener(client, "orders", "shipping-sessions");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+**Apache Kafka — partition-key routing**
+
+```csharp
+await using var sender   = new KafkaEventSender(fixture.ConnectionString, "orders");
+var listener = new KafkaListener(fixture.ConnectionString, "orders", "grp");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(PartitionKey: "cust-1"), ct: ct);
+```
+
+**Amazon SQS — FIFO group ordering**
+
+```csharp
+var sender   = new SqsEventSender(fixture.Client, fifoQueueUrl);
+var listener = new SqsListener(fixture.Client, fifoQueueUrl);
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+**RabbitMQ — topic exchange fan-out**
+
+```csharp
+builder.WithTopology(t =>
+    t.Exchange("events", ExchangeType.Topic)
+     .BindQueue("order-queue", "order.*"));
+await captured.ApplyTopologyAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(PartitionKey: "order.created"), ct: ct);
+```
+
+**NATS JetStream — ordered consumer**
+
+```csharp
+var fx = await SharedNatsJetStreamFixture.GetAsync();
+builder.WithTopology(t => t.Stream("events", cfg => cfg.WithSubjects("events.>")));
+await captured.ApplyTopologyAsync(ct);
+await using var sender   = new NatsJetStreamEventSender(fx.JetStream, "events.orders");
+await using var listener = new NatsJetStreamListener(fx.JetStream, "events", "events.orders");
+await listener.StartAsync(ct);
+await sender.SendAsync("msg", context: new SendContext(SessionKey: "cust-1"), ct: ct);
+```
+
+### `WithTopology` hook
+
+Every messaging provider exposes a strongly-typed `WithTopology` builder hook on its
+`{Provider}RigBuilder`. The base `MessagingRigBuilder<TSelf>` deliberately does **not**
+declare a generic `WithTopology` — each provider's surface is legitimately different and
+the type system carries that constraint.
+
+| Provider | Hook returns | Top-level concepts |
+|----------|-------------|--------------------|
+| Azure Service Bus | `IServiceBusTopologyBuilder` | `Topic` · `Subscription` (with `RequiresSession`, `MaxDeliveryCount`, SQL rule filter) · `Queue` · `WithDeadLetter` |
+| Apache Kafka | `IKafkaTopologyBuilder` | `Topic` (with `WithPartitions`, `WithReplicationFactor`, `WithConfig`) |
+| RabbitMQ | `IRabbitMqTopologyBuilder` | `Exchange(name, ExchangeType)` · `Queue` (with `WithMessageTtl`, `WithMaxLength`, `WithMaxPriority`, `WithDeadLetterExchange`, `WithQuorum`) · `Binding` |
+| Amazon SQS | `ISqsTopologyBuilder` | `Queue` (with `WithFifo`, `WithVisibilityTimeout`, `WithDeadLetter`, `WithMessageRetentionPeriod`) |
+| NATS JetStream | `INatsTopologyBuilder` | `Stream` (with `WithSubjects`, `WithMaxMessages`, `WithRetentionPolicy`) · `Consumer` |
+
+```csharp
+services.AddRigTUnit(rig =>
+    rig.UseServiceBus(source, sb =>
+        sb.WithTopology(t =>
+            t.Topic("orders")
+             .Subscription("orders", "shipping", s => s
+                 .WithRequiresSession()
+                 .WithMaxDeliveryCount(5)
+                 .WithDeadLetter("orders-dlq")))));
+```
+
+`ApplyAsync` is invoked automatically by the rig at fixture init and is **idempotent**:
+create-or-update on every provider, so tests can run in any order without pre-provisioning
+infrastructure and re-runs of the same declaration never throw.
+
+### Administration helpers (provision without the rig)
+
+When you don't own the rig but still need to provision broker topology — typical for
+parameterised integration tests, custom fixtures, or migration verification — the
+provider-specific admin helper is callable directly:
+
+```csharp
+// Service Bus — declarative topic + session subscription, no JSON seed.
+var admin  = new ServiceBusAdministrationClient(connectionString);
+var helper = new ServiceBusAdministrationHelper(admin);
+var subName = $"sess-{Guid.NewGuid():N}";
+await helper.CreateSubscriptionIfNotExistsAsync(
+    "orders", subName, requiresSession: true, ct);
+// ... use the subscription ...
+await admin.DeleteSubscriptionAsync("orders", subName, ct);
+```
+
+Each provider exposes the equivalent surface: Kafka via `Confluent.Kafka.AdminClient`
+(wrapped in `KafkaListener.EnsureTopicExistsAsync`), RabbitMQ via `IChannel` declarations
+in `RabbitMqListener.StartAsync`, NATS JetStream via `INatsJSContext` operations in
+`NatsTopologyBuilder.ApplyAsync`, SQS via `IAmazonSQS` in `SqsTopologyBuilder.ApplyAsync`.
+Each helper:
+
+- Returns gracefully when the resource already exists (create-or-update semantics).
+- Throws specifically when the broker rejects the operation for a real reason (e.g.
+  NATS `JSStreamNameExistErr` / 10058 → fall back to update; any other 400 → propagate).
+- Does **not** create test-state assumptions — every helper is callable from any test
+  framework, not just TUnit.
+
+### Session-aware listeners
+
+For providers with native session/group semantics, ship a dedicated listener that
+populates `CapturedMessage.SessionKey` from the broker's per-message ordering field:
+
+| Provider | Listener | Populates `SessionKey` from |
+|----------|----------|----------------------------|
+| Azure Service Bus | `ServiceBusSessionListener` | `ServiceBusReceivedMessage.SessionId` |
+| Apache Kafka | `KafkaListener` (with `Assign(int partition)`) | `Message.Key` (per partition) |
+| Amazon SQS FIFO | `SqsListener` | `MessageGroupId` attribute |
+| NATS JetStream | `NatsJetStreamListener` | `x-session-key` header |
+| RabbitMQ | `RabbitMqListener` (binding-aware) | `x-partition-key` header |
+
+```csharp
+await using var listener = new ServiceBusSessionListener(client, "orders", "shipping");
+await listener.StartAsync(ct);
+// ... messages flow ...
+OrderingAssert.PerKeyMonotonic(listener, m => m.SessionKey!, m => /* sequence */);
+```
+
+`ServiceBusSessionListener` also surfaces broker errors (lost session locks, auth
+failures) via `ObservedErrors` / `LastError` so they're assertable instead of silently
+discarded. `RabbitMqListener.Errors` carries decode failures (autoAck path).
+
+See the per-provider docs in [`docs/providers/`](docs/providers/) for full option
+references and the [ordering-assertions capability matrix](docs/ordering-assertions.md)
+for which provider supports which `OrderingAssert` mode.
+
+---
+
 ## Isolation
 
 Every fixture automatically derives an `IsolationKey` from TUnit's execution context:
@@ -150,7 +306,7 @@ var key = IsolationKey.FromName("shared-read-model");
 | Azure Service Bus | `Rig.TUnit.Messaging.ServiceBus` | `ServiceBusFixture` | `MessageAssert`, `OrderingAssert` |
 | Apache Kafka | `Rig.TUnit.Messaging.Kafka` | `KafkaFixture` | `MessageAssert` |
 | RabbitMQ | `Rig.TUnit.Messaging.RabbitMq` | `RabbitMqFixture` | `MessageAssert` |
-| NATS | `Rig.TUnit.Messaging.Nats` | `NatsFixture` | `MessageAssert` |
+| NATS | `Rig.TUnit.Messaging.Nats` | `NatsFixture` · `NatsJetStreamFixture` | `MessageAssert` |
 | Amazon SQS | `Rig.TUnit.Messaging.Sqs` | `SqsFixture` | `MessageAssert` |
 | Redis Cache | `Rig.TUnit.Caching.Redis` | `RedisCacheFixture` | — |
 | Memory Cache | `Rig.TUnit.Caching.Memory` | `MemoryCacheFixture` | `CacheAssert` |
@@ -283,6 +439,40 @@ The `.githooks/commit-msg` hook enforces valid prefixes on every commit:
 4. Open a pull request — CI will run the full suite automatically
 
 For significant changes, open an issue first to discuss the approach.
+
+---
+
+## How testing works
+
+Every public API in `Rig.TUnit.*` is covered by unit tests (≥ 90 % line / ≥ 85 % branch) and,
+for each provider, by integration tests that run against a real containerised broker via
+Testcontainers.
+
+Provider completeness is enforced by the architecture-test suite. A file called
+`.parity-coverage.txt` (in `tests/Rig.TUnit.Architecture.Tests/`) lists the messaging-provider
+assembly names that have reached full parity with the Feature-007 shape:
+
+```
+Rig.TUnit.Messaging.ServiceBus
+Rig.TUnit.Messaging.Kafka
+Rig.TUnit.Messaging.Sqs
+Rig.TUnit.Messaging.RabbitMq
+Rig.TUnit.Messaging.Nats
+```
+
+Each time a provider phase ships, its assembly name is appended to that file and the
+`ProviderCompletenessTests` suite immediately enforces three new invariants for it:
+
+1. **`WithTopology`** — the provider's `{Provider}RigBuilder` exposes a strongly-typed
+   `WithTopology(Action<I{Provider}TopologyBuilder>)` hook.
+2. **`SendContext` overload** — at least one `{Provider}EventSender` exposes a `SendAsync`
+   overload that accepts `SendContext` (carries `SessionKey`, `PartitionKey`, `DeduplicationKey`).
+3. **Session listener** (session/partition-capable providers only) — the assembly declares a
+   concrete `ListenerBase<T>` subtype that populates `CapturedMessage.SessionKey`.
+
+The file is intentionally empty at Phase 0 exit; all three assertions pass vacuously until the
+first provider phase appends its name. This keeps CI green during the phased rollout without
+requiring every provider to ship simultaneously.
 
 ---
 

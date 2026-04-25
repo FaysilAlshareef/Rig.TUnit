@@ -145,4 +145,35 @@ public sealed class DependencyDirectionTests
                 .Because($"{pkg} must depend only on base packages, not concrete providers");
         }
     }
+
+    [Test]
+    public async Task NatsJetStream_ReferencedOnlyByNatsProvider()
+    {
+        var nonNatsProviders = new[]
+        {
+            "Rig.TUnit.Messaging.ServiceBus",
+            "Rig.TUnit.Messaging.Kafka",
+            "Rig.TUnit.Messaging.Sqs",
+            "Rig.TUnit.Messaging.RabbitMq",
+        };
+
+        foreach (var provider in nonNatsProviders)
+        {
+            var assembly = AssemblyLoader.TryLoad(provider);
+            if (assembly is null)
+            {
+                continue;
+            }
+
+            var result = Types.InAssembly(assembly)
+                .That()
+                .HaveDependencyOn("NATS.Client.JetStream")
+                .GetTypes()
+                .ToArray();
+
+            await Assert.That(result)
+                .IsEmpty()
+                .Because($"{provider} must not depend on NATS.Client.JetStream");
+        }
+    }
 }

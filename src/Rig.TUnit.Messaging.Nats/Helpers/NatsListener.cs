@@ -85,7 +85,7 @@ public sealed class NatsListener : ListenerBase<NatsMessageRecord>, IAsyncDispos
                     new NatsMessageRecord(msg.Subject, msg.Data, headers),
                     _clock.GetUtcNow(),
                     headers,
-                    msg.Data,
+                    msg.Data ?? string.Empty,
                     correlationId));
             }
         }

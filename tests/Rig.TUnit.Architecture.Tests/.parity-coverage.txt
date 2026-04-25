@@ -1,0 +1,5 @@
+Rig.TUnit.Messaging.ServiceBus
+Rig.TUnit.Messaging.Kafka
+Rig.TUnit.Messaging.Sqs
+Rig.TUnit.Messaging.RabbitMq
+Rig.TUnit.Messaging.Nats

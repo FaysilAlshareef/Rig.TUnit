@@ -11,6 +11,9 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
     private readonly string _groupId;
     private readonly TimeProvider _clock;
     private readonly TimeSpan _joinTimeout;
+    private readonly int _partitions;
+    private readonly IReadOnlyDictionary<string, string>? _topicConfigs;
+    private int? _pinnedPartition;
     private CancellationTokenSource? _cts;
     private Task? _loop;
     private IConsumer<string, string>? _consumer;
@@ -21,7 +24,9 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         string topic,
         string groupId,
         TimeProvider? clock = null,
-        TimeSpan? joinTimeout = null)
+        TimeSpan? joinTimeout = null,
+        int partitions = 1,
+        IReadOnlyDictionary<string, string>? topicConfigs = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(bootstrapServers);
         ArgumentException.ThrowIfNullOrWhiteSpace(topic);
@@ -31,6 +36,18 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         _groupId = groupId;
         _clock = clock ?? TimeProvider.System;
         _joinTimeout = joinTimeout ?? TimeSpan.FromSeconds(30);
+        _partitions = partitions;
+        _topicConfigs = topicConfigs;
+    }
+
+    /// <summary>
+    /// Pins this listener to a single partition. Must be called before <see cref="StartAsync"/>.
+    /// Uses <c>IConsumer.Assign</c> (static assignment) instead of <c>Subscribe</c> (group-rebalance).
+    /// </summary>
+    public KafkaListener Assign(int partition)
+    {
+        _pinnedPartition = partition;
+        return this;
     }
 
     public override async Task StartAsync(CancellationToken ct)
@@ -55,7 +72,16 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         _consumer = new ConsumerBuilder<string, string>(config)
             .SetPartitionsAssignedHandler((_, _) => _partitionsAssigned.TrySetResult())
             .Build();
-        _consumer.Subscribe(_topic);
+
+        if (_pinnedPartition.HasValue)
+        {
+            _consumer.Assign([new TopicPartitionOffset(_topic, new Partition(_pinnedPartition.Value), Offset.Beginning)]);
+            _partitionsAssigned.TrySetResult();
+        }
+        else
+        {
+            _consumer.Subscribe(_topic);
+        }
 
         _loop = Task.Run(() => ConsumeLoop(_cts.Token), _cts.Token);
 
@@ -76,9 +102,17 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
         using var admin = new AdminClientBuilder(new AdminClientConfig { BootstrapServers = _bootstrap }).Build();
         try
         {
-            await admin.CreateTopicsAsync(
-                [new TopicSpecification { Name = _topic, NumPartitions = 1, ReplicationFactor = 1 }])
-                .WaitAsync(ct).ConfigureAwait(false);
+            var spec = new TopicSpecification
+            {
+                Name = _topic,
+                NumPartitions = _partitions,
+                ReplicationFactor = 1,
+            };
+            if (_topicConfigs is not null)
+            {
+                spec.Configs = new Dictionary<string, string>(_topicConfigs);
+            }
+            await admin.CreateTopicsAsync([spec]).WaitAsync(ct).ConfigureAwait(false);
         }
         catch (CreateTopicsException ex) when (ex.Results.All(r => r.Error.Code == ErrorCode.TopicAlreadyExists))
         {
@@ -148,7 +182,7 @@ public sealed class KafkaListener : ListenerBase<ConsumeResult<string, string>>,
                 result,
                 _clock.GetUtcNow(),
                 headers,
-                result.Message.Value,
+                result.Message.Value ?? string.Empty,
                 correlationId));
         }
     }

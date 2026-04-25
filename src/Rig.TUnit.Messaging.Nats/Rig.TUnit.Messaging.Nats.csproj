@@ -3,6 +3,7 @@
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.Nats" />
     <PackageReference Include="NATS.Client.Core" />
+    <PackageReference Include="NATS.Client.JetStream" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>

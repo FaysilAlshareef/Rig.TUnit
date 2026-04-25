@@ -1,5 +1,7 @@
 using System.Reflection;
 using Rig.TUnit.Architecture.Tests.Infrastructure;
+using Rig.TUnit.Messaging.Helpers;
+using Rig.TUnit.Messaging.Topology;
 
 namespace Rig.TUnit.Architecture.Tests.Rules;
 
@@ -16,6 +18,12 @@ namespace Rig.TUnit.Architecture.Tests.Rules;
 /// Deliberately does NOT duplicate <see cref="CodeOrganizationTests.AllFixtures_ExtendFixtureBase"/>
 /// (analysis finding #5): this rule only enforces the presence of the four canonical types.
 /// It reuses <see cref="AssemblyLoader"/> so Phase-4 packages appear automatically when they land.
+///
+/// Feature 007 (C-005) extension: additional tests assert every assembly listed in
+/// <c>.parity-coverage.txt</c> exposes <c>WithTopology(Action&lt;ITopologyBuilder&gt;)</c>,
+/// a <see cref="SendContext"/>-accepting sender overload, and — for session-capable providers —
+/// a concrete <c>ListenerBase&lt;&gt;</c> subtype. The file is empty at Phase 0 exit;
+/// each provider phase appends its assembly name on GREEN and flips its own assertions.
 /// </summary>
 public sealed class ProviderCompletenessTests
 {
@@ -78,6 +86,21 @@ public sealed class ProviderCompletenessTests
         ("Rig.TUnit.Observability.Tracing",           "by-design — telemetry-style"),
         ("Rig.TUnit.Observability.Seq",               "by-design — telemetry-style"),
     ];
+
+    /// <summary>
+    /// Session/partition-capable messaging providers. When one of these assemblies appears in
+    /// <c>.parity-coverage.txt</c>, it MUST expose a concrete <c>ListenerBase&lt;&gt;</c> subtype
+    /// (the listener that populates <c>CapturedMessage.SessionKey</c>).
+    /// </summary>
+    private static readonly HashSet<string> SessionCapableAssemblies = new(StringComparer.Ordinal)
+    {
+        "Rig.TUnit.Messaging.ServiceBus",
+        "Rig.TUnit.Messaging.Kafka",
+        "Rig.TUnit.Messaging.Nats",
+        "Rig.TUnit.Messaging.Sqs",
+    };
+
+    private const string ParityCoverageFileName = ".parity-coverage.txt";
 
     [Test]
     public async Task RequiredProviders_ExposeCanonicalTypes()
@@ -176,6 +199,195 @@ public sealed class ProviderCompletenessTests
         var nullFixtureEntries = RequiredProviders.Where(p => p.FixtureName is null).ToArray();
         await Assert.That(nullFixtureEntries.Length).IsGreaterThanOrEqualTo(1)
             .Because("At least one provider (Jwt) intentionally ships without a container-backed Fixture.");
+    }
+
+    [Test]
+    public async Task ParityCoverageFile_Exists_WithLoadableAssemblies()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, ParityCoverageFileName);
+
+        await Assert.That(File.Exists(path))
+            .IsTrue()
+            .Because(
+                $"{ParityCoverageFileName} drives the Feature-007 parity tests. T003-GREEN creates "
+                + "it empty; each provider phase appends its assembly name on GREEN.");
+
+        foreach (var line in ReadParityCoverageLines())
+        {
+            var assembly = AssemblyLoader.TryLoad(line);
+            await Assert.That(assembly)
+                .IsNotNull()
+                .Because(
+                    $"Parity coverage file references '{line}' but the assembly could not be loaded. "
+                    + "Either the file has a typo, or the assembly is not transitively referenced by "
+                    + "Rig.TUnit.Architecture.Tests.csproj.");
+        }
+    }
+
+    [Test]
+    public async Task Providers_InParityCoverage_DeclareWithTopology()
+    {
+        var offenders = new List<string>();
+
+        foreach (var line in ReadParityCoverageLines())
+        {
+            var assembly = AssemblyLoader.TryLoad(line);
+            if (assembly is null)
+            {
+                continue;
+            }
+
+            var builder = assembly
+                .GetExportedTypes()
+                .FirstOrDefault(t => t.IsClass && t.Name.EndsWith("RigBuilder", StringComparison.Ordinal));
+
+            if (builder is null)
+            {
+                offenders.Add($"{line}: no type whose name ends in 'RigBuilder'");
+                continue;
+            }
+
+            var hasWithTopology = builder
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Any(m =>
+                {
+                    if (!string.Equals(m.Name, "WithTopology", StringComparison.Ordinal))
+                    {
+                        return false;
+                    }
+
+                    var parameters = m.GetParameters();
+                    if (parameters.Length != 1)
+                    {
+                        return false;
+                    }
+
+                    var paramType = parameters[0].ParameterType;
+                    if (!paramType.IsGenericType || paramType.GetGenericTypeDefinition() != typeof(Action<>))
+                    {
+                        return false;
+                    }
+
+                    var actionArg = paramType.GetGenericArguments()[0];
+                    return typeof(ITopologyBuilder).IsAssignableFrom(actionArg);
+                });
+
+            if (!hasWithTopology)
+            {
+                offenders.Add(
+                    $"{line}.{builder.Name}: missing WithTopology(Action<T>) where T : ITopologyBuilder");
+            }
+        }
+
+        await Assert.That(offenders)
+            .IsEmpty()
+            .Because(
+                "Every assembly listed in .parity-coverage.txt must expose a strongly-typed "
+                + "WithTopology overload on its {Provider}RigBuilder (FR-007-02).");
+    }
+
+    [Test]
+    public async Task Providers_InParityCoverage_DeclareSendContextOverload()
+    {
+        var offenders = new List<string>();
+
+        foreach (var line in ReadParityCoverageLines())
+        {
+            var assembly = AssemblyLoader.TryLoad(line);
+            if (assembly is null)
+            {
+                continue;
+            }
+
+            var senders = assembly
+                .GetExportedTypes()
+                .Where(t => t.IsClass && t.Name.EndsWith("EventSender", StringComparison.Ordinal))
+                .ToArray();
+
+            if (senders.Length == 0)
+            {
+                offenders.Add($"{line}: no type whose name ends in 'EventSender'");
+                continue;
+            }
+
+            var anySenderHasOverload = senders.Any(sender => sender
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Any(m =>
+                    string.Equals(m.Name, "SendAsync", StringComparison.Ordinal)
+                    && m.GetParameters().Any(p => p.ParameterType == typeof(SendContext))));
+
+            if (!anySenderHasOverload)
+            {
+                offenders.Add($"{line}: no EventSender with a SendAsync(..., SendContext, ...) overload");
+            }
+        }
+
+        await Assert.That(offenders)
+            .IsEmpty()
+            .Because(
+                "Every assembly listed in .parity-coverage.txt must expose a SendContext-accepting "
+                + "SendAsync overload on at least one of its EventSender types (FR-007-01).");
+    }
+
+    [Test]
+    public async Task SessionCapableProviders_InParityCoverage_DeclareSessionListener()
+    {
+        var offenders = new List<string>();
+        var listenerBaseOpen = typeof(Rig.TUnit.Messaging.Helpers.ListenerBase<>);
+
+        foreach (var line in ReadParityCoverageLines())
+        {
+            if (!SessionCapableAssemblies.Contains(line))
+            {
+                continue;
+            }
+
+            var assembly = AssemblyLoader.TryLoad(line);
+            if (assembly is null)
+            {
+                continue;
+            }
+
+            var hasListener = assembly
+                .GetExportedTypes()
+                .Where(t => t is { IsClass: true, IsAbstract: false })
+                .Any(t => InheritsFromOpenGeneric(t, listenerBaseOpen));
+
+            if (!hasListener)
+            {
+                offenders.Add($"{line}: no concrete ListenerBase<T> subtype found");
+            }
+        }
+
+        await Assert.That(offenders)
+            .IsEmpty()
+            .Because(
+                "Session/partition-capable messaging providers must declare a concrete "
+                + "ListenerBase<T> subtype that populates CapturedMessage.SessionKey (FR-007-03).");
+    }
+
+    private static IEnumerable<string> ReadParityCoverageLines()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, ParityCoverageFileName);
+        if (!File.Exists(path))
+        {
+            return [];
+        }
+        return File.ReadAllLines(path)
+            .Select(l => l.Trim())
+            .Where(l => l.Length > 0);
+    }
+
+    private static bool InheritsFromOpenGeneric(Type type, Type openGeneric)
+    {
+        for (var current = type; current is not null && current != typeof(object); current = current.BaseType)
+        {
+            if (current.IsGenericType && current.GetGenericTypeDefinition() == openGeneric)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static bool IsStaticClass(Type t) => t is { IsClass: true, IsAbstract: true, IsSealed: true };

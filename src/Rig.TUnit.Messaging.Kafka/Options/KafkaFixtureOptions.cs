@@ -11,4 +11,7 @@ public sealed class KafkaFixtureOptions
 
     [Range(1, 600)]
     public int StartupTimeoutSeconds { get; init; } = 300;
+
+    [Range(1, 200)]
+    public int DefaultPartitions { get; init; } = 1;
 }

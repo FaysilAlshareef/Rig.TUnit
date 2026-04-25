@@ -54,7 +54,7 @@ public sealed class OrderingAssertTests
     }
 
     private static CapturedMessage<string> MakeMessage(string key, long seq) =>
-        new(seq.ToString(), DateTimeOffset.UtcNow, new Dictionary<string, string>(), null, null);
+        new(seq.ToString(), DateTimeOffset.UtcNow, new Dictionary<string, string>(), string.Empty, null);
 
     private sealed class StubListener<T> : ListenerBase<T>
     {

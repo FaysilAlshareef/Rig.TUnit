@@ -3,10 +3,18 @@ using YamlDotNet.RepresentationModel;
 namespace Rig.TUnit.Architecture.Tests.Rules;
 
 /// <summary>
-/// Phase 7 FR-070/FR-071/FR-072: the .github/workflows/ tree MUST declare every
-/// required job. <c>benchmark-regression</c> lives in <c>benchmark.yml</c>
-/// (post-merge-only, see feat/006 wrap-up); all other Phase 7 jobs live in
+/// FR-070/FR-071/FR-072: the .github/workflows/ tree MUST declare every required
+/// job. <c>benchmark-regression</c> lives in <c>benchmark.yml</c>
+/// (post-merge-only, see feat/006 wrap-up); all other required jobs live in
 /// <c>ci.yml</c>.
+///
+/// Updated during release-readiness rollout:
+///   - <c>red-commit-verification</c> removed (was a no-op emitting only ::notice::
+///     log lines; <c>commit-discipline-gate</c> is the load-bearing pairing check).
+///   - <c>markdown-link-check</c> consolidated into <c>linkcheck</c> (lychee).
+///   - <c>pack-validate</c> added: builds every packable project and fails the PR
+///     when description / authors / projectUrl / repository / readme / license
+///     metadata is missing.
 /// </summary>
 public sealed class CiJobPresenceTests
 {
@@ -15,10 +23,10 @@ public sealed class CiJobPresenceTests
         (".github/workflows/ci.yml",        "architecture-tests"),
         (".github/workflows/benchmark.yml", "benchmark-regression"),
         (".github/workflows/ci.yml",        "commit-discipline-gate"),
-        (".github/workflows/ci.yml",        "red-commit-verification"),
-        (".github/workflows/ci.yml",        "markdown-link-check"),
+        (".github/workflows/ci.yml",        "linkcheck"),
         (".github/workflows/ci.yml",        "snippet-extraction"),
         (".github/workflows/ci.yml",        "coverage-summary"),
+        (".github/workflows/ci.yml",        "pack-validate"),
     ];
 
     [Test]

@@ -725,5 +725,5 @@ jobs:
           path: |
             artifacts/*.nupkg
             artifacts/*.snupkg
-          retention-days: 7
+          retention-days: 14
           if-no-files-found: warn

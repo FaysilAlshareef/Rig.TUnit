@@ -6,7 +6,57 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 
 ## [Unreleased]
 
-### Added — Release readiness & open-source onboarding (planned release v0.1.0-beta.1)
+## [0.1.0-beta.1] — 2026-04-26 — First public release on nuget.org
+
+This is the inaugural public publish of Rig.TUnit on nuget.org. It bundles the
+internal 0.1.0–0.4.0 milestone work documented below plus the release-readiness
+layer and post-#10 CI hygiene into one coherent first cut. Subsequent stable
+release will be `v0.1.0`; minor bumps (`v0.2.0`, …) follow from there.
+
+### Changed — Post-#10 CI hygiene & gh-pages 404 fix
+
+- `actions/upload-artifact` bumped 4 → 7 across `ci.yml`, `release.yml`,
+  `benchmark.yml` (15 call-sites). v4 was deprecated on Node 20; v7 ships on
+  Node 24. Matrix shards already produced per-shard artifact names, so v4's
+  immutable-name rule was satisfied — no producer/consumer renames.
+- `github/codeql-action` (init + analyze) bumped 3 → 4 in `codeql.yml`.
+- `codeql.yml` switched the C# extractor to `build-mode: none`. Previously the
+  CodeQL run spent ~12 of every 15 minutes on `dotnet restore + build` of
+  `Rig.TUnit.slnx` (60+ projects). With no-build extraction the run lands in
+  ~3–5 min and keeps full `security-and-quality` coverage. `setup-dotnet` and
+  the explicit Restore + Build step are dropped from the workflow.
+- `benchmark.yml` gained an `Ensure gh-pages root redirect` post-deploy step.
+  `benchmark-action/github-action-benchmark` publishes the dashboard under
+  `gh-pages/dev/bench/`, so the project Pages root previously 404'd. The new
+  step writes a one-line `<meta http-equiv="refresh">` redirect at gh-pages
+  root once and is a no-op on subsequent runs.
+- `tests/Rig.TUnit.Architecture.Tests/Rules/{ArtifactUploadTests,
+  CoverageSummaryJobTests}.cs` — pinned upload-artifact prefix updated 4 → 7
+  to match the new floor.
+
+### Fixed — Post-#10 ServiceBus integration flake fixes
+
+- `PartitionedFanoutTests.SendAsync_MessagesWithDistinctPartitionKeys_AllReachSubscription`
+  — the wait loop now polls per-partition-key distinct-body counts instead of
+  total `Captured.Count`. Service Bus can redeliver a message whose peek-lock
+  expires before completion, so total count would climb from duplicates while
+  one slow partition still had unique arrivals pending. The test then failed
+  with "Expected ≥ 4 but received 1" while other partitions had inflated
+  shares. Per-key distinct-count also guards the final assertion against
+  redelivery duplicates.
+- `DlqRedriveTests.SendAsync_MessageAbandonedPastMaxDeliveryCount_AppearsOnDeadLetterQueue`
+  — abandon counter tracks abandons of the test message specifically, not
+  loop iterations. The subscription is created on the shared `test-topic`
+  used by other parallel tests, so messages from those tests fan out to it
+  too. The previous loop burned its iterations completing foreign messages
+  and rarely reached `MaxDeliveryCount=3` for the test message; the broker
+  never auto-DLQ'd and the probe timed out at 90s.
+- `ServiceBusDeadLetterProbe.HasMessageAsync` — the timeout is now caller-
+  controlled with the linked CTS distinguishing inner-deadline elapse from
+  caller cancel; the diagnostic on timeout no longer leaks an
+  `OperationCanceledException` when the caller's token is still healthy.
+
+### Added — Release readiness & open-source onboarding
 
 - **NuGet publishing pipeline** (`.github/workflows/release.yml`) - tag-driven, OIDC-trusted
   publishing to nuget.org with a protected `nuget-org` GitHub environment for owner approval;
@@ -226,7 +276,8 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 - Initial release: `Rig.TUnit.Core` with `RigBuilder`, `RigConnect`, `IsolationKey`.
 - First container-backed fixtures for SqlServer + Redis.
 
-[Unreleased]: https://github.com/FaysilAlshareef/Rig.TUnit/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/FaysilAlshareef/Rig.TUnit/compare/v0.1.0-beta.1...HEAD
+[0.1.0-beta.1]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.1.0-beta.1
 [0.4.0]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.4.0
 [0.3.0]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.3.0
 [0.2.0]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.2.0

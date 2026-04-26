@@ -23,11 +23,14 @@ bld/
 
 ## NuGet
 *.nupkg
+*.snupkg
 **/packages/*
 !**/packages/build/
 *.nuget.props
 *.nuget.targets
 project.lock.json
+artifacts/
+artifacts-smoke/
 
 ## Test results
 TestResults/

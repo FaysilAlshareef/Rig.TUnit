@@ -1,0 +1,19 @@
+title: "[show] "
+labels: ["show-and-tell"]
+body:
+  - type: textarea
+    id: project
+    attributes:
+      label: What did you build?
+      description: A short pitch — what's the project, what does it do, where is it used?
+    validations: { required: true }
+  - type: textarea
+    id: rig-tunit-usage
+    attributes:
+      label: How are you using Rig.TUnit?
+      description: Which packages, which scenarios, what was the win?
+    validations: { required: true }
+  - type: input
+    id: link
+    attributes:
+      label: Link (repo, blog post, video — optional)

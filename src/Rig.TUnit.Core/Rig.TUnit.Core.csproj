@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Core abstractions for Rig.TUnit - RigBuilder, RigConnect, IsolationKey, fixture lifecycle, fluent assertions. Required by every other Rig.TUnit package.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Rig.TUnit.Core.Tests.Unit" />
   </ItemGroup>

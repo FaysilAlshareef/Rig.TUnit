@@ -6,6 +6,86 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 
 ## [Unreleased]
 
+### Added — Release readiness & open-source onboarding (planned release v0.1.0-beta.1)
+
+- **NuGet publishing pipeline** (`.github/workflows/release.yml`) - tag-driven, OIDC-trusted
+  publishing to nuget.org with a protected `nuget-org` GitHub environment for owner approval;
+  GitHub Packages mirror; deterministic builds; embedded sources; symbol packages (`.snupkg`).
+- **Versioning** - MinVer drives `<Version>` from the latest `v*` git tag; untagged builds
+  produce `0.0.0-alpha.0.{height}.{sha}`.
+- **Source Link** - `Microsoft.SourceLink.GitHub` enables step-into debugging for consumers.
+- **Per-package metadata** - every `src/**` package now ships with `<Description>`, repo URL,
+  project URL, MIT license expression, NuGet README, tags. Centralised in
+  `Directory.Build.props` + `src/Directory.Build.props`; per-project descriptions applied via
+  `scripts/apply-package-descriptions.ps1` (idempotent).
+- **Community files** - `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1, fetched via
+  `scripts/install-coc.sh`), `.github/CODEOWNERS`, `.github/PULL_REQUEST_TEMPLATE.md`,
+  `.github/ISSUE_TEMPLATE/{bug,feature,provider,docs}.yml`,
+  `.github/DISCUSSION_TEMPLATE/{q-and-a,show-and-tell,ideas}.yml`, `.github/FUNDING.yml`,
+  `.github/dependabot.yml` (weekly NuGet grouped + GitHub Actions).
+- **Security workflows** - CodeQL C# weekly + on-PR (`.github/workflows/codeql.yml`);
+  release-drafter automation (`.github/workflows/release-drafter.yml` +
+  `.github/release-drafter.yml`); stale-issue/PR bot (`.github/workflows/stale.yml`).
+- **CI improvements** - workflow-scoped concurrency (cancel-in-progress on PR refs); reusable
+  `.github/actions/setup-dotnet-cache` composite action with NuGet cache keyed on
+  `Directory.Packages.props` + `**/*.csproj`; new `pack-validate` job that builds every
+  packable project and fails the PR when description / authors / projectUrl / repository /
+  readme / license metadata is missing.
+- **`docs/RELEASING.md`** - the full release ritual (changelog update, tag push, owner
+  approval, post-publish verification, recovery procedures).
+- **Hand-off scripts** under `scripts/` - `apply-repo-settings.sh`,
+  `apply-branch-protection.sh`, `setup-nuget-environment.sh` - all idempotent, run once
+  during release-readiness rollout.
+
+### Changed
+
+- `Directory.Build.props` - added shared NuGet packaging properties (Authors, RepositoryUrl,
+  PackageProjectUrl, PackageLicenseExpression, PackageReadmeFile, PackageIcon, PackageTags,
+  IncludeSymbols, SymbolPackageFormat, EmbedUntrackedSources, ContinuousIntegrationBuild,
+  Deterministic, EnablePackageValidation). Default `IsPackable=false`.
+- `src/Directory.Build.props` (new) - flips `IsPackable=true` so every production project
+  packs by default.
+- `tests/Directory.Build.props` (new) - explicit `IsPackable=false` defence-in-depth so test
+  and benchmark projects can never be published as packages.
+- `Directory.Packages.props` - added MinVer 6.0.0 + Microsoft.SourceLink.GitHub 8.0.0
+  central versions.
+- `src/Rig.TUnit.Observability.Logging.Analyzers` - marked `IsPackable=false`. The analyzer
+  is internal log-template hygiene used by this rig's own tests; it is not a consumer-facing
+  package. Re-enable when it ships consumer-facing rules.
+
+### Removed
+
+- Duplicate markdown link checker (`gaurav-nelson/github-action-markdown-link-check`) -
+  consolidated under the existing lychee `linkcheck` job.
+- `red-commit-verification` job - was emitting only `::notice::` log lines without
+  performing any real verification. `commit-discipline-gate` continues to enforce RED -> GREEN
+  pairing on every PR.
+
+### Security
+
+- `secret_scanning` and `secret_scanning_push_protection` enabled (applied via
+  `scripts/apply-repo-settings.sh`).
+- Trusted Publishing to nuget.org via OIDC - no long-lived API keys in repository secrets.
+- Branch protection ruleset applied to `master`: 1 CODEOWNERS approval, signed required
+  status checks, linear history, no force pushes, no deletion. Tag protection on `v*` so
+  only admins can publish releases.
+
+### Public package surface (initial drop)
+
+62 packages across 9 families (analyzer is internal). Quick inventory:
+
+**Core**: `Rig.TUnit.Core`.
+**Meta-packages**: `Rig.TUnit`, `Rig.TUnit.All`.
+**SQL**: `Rig.TUnit.Databases.Sql{,.SqlServer,.MySql,.Postgresql,.Oracle,.Sqlite}`.
+**NoSQL**: `Rig.TUnit.Databases.NoSql{,.Redis,.Mongo,.Cosmos,.Cassandra,.Dynamo,.ElasticSearch,.KurrentDb}`.
+**Messaging**: `Rig.TUnit.Messaging{,.ServiceBus,.Kafka,.RabbitMq,.Nats,.Sqs}`.
+**Caching**: `Rig.TUnit.Caching{,.Redis,.Memory,.Hybrid,.Fusion}`.
+**Storage**: `Rig.TUnit.Storage{,.AzureBlob,.FileSystem,.MinIO,.S3}`.
+**Observability**: `Rig.TUnit.Observability{,.Logging,.Metrics,.Tracing,.Seq,.AppInsights}`.
+**Security**: `Rig.TUnit.Security{,.Jwt,.OAuth,.Mtls,.Policies}`.
+**Microservices**: `Rig.TUnit.Microservices{,.EventSourcing,.Outbox,.Inbox,.Saga,.Snapshots,.Contracts}`.
+**Infrastructure**: `Rig.TUnit.{Http,Grpc,HealthChecks,Resilience,Mediator,Docker,Parallelism,Concurrency,Ci,WebAPI}`.
+
 ### Added — Feature 007 Phases 0+1+2+3 (planned release N+1: SendContext · ServiceBus · Kafka · SQS)
 
 - `SendContext` record — unified `SessionKey`, `PartitionKey`, `DeduplicationKey` fields shared

@@ -1,0 +1,64 @@
+name: Provider request
+description: Request a new provider package (new database, message broker, cache, storage, etc.).
+title: "[provider] "
+labels: ["type:provider", "type:feature", "status:needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New providers ship the canonical quartet (Fixture, Options, RigBuilder, Extensions),
+        a contract-test inheritor, an integration-test project, and a leaf README that matches
+        the [provider template](https://github.com/FaysilAlshareef/Rig.TUnit/blob/master/docs/templates/PROVIDER_README_TEMPLATE.md).
+        See [CONTRIBUTING.md](https://github.com/FaysilAlshareef/Rig.TUnit/blob/master/CONTRIBUTING.md#adding-a-new-provider).
+  - type: dropdown
+    id: family
+    attributes:
+      label: Provider family
+      options:
+        - SQL databases
+        - NoSQL databases
+        - Messaging
+        - Caching
+        - Storage
+        - Observability
+        - Security
+        - Microservices
+        - New family (please describe)
+    validations: { required: true }
+  - type: input
+    id: name
+    attributes:
+      label: Provider name
+      placeholder: e.g. ScyllaDB, NATS Core, Pulsar, GCS, Memcached
+    validations: { required: true }
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why this provider?
+      description: Use cases, ecosystem demand, gap in current coverage.
+    validations: { required: true }
+  - type: input
+    id: container
+    attributes:
+      label: Testcontainers module (if any)
+      description: Existing module name in `Testcontainers.*`, or `none — needs custom container builder`.
+      placeholder: Testcontainers.<Module>
+  - type: textarea
+    id: api
+    attributes:
+      label: Sketch of the user-facing API
+      description: How would a consumer wire this in? `services.AddRigTUnit(rig => rig.Use<X>(...))`
+      render: csharp
+    validations: { required: true }
+  - type: textarea
+    id: ordering-keys
+    attributes:
+      label: Ordering / partition / dedup primitives (messaging only)
+      description: How does this broker map to `SessionKey` / `PartitionKey` / `DeduplicationKey`?
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - { label: I confirmed no existing provider package covers this., required: true }
+        - { label: I am willing to contribute / co-author the implementation., required: false }

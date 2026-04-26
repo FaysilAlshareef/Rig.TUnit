@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Azure Application Insights - telemetry capture via the offline channel.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.ApplicationInsights" />

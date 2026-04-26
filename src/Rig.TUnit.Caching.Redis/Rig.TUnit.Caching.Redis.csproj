@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Redis-as-cache backed by Testcontainers. Lock acquisition, tag invalidation, and TTL assertions.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.Redis" />

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for inbox-pattern receivers - idempotent handler assertions and replay helpers.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
   </ItemGroup>

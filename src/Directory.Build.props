@@ -1,0 +1,10 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))" />
+
+  <PropertyGroup>
+    <!-- Production code under src/ ships as NuGet packages by default. -->
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+</Project>

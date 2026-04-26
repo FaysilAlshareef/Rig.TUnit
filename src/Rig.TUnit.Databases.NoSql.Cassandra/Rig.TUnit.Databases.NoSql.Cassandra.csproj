@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Apache Cassandra backed by Testcontainers. Per-test keyspace isolation and CQL assertion helpers.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.Cassandra" />

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for ASP.NET Core health-check assertions - liveness/readiness lifecycle and degraded-state simulation.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />

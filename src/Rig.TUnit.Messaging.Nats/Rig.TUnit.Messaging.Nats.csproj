@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for NATS JetStream backed by Testcontainers. Stream lifecycle, ordered consumers, and x-session-key header propagation.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.Nats" />

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for KurrentDb (formerly EventStoreDB) backed by Testcontainers. Stream-aware lifecycle and read-model assertions.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.KurrentDb" />

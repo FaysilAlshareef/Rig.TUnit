@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Description>TUnit fixture for the transactional outbox pattern - visibility-timeout helpers, dispatcher assertions, and dedup checks.</Description>
     <NoWarn>$(NoWarn);CS1573;CS1734</NoWarn>
   </PropertyGroup>
   <ItemGroup>

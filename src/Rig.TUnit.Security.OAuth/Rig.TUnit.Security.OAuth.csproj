@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Description>TUnit fixture for OAuth flows (auth-code+PKCE, client-credentials) against an in-process IdentityServer or stub provider.</Description>
     <UseAspNetCore>true</UseAspNetCore>
   </PropertyGroup>
   <ItemGroup>

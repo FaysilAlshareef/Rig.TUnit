@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for ASP.NET Core HybridCache (L1+L2). Layered cache assertions and stampede-prevention checks.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />

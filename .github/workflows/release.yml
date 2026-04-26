@@ -1,0 +1,185 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v0.1.0-beta.1)'
+        required: true
+      skip_nuget:
+        description: 'Skip nuget.org publish (rehearsal mode)'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write    # GitHub Release creation
+  packages: write    # GitHub Packages mirror
+  id-token: write    # NuGet Trusted Publishing (OIDC)
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pack:
+    name: Pack & validate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.minver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: ./.github/actions/setup-dotnet-cache
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore Rig.TUnit.slnx
+
+      - name: Build
+        run: dotnet build Rig.TUnit.slnx -c Release --no-restore
+
+      - name: Resolve MinVer version
+        id: minver
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet tool install -g minver-cli || true
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          version=$(minver -t v -d alpha)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved package version: $version"
+
+      - name: Pack
+        run: |
+          dotnet pack Rig.TUnit.slnx -c Release --no-build \
+            -o ./artifacts \
+            -p:Version=${{ steps.minver.outputs.version }}
+
+      - name: Validate package metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          missing=0
+          for pkg in artifacts/*.nupkg; do
+            nuspec=$(unzip -p "$pkg" '*.nuspec')
+            for tag in description authors projectUrl repository readme; do
+              if ! grep -qi "<$tag" <<<"$nuspec"; then
+                echo "::error::$pkg missing <$tag>"
+                missing=$((missing + 1))
+              fi
+            done
+            if ! grep -qi '<license' <<<"$nuspec"; then
+              echo "::error::$pkg missing <license> expression"
+              missing=$((missing + 1))
+            fi
+          done
+          if [[ $missing -gt 0 ]]; then
+            echo "::error::Found $missing metadata violations"
+            exit 1
+          fi
+          echo "All packages have complete metadata."
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          retention-days: 30
+          if-no-files-found: error
+
+  publish-nuget:
+    name: Publish to nuget.org
+    needs: pack
+    runs-on: ubuntu-latest
+    environment:
+      name: nuget-org
+      url: https://www.nuget.org/packages?q=Rig.TUnit
+    if: ${{ inputs.skip_nuget != 'true' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkgs
+          path: ./artifacts
+
+      - name: Login to nuget.org via Trusted Publishing (OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: NuGetTrustedPublisher
+
+      - name: Push to nuget.org
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+  publish-ghpackages:
+    name: Mirror to GitHub Packages
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkgs
+          path: ./artifacts
+
+      - name: Push to GitHub Packages
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "${{ secrets.GITHUB_TOKEN }}" \
+            --source "https://nuget.pkg.github.com/FaysilAlshareef/index.json" \
+            --skip-duplicate
+
+  github-release:
+    name: Create GitHub Release
+    needs: [pack, publish-nuget, publish-ghpackages]
+    if: always() && needs.pack.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkgs
+          path: ./artifacts
+
+      - name: Extract release notes from CHANGELOG
+        id: extract
+        shell: bash
+        run: |
+          version="${{ needs.pack.outputs.version }}"
+          # Extract the section between "## [<version>]" and the next "## [".
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-body.md
+          if [[ ! -s release-body.md ]]; then
+            echo "::warning::No CHANGELOG section for $version - using auto-notes"
+            echo "_Release notes auto-generated by GitHub_" > release-body.md
+          fi
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: ${{ inputs.tag || github.ref_name }}
+          body_path: release-body.md
+          generate_release_notes: true
+          files: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          fail_on_unmatched_files: true
+          prerelease: ${{ contains(needs.pack.outputs.version, '-') }}

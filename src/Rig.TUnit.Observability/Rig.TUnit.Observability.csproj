@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Observability family base - TelemetryFixtureBase, exemplar helpers, log-redaction utilities. Pull a leaf provider.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.Extensions.Options" />

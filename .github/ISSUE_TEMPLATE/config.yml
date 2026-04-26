@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question / Discussion
+    url: https://github.com/FaysilAlshareef/Rig.TUnit/discussions
+    about: Ask a usage question, share a tip, or float an idea before opening an issue.
+  - name: Security report
+    url: https://github.com/FaysilAlshareef/Rig.TUnit/blob/master/SECURITY.md
+    about: Report a security vulnerability privately — do NOT open a public issue.
+  - name: Contributing guide
+    url: https://github.com/FaysilAlshareef/Rig.TUnit/blob/master/CONTRIBUTING.md
+    about: Read the contribution rules before opening a PR (TDD pairing, coverage, provider quartet).

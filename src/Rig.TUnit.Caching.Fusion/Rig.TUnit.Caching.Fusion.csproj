@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for ZiggyCreatures FusionCache. Layered cache, fail-safe, and adaptive caching test helpers.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="ZiggyCreatures.FusionCache" />

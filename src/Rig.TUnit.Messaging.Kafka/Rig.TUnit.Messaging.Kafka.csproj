@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for Apache Kafka backed by Testcontainers. Per-key partition affinity, runtime topology builder, and per-partition offset snapshot utilities.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Testcontainers.Kafka" />

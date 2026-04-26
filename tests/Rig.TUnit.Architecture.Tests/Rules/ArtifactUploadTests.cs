@@ -36,11 +36,6 @@ public sealed class ArtifactUploadTests
         // Phase 7 T166/T167 — benchmark-regression uploads its own `benchmark-results`
         // artefact (not test-results).
         "benchmark-regression",
-        // Phase 7 T170/T171 — red-commit-verification walks git log, no test output.
-        "red-commit-verification",
-        // Phase 6d T160 — markdown-link-check is a third-party action with its own
-        // reporting; no upload needed.
-        "markdown-link-check",
         // Phase 6d T162 — snippet-extraction runs dotnet build, emits compiler output
         // to the action log; no artefact.
         "snippet-extraction",

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Caching family base - ICacheFixture, stampede-protection helpers, tag-based invalidation utilities. Pull a leaf provider.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
     <PackageReference Include="Microsoft.Extensions.Options" />

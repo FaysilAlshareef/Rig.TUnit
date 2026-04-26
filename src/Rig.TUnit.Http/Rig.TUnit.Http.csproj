@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>TUnit fixture for HTTP integration testing - captured request/response model, redirect/cookie/CORS assertions, and protocol-aware (HTTP/1.1, HTTP/2, HTTP/3) helpers.</Description>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TUnit.Core" />
   </ItemGroup>

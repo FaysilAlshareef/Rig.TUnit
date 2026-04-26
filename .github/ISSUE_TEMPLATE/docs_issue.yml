@@ -1,0 +1,30 @@
+name: Documentation issue
+description: Something in the docs is wrong, missing, broken, or unclear.
+title: "[docs] "
+labels: ["type:docs", "status:needs-triage"]
+body:
+  - type: input
+    id: file
+    attributes:
+      label: Affected file or page
+      description: e.g. `README.md`, `src/Rig.TUnit.Messaging.Kafka/README.md`, `docs/glossary.md`
+      placeholder: path/to/file.md
+    validations: { required: true }
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong?
+      description: |
+        Wrong code sample? Broken link? Missing section? Outdated screenshot?
+    validations: { required: true }
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested correction (optional)
+      description: If you already know the fix, paste it here. PRs welcome.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight checks
+      options:
+        - { label: I checked the latest version of the file on `master`., required: true }

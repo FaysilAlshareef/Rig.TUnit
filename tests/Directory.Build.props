@@ -1,0 +1,12 @@
+<Project>
+
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))" />
+
+  <PropertyGroup>
+    <!-- Tests and benchmarks must never be published as packages. -->
+    <IsPackable>false</IsPackable>
+    <!-- Test projects do not need an XML doc file; suppress to avoid noise. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

@@ -22,14 +22,31 @@ public sealed class DeadLetterAssertTests
     }
 
     [Test]
-    public async Task HasMessage_ValidArgs_DelegatesToProbe()
+    public async Task HasMessage_ValidArgs_DelegatesToProbeWithDefaultTimeout()
     {
         var probe = Substitute.For<IDeadLetterProbe>();
-        probe.HasMessageAsync("reason", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+        probe.HasMessageAsync("reason", Arg.Any<TimeSpan>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
 
         await DeadLetterAssert.HasMessage(probe, "reason");
 
-        await probe.Received(1).HasMessageAsync("reason", Arg.Any<CancellationToken>());
+        await probe.Received(1).HasMessageAsync(
+            "reason",
+            DeadLetterAssert.DefaultTimeout,
+            Arg.Any<CancellationToken>());
+    }
+
+    [Test]
+    public async Task HasMessage_ExplicitTimeout_PassesThroughToProbe()
+    {
+        var probe = Substitute.For<IDeadLetterProbe>();
+        var timeout = TimeSpan.FromSeconds(90);
+        probe.HasMessageAsync("reason", timeout, Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        await DeadLetterAssert.HasMessage(probe, "reason", timeout);
+
+        await probe.Received(1).HasMessageAsync("reason", timeout, Arg.Any<CancellationToken>());
     }
 
     [Test]

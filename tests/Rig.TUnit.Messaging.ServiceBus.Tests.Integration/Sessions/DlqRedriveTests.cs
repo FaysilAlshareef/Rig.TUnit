@@ -41,8 +41,17 @@ public sealed class DlqRedriveTests
             await receiver.AbandonMessageAsync(msg, cancellationToken: ct);
         }
 
-        // Assert — message appears on DLQ with MaxDeliveryCountExceeded reason
-        await DeadLetterAssert.HasMessage(dlqProbe, "MaxDeliveryCountExceeded", ct);
+        // Assert — message appears on DLQ with MaxDeliveryCountExceeded reason.
+        // Probe window bumped to 90s: the Microsoft Service Bus emulator
+        // (servicebus-emulator + SQL Edge) takes longer than real Azure
+        // Service Bus to materialise the auto-DLQ after delivery-count
+        // exhaustion; 60s default is right for production, 90s gives a
+        // comfortable margin on emulator-backed CI.
+        await DeadLetterAssert.HasMessage(
+            dlqProbe,
+            "MaxDeliveryCountExceeded",
+            timeout: TimeSpan.FromSeconds(90),
+            ct: ct);
 
         // Cleanup
         await admin.DeleteSubscriptionAsync(Topic, subName, ct);

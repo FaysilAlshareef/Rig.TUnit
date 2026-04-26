@@ -107,7 +107,7 @@ public sealed class CoverageSummaryJobTests
         var uploadStep = FindUploadStep(steps);
         if (uploadStep is null)
         {
-            offenders.Add($"`{JobName}` must upload its rendered report via `actions/upload-artifact@v4`");
+            offenders.Add($"`{JobName}` must upload its rendered report via `actions/upload-artifact@v7`");
         }
         else
         {
@@ -215,7 +215,7 @@ public sealed class CoverageSummaryJobTests
         foreach (var s in steps)
         {
             if (GetScalar(s, "uses") is { } uses
-                && uses.StartsWith("actions/upload-artifact@v4", StringComparison.Ordinal))
+                && uses.StartsWith("actions/upload-artifact@v7", StringComparison.Ordinal))
             {
                 return s;
             }

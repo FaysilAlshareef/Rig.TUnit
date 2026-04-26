@@ -4,7 +4,7 @@ namespace Rig.TUnit.Architecture.Tests.Rules;
 
 /// <summary>
 /// FR-013 / SC-018: every job in <c>.github/workflows/ci.yml</c> MUST ship a step
-/// using <c>actions/upload-artifact@v4</c> with <c>if: always()</c> and
+/// using <c>actions/upload-artifact@v7</c> with <c>if: always()</c> and
 /// <c>retention-days: 14</c>, so triage after a failed run can fetch TUnit HTML reports,
 /// TRX files, and cobertura coverage XML without replaying the pipeline.
 ///
@@ -13,7 +13,7 @@ namespace Rig.TUnit.Architecture.Tests.Rules;
 public sealed class ArtifactUploadTests
 {
     private const string WorkflowRelativePath = ".github/workflows/ci.yml";
-    private const string RequiredActionPrefix = "actions/upload-artifact@v4";
+    private const string RequiredActionPrefix = "actions/upload-artifact@v7";
     private const string RequiredIfExpression = "always()";
     private const int RequiredRetentionDays = 14;
 
@@ -64,7 +64,7 @@ public sealed class ArtifactUploadTests
             var uploadStep = FindUploadStep(steps);
             if (uploadStep is null)
             {
-                offenders.Add($"{jobName}: no `actions/upload-artifact@v4` step found");
+                offenders.Add($"{jobName}: no `actions/upload-artifact@v7` step found");
                 continue;
             }
 

@@ -26,26 +26,24 @@ jobs:
   analyze:
     name: Analyze C#
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: '10.0.x'
-
+      # `build-mode: none` lets the CodeQL C# extractor scan source directly
+      # without invoking the .NET toolchain. Previously the run spent ~12 of
+      # every 15 minutes on `dotnet restore + build` of Rig.TUnit.slnx (60+
+      # projects). With no-build extraction the run lands in ~3-5 min and
+      # keeps full security-and-quality coverage — the extractor resolves
+      # type references from the source graph itself.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: csharp
+          build-mode: none
           queries: security-and-quality
 
-      - name: Restore + Build
-        run: |
-          dotnet restore Rig.TUnit.slnx
-          dotnet build Rig.TUnit.slnx -c Release --no-restore
-
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: "/language:csharp"

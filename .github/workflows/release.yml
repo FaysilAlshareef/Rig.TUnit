@@ -115,7 +115,12 @@ jobs:
         id: nuget-login
         uses: NuGet/login@v1
         with:
-          user: NuGetTrustedPublisher
+          # Must be the nuget.org username of the trusted-publishing policy
+          # creator — i.e., the account that registered the entry under
+          # Manage Account → Trusted Publishing. The previous literal
+          # `NuGetTrustedPublisher` produced HTTP 401 from /api/v2/token:
+          # "No matching trust policy owned by user 'NuGetTrustedPublisher'".
+          user: FaysilAlshareef
 
       - name: Push to nuget.org
         run: |

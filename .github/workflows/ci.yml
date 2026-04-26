@@ -49,7 +49,7 @@ jobs:
               exit 1
           }
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}
@@ -84,7 +84,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.Sql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -117,7 +117,7 @@ jobs:
         if: matrix.provider != 'Cosmos' || runner.os != 'Windows'
         run: dotnet test --project tests/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Databases.NoSql.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -145,7 +145,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Caching.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -173,7 +173,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Messaging.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -201,7 +201,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration/Rig.TUnit.Microservices.${{ matrix.component }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.component }}
@@ -229,7 +229,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration/Rig.TUnit.Security.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.area }}
@@ -257,7 +257,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Observability.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -285,7 +285,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration/Rig.TUnit.Storage.${{ matrix.provider }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.provider }}
@@ -313,7 +313,7 @@ jobs:
       - name: Run integration
         run: dotnet test --project tests/Rig.TUnit.${{ matrix.area }}.Tests.Integration/Rig.TUnit.${{ matrix.area }}.Tests.Integration.csproj --no-build -c Release -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-${{ github.job }}-${{ matrix.area }}
@@ -421,7 +421,7 @@ jobs:
           print('All packages meet the coverage floor.')
           PYEOF
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
@@ -668,7 +668,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-linkcheck
@@ -718,7 +718,7 @@ jobs:
           done
           echo "Inspected $count package(s); $missing metadata violation(s)."
           [[ $missing -eq 0 ]] || exit 1
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pack-artefacts

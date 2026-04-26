@@ -36,7 +36,6 @@ gh api -X POST "repos/$REPO/rulesets" --input - <<'JSON'
         "require_code_owner_review": true,
         "require_last_push_approval": true,
         "required_review_thread_resolution": true,
-        "automatic_copilot_code_review_enabled": false,
         "allowed_merge_methods": ["squash", "rebase"]
       }
     },
@@ -53,13 +52,6 @@ gh api -X POST "repos/$REPO/rulesets" --input - <<'JSON'
           { "context": "Link checker" },
           { "context": "lint" }
         ]
-      }
-    },
-    {
-      "type": "commit_message_pattern",
-      "parameters": {
-        "operator": "regex",
-        "pattern": "^(test|feat|refactor|fix|chore|docs|style|perf|build|ci|revert|red|green|release)(\\(.+\\))?:"
       }
     }
   ],

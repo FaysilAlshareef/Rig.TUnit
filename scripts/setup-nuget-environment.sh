@@ -14,16 +14,12 @@ set -euo pipefail
 
 REPO="${RIG_TUNIT_REPO:-FaysilAlshareef/Rig.TUnit}"
 
-echo "==> Create nuget-org environment"
-gh api -X PUT "repos/$REPO/environments/nuget-org" \
-  -F wait_timer=0 \
-  -F prevent_self_review=false \
-  -F deployment_branch_policy[protected_branches]=false \
-  -F deployment_branch_policy[custom_branch_policies]=true
-
-echo "==> Add owner as reviewer"
+echo "==> Create nuget-org environment with owner as reviewer"
 USER_ID=$(gh api user --jq .id)
 gh api -X PUT "repos/$REPO/environments/nuget-org" \
+  -F wait_timer=0 \
+  -F deployment_branch_policy[protected_branches]=false \
+  -F deployment_branch_policy[custom_branch_policies]=true \
   -F "reviewers[][type]=User" \
   -F "reviewers[][id]=$USER_ID"
 

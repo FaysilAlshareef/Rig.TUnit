@@ -13,6 +13,7 @@ public sealed class NatsListener : ListenerBase<NatsMessageRecord>, IAsyncDispos
     private readonly string _subject;
     private readonly TimeProvider _clock;
     private NatsConnection? _connection;
+    private INatsSub<string>? _sub;
     private CancellationTokenSource? _cts;
     private Task? _loop;
 
@@ -30,10 +31,24 @@ public sealed class NatsListener : ListenerBase<NatsMessageRecord>, IAsyncDispos
         _connection = new NatsConnection(new NatsOpts { Url = _url });
         await _connection.ConnectAsync().ConfigureAwait(false);
 
-        _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        _loop = Task.Run(() => SubscribeLoopAsync(_cts.Token), _cts.Token);
+        // Register the subscription EAGERLY before returning. The previous
+        // implementation called `_connection.SubscribeAsync<T>(...)` from
+        // inside a Task.Run loop. That method is lazy — the SUB protocol
+        // message isn't sent to the server until the first MoveNextAsync
+        // on the IAsyncEnumerable runs. NATS Core is fire-and-forget with
+        // no server-side buffering, so a publisher that calls SendAsync
+        // immediately after StartAsync could see its message land at the
+        // broker BEFORE the SUB is registered, and the broker drops it.
+        // PingAsync forces a flush + PONG round-trip; the server processes
+        // commands in order, so a successful PING after SUB confirms SUB
+        // has been registered.
+        _sub = await _connection
+            .SubscribeCoreAsync<string>(_subject, cancellationToken: ct)
+            .ConfigureAwait(false);
+        await _connection.PingAsync(ct).ConfigureAwait(false);
 
-        await Task.Yield();
+        _cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        _loop = Task.Run(() => SubscribeLoopAsync(_sub, _cts.Token), _cts.Token);
     }
 
     public override async Task StopAsync(CancellationToken ct)
@@ -55,6 +70,11 @@ public sealed class NatsListener : ListenerBase<NatsMessageRecord>, IAsyncDispos
             }
             _loop = null;
         }
+        if (_sub is not null)
+        {
+            await _sub.DisposeAsync().ConfigureAwait(false);
+            _sub = null;
+        }
         if (_connection is not null)
         {
             await _connection.DisposeAsync().ConfigureAwait(false);
@@ -64,11 +84,11 @@ public sealed class NatsListener : ListenerBase<NatsMessageRecord>, IAsyncDispos
 
     public async ValueTask DisposeAsync() => await StopAsync(CancellationToken.None).ConfigureAwait(false);
 
-    private async Task SubscribeLoopAsync(CancellationToken ct)
+    private async Task SubscribeLoopAsync(INatsSub<string> sub, CancellationToken ct)
     {
         try
         {
-            await foreach (var msg in _connection!.SubscribeAsync<string>(_subject, cancellationToken: ct).ConfigureAwait(false))
+            await foreach (var msg in sub.Msgs.ReadAllAsync(ct).ConfigureAwait(false))
             {
                 var headers = new Dictionary<string, string>(StringComparer.Ordinal);
                 if (msg.Headers is not null)

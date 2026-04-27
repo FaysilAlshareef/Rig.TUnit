@@ -95,7 +95,7 @@ jobs:
       # break. Add a one-line redirect once so the root resolves to the
       # dashboard. Idempotent: later runs see the file and exit early.
       - name: Ensure gh-pages root redirect
-        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        if: always() && (github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

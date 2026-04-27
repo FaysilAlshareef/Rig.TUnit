@@ -32,9 +32,15 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Run benchmarks
+        # `--job` is no longer passed on the CLI; the run shape comes from
+        # `CiBenchmarkConfig` in tests/Rig.TUnit.Benchmarks/Program.cs
+        # (3 warmup × 5 iterations × 1 launch). The previous `--job short`
+        # default (1 × 3 × 1) produced ~50 % per-bench variance on shared
+        # GH-hosted runners — see the 2026-04-26 RCA in
+        # `chore/benchmark-regression-rca`.
         run: |
           dotnet run -c Release --project tests/Rig.TUnit.Benchmarks -- \
-            --exporters json --artifacts ./benchmark-results --job short --filter '*'
+            --exporters json --artifacts ./benchmark-results --filter '*'
       - name: Merge benchmark JSON files
         shell: bash
         run: |
@@ -65,17 +71,15 @@ jobs:
           tool: 'benchmarkdotnet'
           output-file-path: ./benchmark-results/merged.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-push: true
-          # 150% threshold + comment-only mode. Single-iteration BDN
-          # (`--job short`) on shared GitHub-hosted runners has ~20–40 %
-          # inherent variance from noisy-neighbour effects, so a 120 %
-          # gate triggers on every push regardless of code changes (the
-          # 2026-04-26 run flagged ~90 benchmarks across files PR #18
-          # never touched). Comment + alert remain so real regressions
-          # surface — they just no longer block master.
-          alert-threshold: '150%'
+          # Only push to gh-pages and gate on alerts when running against
+          # master. workflow_dispatch / branch runs produce artefacts +
+          # console output but don't pollute the master baseline timeline
+          # or fail the run while the new measurement methodology
+          # (CiBenchmarkConfig) is being validated.
+          auto-push: ${{ github.ref == 'refs/heads/master' }}
+          alert-threshold: '120%'
           comment-on-alert: true
-          fail-on-alert: false
+          fail-on-alert: ${{ github.ref == 'refs/heads/master' }}
       - name: Upload benchmark artefacts
         if: always()
         uses: actions/upload-artifact@v7

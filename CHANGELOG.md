@@ -6,6 +6,58 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 
 ## [Unreleased]
 
+## [0.1.0-beta.2] — 2026-04-27 — Packaging + benchmark methodology fixes
+
+Two fixes uncovered while validating the v0.1.0-beta.1 release:
+
+### Fixed
+
+- **Per-package README on nuget.org** (#19). All 63 published `Rig.TUnit.*` packages
+  in v0.1.0-beta.1 rendered the same generic landing copy because
+  `Directory.Build.props` packed the repo-level `docs/nuget/README.md` into every
+  `.nupkg`. Each `src/Rig.TUnit.*/README.md` is package-specific (Quick start,
+  install, API), but the build wasn't using them. Switched the `<None Include>`
+  source to `$(MSBuildProjectDirectory)\README.md` with an `Exists()` guard;
+  the repo-level README remains as a defensive fallback for any future project
+  that doesn't carry one. From v0.1.0-beta.2 onwards, each NuGet listing renders
+  its own README. v0.1.0-beta.1 packages on nuget.org cannot be patched —
+  `--skip-duplicate` will leave them as-is and the corrected content lands on
+  the new version.
+- **Benchmark workflow false-positive alerts** (#20). The 2026-04-26 master
+  benchmark run alerted on ~106 of 182 benchmarks under the 120 % threshold,
+  including ~95 in code paths #18 never touched. Cross-run analysis traced this
+  to two layered methodology bugs:
+  - `--job short` (1 warmup × 3 iterations × 1 launch) on shared GitHub-hosted
+    runners produces ±50 % per-bench variance run-to-run on identical source
+    code. The "previous baseline" run (`1311139`, a Bump-checkout-only commit)
+    measured 26 % faster than its own predecessor — that anomaly was what the
+    current run was being compared against.
+  - `InProcessEmitBenchmarkConfig` (used by the 21 provider benchmark classes
+    via `[Config(typeof(...))]`) was wired with `Job.Dry` + `RunStrategy.ColdStart`
+    + `IterationCount = 1` + `InvocationCount = 1` — a single-invocation cold-start
+    smoke shape that included JIT compile time in the measurement. That's why
+    `MySql.Options_ConstructWithDefaults` was reporting 0.5–1 ms per
+    `new Options()` call.
+
+  Two-commit fix:
+  - New global `CiBenchmarkConfig` (3 warmup × 5 iterations × 1 launch,
+    Throughput strategy). Workflow no longer passes `--job` on the CLI.
+    `auto-push` and `fail-on-alert` gated on `github.ref == refs/heads/master`,
+    so workflow_dispatch runs from feature branches don't pollute master's
+    gh-pages baseline timeline.
+  - `InProcessEmitBenchmarkConfig` switched to the same 3 × 5 × 1 shape;
+    `InProcessEmitToolchain` retained because BDN's external auto-generated
+    boilerplate build still exceeds the 2-minute timeout on the 100+ project
+    transitive graph.
+
+  Validation across 4 dispatched runs on `chore/benchmark-regression-rca`:
+  external-suite between-run median ratio is now 1.036 (was diverging to 1.30
+  under `--job short`); 1.7 % of external benchmarks drift > 1.20× run-to-run
+  on identical source. The remaining ~9 % residual noise concentrates in
+  sub-100 ns `Options_ConstructWith*` benchmarks where measurement floor on
+  shared CPU exceeds the alert threshold by definition; a follow-up will drop
+  or `[BenchmarkCategory]`-skip those.
+
 ## [0.1.0-beta.1] — 2026-04-26 — First public release on nuget.org
 
 This is the inaugural public publish of Rig.TUnit on nuget.org. It bundles the
@@ -276,7 +328,8 @@ release will be `v0.1.0`; minor bumps (`v0.2.0`, …) follow from there.
 - Initial release: `Rig.TUnit.Core` with `RigBuilder`, `RigConnect`, `IsolationKey`.
 - First container-backed fixtures for SqlServer + Redis.
 
-[Unreleased]: https://github.com/FaysilAlshareef/Rig.TUnit/compare/v0.1.0-beta.1...HEAD
+[Unreleased]: https://github.com/FaysilAlshareef/Rig.TUnit/compare/v0.1.0-beta.2...HEAD
+[0.1.0-beta.2]: https://github.com/FaysilAlshareef/Rig.TUnit/compare/v0.1.0-beta.1...v0.1.0-beta.2
 [0.1.0-beta.1]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.1.0-beta.1
 [0.4.0]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.4.0
 [0.3.0]: https://github.com/FaysilAlshareef/Rig.TUnit/releases/tag/v0.3.0

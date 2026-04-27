@@ -8,10 +8,23 @@ All notable changes to Rig.TUnit are documented in this file. Format follows
 
 ## [0.1.0-beta.2] — 2026-04-27 — Packaging + benchmark methodology fixes
 
-Two fixes uncovered while validating the v0.1.0-beta.1 release:
+Three fixes uncovered while validating the v0.1.0-beta.1 release:
 
 ### Fixed
 
+- **Release pipeline produced `0.0.0-alpha.0.{height}.{sha}` nupkgs from `v0.1.0-beta.1` tag**.
+  The first v0.1.0-beta.1 release run resolved MinVer to the correct version
+  (`MinVer: Calculated version 0.1.0-beta.1`) but `dotnet pack --no-build`
+  emitted files named `Rig.TUnit.*.0.0.0-alpha.0.14.nupkg`. Root cause: MinVer's
+  MSBuild target overrides the user-set `Version` property, and `--no-build`
+  ran MinVer again at pack-time in a context where it fell back to the
+  `0.0.0-alpha.0.{height}.{sha}` default — clobbering the `-p:Version=…`
+  override. Fix: derive the version from the tag itself and pass
+  `-p:MinVerVersionOverride=…` to BOTH build and pack steps; this is the
+  documented escape hatch that tells MinVer to use the value verbatim
+  across both invocations. The release.yml workflow also drops its
+  dependency on `minver-cli` walking git history — the tag is now the sole
+  source of truth.
 - **Per-package README on nuget.org** (#19). All 63 published `Rig.TUnit.*` packages
   in v0.1.0-beta.1 rendered the same generic landing copy because
   `Directory.Build.props` packed the repo-level `docs/nuget/README.md` into every

@@ -29,39 +29,63 @@ jobs:
     name: Pack & validate
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.minver.outputs.version }}
+      version: ${{ steps.ver.outputs.version }}
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          fetch-tags: true
           ref: ${{ inputs.tag || github.ref }}
 
       - uses: ./.github/actions/setup-dotnet-cache
         with:
           dotnet-version: '10.0.x'
 
+      # Derive the package version from the tag itself (the source of truth
+      # for a tag-driven release), instead of asking minver-cli to walk git
+      # history. The previous approach combined `dotnet build` (where MinVer
+      # auto-resolved the version), a separate minver-cli call, and a pack
+      # invocation that passed `-p:Version=...`. MinVer's MSBuild target
+      # then overrode the user-set `Version` again at pack-time and — when
+      # `--no-build` skipped the property cache from build — fell back to
+      # the `0.0.0-alpha.0.{height}.{sha}` default. Result: `dotnet pack`
+      # produced .nupkgs named `0.0.0-alpha.0.14.nupkg` even though the
+      # tag was `v0.1.0-beta.1`. Documented escape: pass
+      # `-p:MinVerVersionOverride=<version>` so MinVer uses the value
+      # verbatim across both build and pack and stops auto-resolving.
+      - name: Resolve version from tag
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${{ inputs.tag }}" ]]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF#refs/tags/}"
+          fi
+          # Strip the leading 'v' if present.
+          version="${tag#v}"
+          if [[ -z "$version" || "$version" == "$tag" && "$tag" != v* ]]; then
+            echo "::error::Could not derive version from ref/input '$tag' (expected leading 'v')."
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Tag: $tag, Package version: $version"
+
       - name: Restore
         run: dotnet restore Rig.TUnit.slnx
 
       - name: Build
-        run: dotnet build Rig.TUnit.slnx -c Release --no-restore
-
-      - name: Resolve MinVer version
-        id: minver
-        shell: bash
         run: |
-          set -euo pipefail
-          dotnet tool install -g minver-cli || true
-          export PATH="$PATH:$HOME/.dotnet/tools"
-          version=$(minver -t v -d alpha)
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Resolved package version: $version"
+          dotnet build Rig.TUnit.slnx -c Release --no-restore \
+            -p:MinVerVersionOverride=${{ steps.ver.outputs.version }}
 
       - name: Pack
         run: |
           dotnet pack Rig.TUnit.slnx -c Release --no-build \
             -o ./artifacts \
-            -p:Version=${{ steps.minver.outputs.version }}
+            -p:MinVerVersionOverride=${{ steps.ver.outputs.version }}
 
       - name: Validate package metadata
         shell: bash

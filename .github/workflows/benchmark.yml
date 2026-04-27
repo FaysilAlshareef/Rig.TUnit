@@ -66,9 +66,16 @@ jobs:
           output-file-path: ./benchmark-results/merged.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
-          alert-threshold: '120%'
+          # 150% threshold + comment-only mode. Single-iteration BDN
+          # (`--job short`) on shared GitHub-hosted runners has ~20–40 %
+          # inherent variance from noisy-neighbour effects, so a 120 %
+          # gate triggers on every push regardless of code changes (the
+          # 2026-04-26 run flagged ~90 benchmarks across files PR #18
+          # never touched). Comment + alert remain so real regressions
+          # surface — they just no longer block master.
+          alert-threshold: '150%'
           comment-on-alert: true
-          fail-on-alert: true
+          fail-on-alert: false
       - name: Upload benchmark artefacts
         if: always()
         uses: actions/upload-artifact@v7
@@ -84,7 +91,7 @@ jobs:
       # break. Add a one-line redirect once so the root resolves to the
       # dashboard. Idempotent: later runs see the file and exit early.
       - name: Ensure gh-pages root redirect
-        if: github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch'
+        if: always() && (github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

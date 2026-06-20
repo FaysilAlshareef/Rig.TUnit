@@ -22,7 +22,7 @@ jobs:
     name: Build + Unit + Arch
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -66,7 +66,7 @@ jobs:
       matrix:
         provider: [SqlServer, Sqlite, Postgresql, MySql, Oracle]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -101,7 +101,7 @@ jobs:
       matrix:
         provider: [Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb, Redis, Cosmos]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -134,7 +134,7 @@ jobs:
       matrix:
         provider: [Memory, Redis, Hybrid, Fusion]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -162,7 +162,7 @@ jobs:
       matrix:
         provider: [Kafka, Nats, RabbitMq, ServiceBus, Sqs]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -190,7 +190,7 @@ jobs:
       matrix:
         component: [Contracts, EventSourcing, Inbox, Outbox, Saga, Snapshots]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -218,7 +218,7 @@ jobs:
       matrix:
         area: [Jwt, Mtls, OAuth, Policies]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -246,7 +246,7 @@ jobs:
       matrix:
         provider: [Logging, Metrics, Tracing, Seq, AppInsights]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -274,7 +274,7 @@ jobs:
       matrix:
         provider: [FileSystem, MinIO, S3, AzureBlob]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -302,7 +302,7 @@ jobs:
       matrix:
         area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience, Core, Ci, Grpc, Http, WebAPI, Mediator]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -343,7 +343,7 @@ jobs:
       - integration-storage
       - integration-core
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -439,7 +439,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Check RED → GREEN subject pairing
@@ -510,7 +510,7 @@ jobs:
     if: |
       github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -634,7 +634,7 @@ jobs:
     name: Architecture tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
@@ -659,7 +659,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check links in README.md
         uses: lycheeverse/lychee-action@v2
         with:
@@ -685,7 +685,7 @@ jobs:
     name: Pack & validate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # MinVer needs full tag history
       - uses: ./.github/actions/setup-dotnet-cache

@@ -23,7 +23,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore
@@ -67,7 +67,7 @@ jobs:
         provider: [SqlServer, Sqlite, Postgresql, MySql, Oracle]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Pull provider image (warm cache)
@@ -102,7 +102,7 @@ jobs:
         provider: [Mongo, Cassandra, Dynamo, ElasticSearch, KurrentDb, Redis, Cosmos]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Skip Cosmos on Windows
@@ -135,7 +135,7 @@ jobs:
         provider: [Memory, Redis, Hybrid, Fusion]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -163,7 +163,7 @@ jobs:
         provider: [Kafka, Nats, RabbitMq, ServiceBus, Sqs]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -191,7 +191,7 @@ jobs:
         component: [Contracts, EventSourcing, Inbox, Outbox, Saga, Snapshots]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -219,7 +219,7 @@ jobs:
         area: [Jwt, Mtls, OAuth, Policies]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -247,7 +247,7 @@ jobs:
         provider: [Logging, Metrics, Tracing, Seq, AppInsights]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -275,7 +275,7 @@ jobs:
         provider: [FileSystem, MinIO, S3, AzureBlob]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -303,7 +303,7 @@ jobs:
         area: [Concurrency, Docker, HealthChecks, Parallelism, Resilience, Core, Ci, Grpc, Http, WebAPI, Mediator]
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
@@ -344,7 +344,7 @@ jobs:
       - integration-core
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Download all test-results artifacts
@@ -511,7 +511,7 @@ jobs:
       github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Extract + build snippets
@@ -635,7 +635,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '10.0.x'
       - name: Restore + Build
